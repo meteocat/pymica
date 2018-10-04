@@ -1,0 +1,28 @@
+{
+    "autoDocstring.docstringFormat": "google",
+    "cSpell.words": [
+        "catalunya",
+        "clustered",
+        "coef",
+        "coefs",
+        "meteorològic",
+        "numpy",
+        "pymica",
+        "pynterpolate",
+        "scipy",
+        "servei",
+        "sklearn"
+    ],
+    "python.pythonPath": "~/anaconda3/envs/pymica/bin/python",
+    "python.unitTest.unittestArgs": [
+        "-v",
+        "-s",
+        "./test",
+        "-p",
+        "*_test.py"
+    ],
+    "python.unitTest.pyTestEnabled": false,
+    "python.unitTest.nosetestsEnabled": false,
+    "python.unitTest.unittestEnabled": true,
+    "python.linting.flake8Enabled": true
+}

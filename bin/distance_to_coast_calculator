@@ -1,0 +1,3 @@
+#!/usr/bin/env python
+
+print("I'm the distance to coast calculator skeleton")

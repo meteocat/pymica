@@ -1,0 +1,5 @@
+name: pymica
+dependencies:
+  - numpy
+  - scipy
+  - scikit-learn
