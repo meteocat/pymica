@@ -5,11 +5,35 @@ until the score is under a threshold
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
+from typing import Dict, List, Union
 
 
 class MultiRegression:
+    """
+    Calculates a multiple linear regression given the provided data.
+    There is a maximum score that prevents adding more variables if reached.
+    """
 
-    def __init__(self, data, y_var='temp', x_vars=['altitude', 'dist']):
+    def __init__(self, data: List[Dict[str, Union[str, float]]],
+                 id: str = 'id',
+                 y_var: str = 'temp', x_vars: list = ['altitude', 'dist'],
+                 score_threshold: float = 0.05):
+        """
+        Args:
+            data (list): The input data, as a list of dicts
+                         with the id, y_var and x_vars values
+            id (str, optional): Defaults to 'id'.
+                                The identifier key name
+            y_var (str, optional): Defaults to 'temp'.
+                                   The dict key used for the y variable
+            x_vars (list, optional): Defaults to ['altitude', 'dist'].
+                                     The dict keys used for the x variable
+            score_threshold (float): Defaults to 0.05.
+                                     The maximum score improvement that
+                                     prevents the function adding
+                                     more variables
+        """
+
         self.regr = LinearRegression()
         self.x_data = {}
         self.used_vars = []
@@ -17,11 +41,12 @@ class MultiRegression:
         for x_var in x_vars:
             self.x_data[x_var] = []
         self.y_data = []
-        self.keys = sorted(data.keys())
-        for key in self.keys:
+        self.keys = []
+        for value in data:
             for x_var in x_vars:
-                self.x_data[x_var].append(data[key][x_var])
-            self.y_data.append(data[key][y_var])
+                self.x_data[x_var].append(value[x_var])
+            self.y_data.append(value[y_var])
+            self.keys.append(value[id])
 
         left_vars = x_vars[:]
         final_score = 0
@@ -34,6 +59,7 @@ class MultiRegression:
                 self.regr.fit(x_data, self.y_data)
 
                 score = self.regr.score(x_data, self.y_data)
+                print(x_var, score)
                 if score > max_score:
                     max_score = score
                     chosen_var = x_var
@@ -42,7 +68,7 @@ class MultiRegression:
             else:
                 left_vars.remove(chosen_var)
 
-                if max_score - final_score > 0.05:
+                if max_score - final_score > score_threshold:
                     final_score = max_score
                     self.used_vars.append(chosen_var)
 
@@ -72,14 +98,34 @@ class MultiRegression:
         return self.score
 
     def get_mae(self):
+        """Returns the regression's Mean Absolute Error
+
+        Returns:
+            float: The MAE value
+        """
+
         predict = self.regr.predict(self.x_final_data)
         return mean_absolute_error(self.y_data, predict)
 
     def get_mse(self):
+        """Returns the regression's Mean Square Error
+
+        Returns:
+            float: The MSE value
+        """
+
         predict = self.regr.predict(self.x_final_data)
         return mean_squared_error(self.y_data, predict)
 
     def get_residuals(self):
+        """Returns all the regression residuals
+        (predicted value minus the actual value)
+
+        Returns:
+            dict: A dict where the key is the id of the data
+                  and the value the residual
+        """
+
         predict = self.regr.predict(self.x_final_data)
         residuals_array = predict - self.y_data
 
@@ -90,7 +136,17 @@ class MultiRegression:
             i += 1
         return residuals
 
-    def predict_point(self, x_data):
+    def predict_point(self, x_data: Dict[str, float]):
+        """Returns the predicted value given the x variables (predictors)
+
+        Args:
+            x_data (Dict[str, float]): the x variable values with
+                                       the var names as the keys
+
+        Returns:
+            float: The predicted value
+        """
+
         data = [[]]
         for var in self.used_vars:
             data[0].append(x_data[var])
@@ -98,7 +154,18 @@ class MultiRegression:
         predict = self.regr.predict(data)
         return predict[0]
 
-    def predict_points(self, x_data):
+    def predict_points(self, x_data: List[Dict[str, float]]):
+        """Returns the predicted values for multiple points given the
+           x variables (predictors)
+
+        Args:
+            x_data (List[Dict[str, float]]): the x variable values list
+                                             with the var names as the keys
+
+        Returns:
+            List[float]: The predicted values
+        """
+
         data = []
         for point_data in x_data:
             point_vars = []
