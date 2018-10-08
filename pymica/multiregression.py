@@ -5,6 +5,8 @@ until the score is under a threshold
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
+from numpy import std
+from numpy import array
 from typing import Dict, List, Union
 
 
@@ -35,20 +37,30 @@ class MultiRegression:
         """
 
         self.regr = LinearRegression()
-        self.x_data = {}
-        self.used_vars = []
+        self.score_threshold = score_threshold
+        self.x_vars = x_vars
+        self.y_var = y_var
+        self.data = data
+        self.id = id
 
-        for x_var in x_vars:
+        self._init_multiregression()
+
+    def _init_multiregression(self):
+
+        self.used_vars = []
+        self.x_data = {}
+
+        for x_var in self.x_vars:
             self.x_data[x_var] = []
         self.y_data = []
         self.keys = []
-        for value in data:
-            for x_var in x_vars:
+        for value in self.data:
+            for x_var in self.x_vars:
                 self.x_data[x_var].append(value[x_var])
-            self.y_data.append(value[y_var])
-            self.keys.append(value[id])
+            self.y_data.append(value[self.y_var])
+            self.keys.append(value[self.id])
 
-        left_vars = x_vars[:]
+        left_vars = self.x_vars[:]
         final_score = 0
 
         while len(left_vars) > 0:
@@ -59,7 +71,6 @@ class MultiRegression:
                 self.regr.fit(x_data, self.y_data)
 
                 score = self.regr.score(x_data, self.y_data)
-                print(x_var, score)
                 if score > max_score:
                     max_score = score
                     chosen_var = x_var
@@ -68,7 +79,7 @@ class MultiRegression:
             else:
                 left_vars.remove(chosen_var)
 
-                if max_score - final_score > score_threshold:
+                if max_score - final_score > self.score_threshold:
                     final_score = max_score
                     self.used_vars.append(chosen_var)
 
@@ -174,3 +185,38 @@ class MultiRegression:
             data.append(point_vars)
         predict = self.regr.predict(data)
         return predict
+
+
+class MultiRegressionSigma(MultiRegression):
+    def __init__(self,  *args, sigma_limit=1.5, **kwargs):
+        """
+        Calculates a multiple linear regression like in :meth:`MultiRegression`
+        and eliminates the points where the data error is bigger than a
+        threshold before re-calculating the regression again.
+        The idea is geting a better fitting function.
+
+        The class inherits all the parameters and methods from
+        :meth:`MultiRegression`, but adds:
+
+        Args:
+            sigma_limit (float, optional): Defaults to 1.5.
+                    The maximum error allowed to the data,
+                    in multiples of the sigma value.
+                    The error that is above this is erased before
+                    re-calculating the regression
+        """
+        limit = 0.1
+        super().__init__(*args, **kwargs)
+        residues = self.get_residuals()
+        sigma = std(array(list(residues.values())))
+        # self._init_multiregression()
+        new_data = []
+        i = 0
+        for key in residues.keys():
+            if (abs(residues[key]) < sigma * sigma_limit or abs(
+                    residues[key]) < limit):
+
+                new_data.append(self.data[i])
+            i += 1
+        self.data = new_data
+        self._init_multiregression()
