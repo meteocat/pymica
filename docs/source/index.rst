@@ -8,15 +8,12 @@ Welcome to pyMICA's documentation!
 
 Meteorological variable Interpolation based on Clustered Analysis. 
 
-multiregression
----------------
-
-.. automodule:: pymica.multiregression
-    :members:
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+   
+   installation
+   regression
 
 
 
