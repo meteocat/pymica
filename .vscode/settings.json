@@ -5,7 +5,13 @@
         "clustered",
         "coef",
         "coefs",
+        "dtree",
+        "k",
         "meteorològic",
+        "minkowski",
+        "ndarray",
+        "neighbour",
+        "neighbours",
         "numpy",
         "pymica",
         "pynterpolate",
@@ -24,5 +30,8 @@
     "python.unitTest.pyTestEnabled": false,
     "python.unitTest.nosetestsEnabled": false,
     "python.unitTest.unittestEnabled": true,
-    "python.linting.flake8Enabled": true
+    "python.linting.flake8Enabled": true,
+    "python.linting.pylintArgs": [
+        "--extension-pkg-whitelist=numpy,scipy"
+    ]
 }

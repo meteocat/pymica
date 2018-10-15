@@ -14,6 +14,7 @@ Meteorological variable Interpolation based on Clustered Analysis.
    
    installation
    regression
+   interpolation
 
 
 
