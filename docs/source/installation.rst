@@ -10,9 +10,10 @@ setup.py
 
 :code:`python3 setup.py install`
 
-
 pip
 ---
+
+pip install -r requirements.txt
 
 :code:`pip install pymica`
 

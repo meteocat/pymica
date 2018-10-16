@@ -5,6 +5,8 @@
         "clustered",
         "coef",
         "coefs",
+        "cython",
+        "cythonize",
         "dtree",
         "k",
         "meteorològic",
@@ -13,6 +15,7 @@
         "neighbour",
         "neighbours",
         "numpy",
+        "pylint",
         "pymica",
         "pynterpolate",
         "scipy",
@@ -31,6 +34,7 @@
     "python.unitTest.nosetestsEnabled": false,
     "python.unitTest.unittestEnabled": true,
     "python.linting.flake8Enabled": true,
+    "python.linting.pep8Enabled": false,
     "python.linting.pylintArgs": [
         "--extension-pkg-whitelist=numpy,scipy"
     ]

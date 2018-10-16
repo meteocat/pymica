@@ -2,12 +2,11 @@
 Calculates a multiple linear regression recursively adding variables,
 until the score is under a threshold
 """
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
-from sklearn.metrics import mean_absolute_error
-from numpy import std
-from numpy import array
 from typing import Dict, List, Union
+
+from numpy import array, std
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 
 class MultiRegression:

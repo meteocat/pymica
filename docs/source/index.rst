@@ -13,6 +13,7 @@ Meteorological variable Interpolation based on Clustered Analysis.
    :caption: Contents:
    
    installation
+   calculate_field
    regression
    interpolation
 

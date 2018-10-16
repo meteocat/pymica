@@ -113,9 +113,6 @@ class Tree(object):
         Returns:
             (N,) ndarray: Corresponding scores.
 
-        Notes:
-        ------
-        Wrapper around __call__().
         """
         return self.__call__(coordinates, num_nearest, eps,
                              p_norm, regularize_by)
