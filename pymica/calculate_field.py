@@ -1,5 +1,5 @@
 '''Calculates the interpolation for a field, using the points data,
-the interpolation options and the residuals calculation
+the interpolation options and the residuals calculation.
 '''
 from pymica.multiregression import MultiRegression
 from pymica.multiregression import MultiRegressionSigma
