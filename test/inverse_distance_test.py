@@ -1,5 +1,5 @@
 import unittest
-from inverse_distance import inverse_distance  # pylint: disable=E0611
+from interpolation.inverse_distance import inverse_distance  # pylint: disable=E0611
 from numpy import array
 from datetime import datetime
 

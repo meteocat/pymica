@@ -10,7 +10,7 @@ This can be done using several methods:
 Inverse of the distance
 -----------------------
 
-.. automodule:: inverse_distance
+.. automodule:: interpolation.inverse_distance
     :members:
 
 IDW

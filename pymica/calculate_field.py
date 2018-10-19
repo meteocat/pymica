@@ -2,7 +2,7 @@
 the interpolation options and the residuals calculation.
 '''
 import numpy as np
-from inverse_distance import inverse_distance  # pylint: disable=E0611
+from interpolation.inverse_distance import inverse_distance  # pylint: disable=E0611
 from pymica.apply_regression import apply_regression
 from pymica.multiregression import MultiRegression, MultiRegressionSigma
 
