@@ -1,5 +1,9 @@
-import setuptools
+'''Standard setup.py file to install the library.
+Run python setup.py --help for options
+'''
 import datetime
+
+import setuptools
 
 version = "0.0"
 release = "0.0.1"
@@ -7,16 +11,37 @@ name = "pyMICA"
 
 now = datetime.datetime.now()
 
+try:
+    from Cython.Build import cythonize
+    # If called before, it fails: https://github.com/pypa/setuptools/issues/309#issuecomment-202915959
+    from distutils.extension import Extension
+except ImportError:
+    from distutils.extension import Extension
+    has_cython = False
+    ext_extention = 'c'
+else:
+    has_cython = True
+    ext_extention = 'pyx'
+
+ext_modules = [Extension("interpolation.inverse_distance",
+               ['interpolation/inverse_distance.' + ext_extention])]
+
+for e in ext_modules:
+    e.cython_directives = {"embedsignature": True}
+
+if has_cython is True:
+    ext_modules = cythonize(ext_modules)
+    
 setuptools.setup(
     name=name,
     version=version,
-    description="pyMICA, Meteorological variable Interpolation based on Clustered Analysis" +
-    "on clustered analysis",
+    description="pyMICA, Meteorological variable Interpolation based" +
+    "on Clustered Analysis",
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
     url="https://github.com/pypa/sampleproject",
     packages=setuptools.find_packages(),
-    install_requires=['numpy', 'scipy', 'scikit-learn'],
+    install_requires=['cython', 'numpy', 'scipy', 'scikit-learn'],
     scripts=['bin/distance_to_coast_calculator'],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
@@ -33,6 +58,7 @@ setuptools.setup(
             'release': ('setup.py', release),
             'copyright': ('setup.py',
                           str(now.year)+",Servei Meteorològic de Catalunya")
-            }},
-
+            }
+        },
+    ext_modules=ext_modules
 )
