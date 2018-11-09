@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+import json
+from cluster.create_clusters import create_clusters
+
+if __name__ == '__main__':
+    fp = open("./test/data/sample_station_metadata.json")
+    data = json.load(fp)
+    create_clusters(data, 3)
+
+    '''
+    fp = open("./test/data/sample_station_metadata.json")
+    import json
+    data = json.load(fp)
+    out_data = []
+    for station in data:
+        out_data.append({'id': station['codi'], 'alt': station['altitud'], 'lon': station['coordenades']['longitud'], 'lat': station['coordenades']['latitud']})
+    print(out_data)
+    fp.close()
+    fp = open("./test/data/sample_station_metadata2.json", 'w')
+    json.dump(out_data, fp)
+    '''
