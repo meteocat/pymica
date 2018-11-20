@@ -1,14 +1,12 @@
 import json
 import unittest
-
-from cluster.create_clusters import create_clusters
-from cluster.create_clusters import calculate_utm_def
-
 from pyproj import Proj
 
+from cluster.create_clusters import calculate_utm_def, create_clusters
 
-class TestInverseDistance(unittest.TestCase):
-    def test_inverse_distance(self):
+
+class TestCreateClusters(unittest.TestCase):
+    def test_create_clusters(self):
         fp = open("./test/data/sample_station_metadata.json")
         data = json.load(fp)
         create_clusters(data, 3)
@@ -41,4 +39,3 @@ class TestInverseDistance(unittest.TestCase):
         self.assertIsInstance(result, Proj)
         self.assertEqual(set(result(point[0], point[1])),
                          set(expected(point[0], point[1])))
-

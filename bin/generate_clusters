@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+'''Generates the clusters GeoJSON from the locations and
+the help of the browser
+'''
+
+import argparse
+
+from cluster.create_clusters import create_clusters
+
+if __name__ == '__main__':
+    PARSER = argparse.ArgumentParser(description='Creates clusters from ' +
+                                     'data locations to be used by PyMICA')
+    PARSER.add_argument('locations_file', type=str,
+                        help='The file path with the locations')
+    PARSER.add_argument('num_clusters', type=int,
+                        help='The number of clusters to generate')
+    ARGS = PARSER.parse_args()
+
+    try:
+        create_clusters(ARGS.locations_file, ARGS.num_clusters)
+    except Exception as err:
+        print(err)

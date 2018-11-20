@@ -1,14 +1,10 @@
 '''Tool for creating and editing clusters with the K-Means method
 '''
-import asyncio
-import http.server
-import socketserver
 import webbrowser
-import sys
-from json import dumps
+
+from json import dumps, load
 from math import floor
-from os import chdir
-from shutil import copytree, rmtree
+from shutil import copytree
 from tempfile import mkdtemp
 
 import numpy as np
@@ -21,9 +17,13 @@ def create_clusters(locations, n_clusters):
        to edit the result
 
     Args:
-        locations (list): The locations list
+        locations (list, str): The locations list or the file path with the
+                               json data
         n_clusters (int): The number of clusters to create
     """
+    if isinstance(locations, str):
+        f_p = open(locations)
+        locations = load(f_p)
 
     positions = np.zeros([len(locations), 2])
     calculate_utm_def([locations[0]['lon'], locations[0]['lat']])
@@ -59,57 +59,17 @@ def create_clusters(locations, n_clusters):
     f_p.write(dumps(out_geojson))
     f_p.close()
 
-    chdir(web_dir+"/web")
-    port = 8087
-
-    Handler = http.server.SimpleHTTPRequestHandler
-
-    httpd = socketserver.TCPServer(("", port), Handler)
-    print("serving at port", port)
-    webbrowser.open("http://127.0.0.1:" + str(port), new=2)
-    #asyncio.run(open_browser(2, port))
-    asyncio.run(close_after(100, httpd, web_dir))
-    
-    httpd.serve_forever()
-    print("ENCARA")
-
-
-async def open_browser(delay, port):
-    """Opens browser after some seconds, so the server is running
-    
-    Args:
-        delay (int): Seconds to wait before opening
-        port (int): Port to open at the localhost
-    """
-
-    await asyncio.sleep(delay)
-    webbrowser.open("http://127.0.0.1:" + str(port), new=2)
-
-
-async def close_after(delay, httpd, web_dir):
-    """Closes the script after a delay, so the serve_forever is stopped
-    
-    Args:
-        delay (int): Seconds to wait before closing
-        httpd (obj): The web server instance
-        web_dir (str): The web dir path to be deleted before leaving
-    """
-
-    await asyncio.sleep(delay)
-    print("Closing the server")
-    rmtree(web_dir)
-    httpd.shutdown()
-    sys.exit()  # httpd.shutdown() doesn't work...
+    webbrowser.get('firefox').open_new_tab(web_dir + "/web/index.html")
 
 
 def calculate_utm_def(point):
     """Returns the proj4 definition, calculating the utm zone from
     a point definition
-    
+
     Args:
         point (list): A two element list with the lon and lat values
                       from a point
-    
+
     Returns:
         object: The pyproj.Proj object to use to convert
     """
