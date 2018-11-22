@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+'''Script that calculates the distance to the coast file
+from the shore geometry
+'''
+
+import argparse
+
+import gdal
+import osr
+
+from distance.distance_to_sea import get_dist_array
+
+
+def write_data(data, geotransform, epsg, size, out_file):
+    driver = gdal.GetDriverByName('GTIFF')
+    ds_out = driver.Create(out_file, size[0],
+                           size[1],
+                           1, gdal.GDT_Float32)
+    ds_out.SetGeoTransform(geotransform)
+    proj = osr.SpatialReference()
+    proj.ImportFromEPSG(epsg)
+    ds_out.SetProjection(proj.ExportToWkt())
+
+    ds_out.GetRasterBand(1).WriteArray(data)
+    ds_out = None
+
+if __name__ == '__main__':
+    PARSER = argparse.ArgumentParser(description='Calculates the distance ' +
+                                     'to the coast file from the ' +
+                                     'shore geometry.')
+
+    PARSER.add_argument('shore_file', type=str,
+                        help='The GeoJSON file path with the ' +
+                        'shore line')
+    PARSER.add_argument('out_file', type=str,
+                        help='The output file name')
+
+    PARSER.add_argument('--epsg', type=int,
+                        help='The output file projection EPSG code. ' +
+                        'By default, 25831',
+                        default=25831)
+    PARSER.add_argument('--size', type=int,
+                        nargs=2,
+                        metavar=('x_size', 'y_size'),
+                        help='The output file size in pixels',
+                        default=[1000, 1000])
+    PARSER.add_argument('--origin', type=float,
+                        nargs=2,
+                        metavar=('x', 'y'),
+                        help='The output file origin coordinates',
+                        default=[260000.0, 4750000.0])
+    PARSER.add_argument('--pixel_size', type=float,
+                        nargs=2,
+                        metavar=('pixel_x', 'pixel_y'),
+                        help='The output file pixel size',
+                        default=[270.0, -270.0])
+    PARSER.add_argument('--verbose', type=bool,
+                        help='Output progress',
+                        default=True)
+
+    ARGS = PARSER.parse_args()
+
+    try:
+        data = get_dist_array(ARGS.epsg, (ARGS.origin[0], ARGS.pixel_size[0],
+                                          0, ARGS.origin[1], 0,
+                                          ARGS.pixel_size[1]),
+                              ARGS.size,
+                              ARGS.shore_file, ARGS.verbose)
+        write_data(data, (ARGS.origin[0], ARGS.pixel_size[0],
+                          0, ARGS.origin[1], 0,
+                          ARGS.pixel_size[1]), ARGS.epsg,
+                          ARGS.size, ARGS.out_file)
+    except IOError as err:
+        print(err)

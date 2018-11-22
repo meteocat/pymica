@@ -88,7 +88,7 @@ def calculate_utm_def(point):
     return proj
 
 
-def get_dist_array(proj, geotransform, size, dist_file):
+def get_dist_array(proj, geotransform, size, dist_file, verbose=True):
     '''Creates a numpy array with the distance to the coast values applying
     the dist2func to all the actual distances so the values go from 0 to 1
     
@@ -126,6 +126,8 @@ def get_dist_array(proj, geotransform, size, dist_file):
     out_array = ones([size[1], size[0]])
 
     for i in range(size[0]):
+        if verbose:
+            print("\rProgress: {:.1f}%".format(100*(i/size[0])), end='', flush=True)
         for j in range(size[1]):
             x_coord = i * geotransform[1] + geotransform[0]
             y_coord = j * geotransform[5] + geotransform[3]
@@ -136,5 +138,6 @@ def get_dist_array(proj, geotransform, size, dist_file):
             dist = point.Distance(geom)
 
             out_array[j, i] = dist2func(dist)
-
+    if verbose:  
+        print("\rProgress: 100%  ")
     return out_array
