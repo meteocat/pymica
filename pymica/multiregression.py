@@ -2,8 +2,6 @@
 Calculates a multiple linear regression recursively adding variables,
 until the score is under a threshold
 """
-from typing import Dict, List, Union
-
 from numpy import array, std
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error
@@ -15,19 +13,19 @@ class MultiRegression:
     There is a maximum score that prevents adding more variables if reached.
     """
 
-    def __init__(self, data: List[Dict[str, Union[str, float]]],
-                 id: str = 'id',
-                 y_var: str = 'temp', x_vars: list = ['altitude', 'dist'],
-                 score_threshold: float = 0.05):
+    def __init__(self, data,
+                 id_key='id',
+                 y_var='temp', x_vars=('altitude', 'dist'),
+                 score_threshold=0.05):
         """
         Args:
             data (list): The input data, as a list of dicts
                          with the id, y_var and x_vars values
-            id (str, optional): Defaults to 'id'.
+            id_key (str, optional): Defaults to 'id'.
                                 The identifier key name
             y_var (str, optional): Defaults to 'temp'.
                                    The dict key used for the y variable
-            x_vars (list, optional): Defaults to ['altitude', 'dist'].
+            x_vars (seq, list, optional): Defaults to ['altitude', 'dist'].
                                      The dict keys used for the x variable
             score_threshold (float): Defaults to 0.05.
                                      The maximum score improvement that
@@ -35,17 +33,17 @@ class MultiRegression:
                                      more variables
         """
 
-        self.regr = LinearRegression()
         self.score_threshold = score_threshold
-        self.x_vars = x_vars
+        self.x_vars = list(x_vars)
         self.y_var = y_var
         self.data = data
-        self.id = id
+        self.id_key = id_key
 
         self._init_multiregression()
 
     def _init_multiregression(self):
 
+        self.regr = LinearRegression()
         self.used_vars = []
         self.x_data = {}
 
@@ -57,12 +55,12 @@ class MultiRegression:
             for x_var in self.x_vars:
                 self.x_data[x_var].append(value[x_var])
             self.y_data.append(value[self.y_var])
-            self.keys.append(value[self.id])
+            self.keys.append(value[self.id_key])
 
         left_vars = self.x_vars[:]
         final_score = 0
 
-        while len(left_vars) > 0:
+        while left_vars:
             max_score = 0
             chosen_var = None
             for x_var in left_vars:
@@ -95,16 +93,21 @@ class MultiRegression:
         return list(zip(*data))
 
     def get_coefs(self):
+        '''Returns the regression coefficients and independent term
+
+        Returns:
+            list: The n coefficients and then the intercept or independent term
+        '''
+
         return [self.regr.coef_, self.regr.intercept_]
 
-    def get_vars_coefs(self):
-        vars_coefs = {"residual": self.regr.intercept_}
-        for i in range(len(self.used_vars)):
-            vars_coefs[self.used_vars[i]] = self.regr.coef_[i]
-
-        return vars_coefs
-
     def get_score(self):
+        '''Returns the global regression score
+
+        Returns:
+            float: The score from 0 to 1
+        '''
+
         return self.score
 
     def get_mae(self):
@@ -135,7 +138,6 @@ class MultiRegression:
             dict: A dict where the key is the id of the data
                   and the value the residual
         """
-
         predict = self.regr.predict(self.x_final_data)
         residuals_array = predict - self.y_data
 
@@ -146,7 +148,7 @@ class MultiRegression:
             i += 1
         return residuals
 
-    def predict_point(self, x_data: Dict[str, float]):
+    def predict_point(self, x_data):
         """Returns the predicted value given the x variables (predictors)
 
         Args:
@@ -164,7 +166,7 @@ class MultiRegression:
         predict = self.regr.predict(data)
         return predict[0]
 
-    def predict_points(self, x_data: List[Dict[str, float]]):
+    def predict_points(self, x_data):
         """Returns the predicted values for multiple points given the
            x variables (predictors)
 
@@ -187,14 +189,14 @@ class MultiRegression:
 
 
 class MultiRegressionSigma(MultiRegression):
-    def __init__(self,  *args, sigma_limit=1.5, **kwargs):
-        """
-        Calculates a multiple linear regression like in :meth:`MultiRegression`
+    """Calculates a multiple linear regression like in :meth:`MultiRegression`
         and eliminates the points where the data error is bigger than a
         threshold before re-calculating the regression again.
         The idea is geting a better fitting function.
+    """
 
-        The class inherits all the parameters and methods from
+    def __init__(self, *args, sigma_limit=1.5, **kwargs):
+        """The class inherits all the parameters and methods from
         :meth:`MultiRegression`, but adds:
 
         Args:
@@ -206,16 +208,46 @@ class MultiRegressionSigma(MultiRegression):
         """
         limit = 0.1
         super().__init__(*args, **kwargs)
-        residues = self.get_residuals()
+        residues = super().get_residuals()
         sigma = std(array(list(residues.values())))
-        # self._init_multiregression()
         new_data = []
         i = 0
-        for key in residues.keys():
+        for key in residues:
             if (abs(residues[key]) < sigma * sigma_limit or abs(
                     residues[key]) < limit):
 
                 new_data.append(self.data[i])
             i += 1
+        self.original_data = self.data.copy()
         self.data = new_data
         self._init_multiregression()
+
+    def get_residuals(self):
+        """Returns all the regression residuals
+        (predicted value minus the actual value)
+        including the points eliminated because of
+        the sigma value
+
+        Returns:
+            dict: A dict where the key is the id of the data
+                  and the value the residual
+        """
+        y_data = []
+        keys = []
+        for point in self.original_data:
+            point_values = []
+            for var in self.x_data:
+                point_values.append(point[var])
+            y_data.append(point[self.y_var])
+            keys.append(point[self.id_key])
+
+        predict = self.predict_points(self.original_data)
+
+        residuals_array = predict - y_data
+        residuals = {}
+
+        i = 0
+        for key in keys:
+            residuals[key] = residuals_array[i]
+            i += 1
+        return residuals
