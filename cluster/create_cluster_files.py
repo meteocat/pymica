@@ -20,10 +20,9 @@ def create_reprojected_geoms(file_name, epsg):
     Returns:
         osgeo.ogr.DataSource: The reprojected ogr datasource object
     '''
-
     out_proj = osr.SpatialReference()
     out_proj.ImportFromEPSG(epsg)
-    if out_proj.ExportToPrettyWkt():
+    if len(out_proj.ExportToPrettyWkt()) <= 1:
         raise ValueError("Wrong EPSG code: {}".format(epsg))
 
     in_proj = osr.SpatialReference()
@@ -96,7 +95,8 @@ def rasterize_clusters(ds_in, out_conf, sigma=15):
         gdal.RasterizeLayer(ds_out, [i + 1], layer, burn_values=[1])
 
     data = ds_out.ReadAsArray().astype(numpy.float32)
-    blurred = gaussian_filter(data[0], sigma)
+    for i in range(num_layers):
+        blurred = gaussian_filter(data[i], sigma)
+        ds_out.GetRasterBand(i + 1).WriteArray(blurred)
 
-    ds_out.GetRasterBand(1).WriteArray(blurred)
     ds_out = None

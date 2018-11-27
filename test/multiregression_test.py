@@ -90,7 +90,7 @@ class TestMultiRegression(unittest.TestCase):
                  'altitude': 0.5},
                 {'name': 'CC', 'hr': 1, 'temp': 1, 'dist': 0, 'altitude': 1}
                 ]
-        inst_regression = MultiRegression(data, id='name')
+        inst_regression = MultiRegression(data, id_key='name')
 
         residuals = inst_regression.get_residuals()
         self.assertTrue('BB' in residuals)

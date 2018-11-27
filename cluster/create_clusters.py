@@ -26,7 +26,6 @@ def create_clusters(locations, n_clusters):
         locations = load(f_p)
 
     positions = np.zeros([len(locations), 2])
-    calculate_utm_def([locations[0]['lon'], locations[0]['lat']])
     utm = calculate_utm_def([locations[0]['lon'], locations[0]['lat']])
     positions_list = []
     for i in range(len(locations)):

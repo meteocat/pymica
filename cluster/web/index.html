@@ -35,6 +35,10 @@ var detailsDiv = d3.select("#content")
                   .style('background-color', '#bdb');
 detailsDiv.text("Click on the circles for details and changes");
 
+var downloadDiv = d3.select("#content")
+                  .append("div")
+                  .style('width', width+'px')
+                  .style('background-color', '#bdb');
 Promise.all([
     d3.json("world-50m.v1.json"),
     d3.json("points.json"),
@@ -49,11 +53,17 @@ Promise.all([
     .projection(projection);
  
 
-  var clusters = [0, 1, 2];
+  maxCluster = points.features.reduce((a,b) => {return a.properties.cluster<b.properties.cluster?b:a;});
+  var clusters = Array.apply(null, {length: 1 + maxCluster.properties.cluster}).map(Number.call, Number);
 
   calculateZones(points, clusters, path2);
 
-   
+  downloadDiv.append("button").text("Download clusters file")
+            .on("click", () => {
+                let dataStr = JSON.stringify(outJSON);
+                var blob = new Blob([dataStr], {type: "text/json;charset=utf-8"});
+                saveAs(blob, "clusters.json");
+            }); 
 
   svg.selectAll(".point")
     .data(points.features)
@@ -83,12 +93,6 @@ Promise.all([
             calculateZones(points, clusters, path);
 
         });
-        detailsDiv.append("button").text("Download clusters")
-            .on("click", () => {
-                let dataStr = JSON.stringify(outJSON);
-                var blob = new Blob([dataStr], {type: "text/json;charset=utf-8"});
-                saveAs(blob, "clusters.json");
-            });
     })
     .on("mouseover", function(d){
         d3.select(this).style("cursor", "pointer");
@@ -122,16 +126,6 @@ const calculateZones = (points, clusters, path) => {
                 .filter((d, i) => {
                     return points.features[i].properties.cluster === cluster_id; 
                 }))});
-/*
-    merged.forEach(d=>{
-        d.coordinates[0][0].forEach(f => {
-            f[0] = f[0]<0?0:f[0];
-            f[0] = f[0]>60?6:f[0];
-            f[1] = f[1]<35?35:f[1];
-            f[1] = f[1]>45?45:f[1];
-        });
-    });
-    console.info(merged);*/
     
     let voronoiZones = svg.selectAll(".voronoi")
         .data(merged);

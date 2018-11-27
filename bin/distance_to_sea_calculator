@@ -24,6 +24,7 @@ def write_data(data, geotransform, epsg, size, out_file):
     ds_out.GetRasterBand(1).WriteArray(data)
     ds_out = None
 
+
 if __name__ == '__main__':
     PARSER = argparse.ArgumentParser(description='Calculates the distance ' +
                                      'to the coast file from the ' +
@@ -61,14 +62,14 @@ if __name__ == '__main__':
     ARGS = PARSER.parse_args()
 
     try:
-        data = get_dist_array(ARGS.epsg, (ARGS.origin[0], ARGS.pixel_size[0],
+        DATA = get_dist_array(ARGS.epsg, (ARGS.origin[0], ARGS.pixel_size[0],
                                           0, ARGS.origin[1], 0,
                                           ARGS.pixel_size[1]),
                               ARGS.size,
                               ARGS.shore_file, ARGS.verbose)
-        write_data(data, (ARGS.origin[0], ARGS.pixel_size[0],
+        write_data(DATA, (ARGS.origin[0], ARGS.pixel_size[0],
                           0, ARGS.origin[1], 0,
                           ARGS.pixel_size[1]), ARGS.epsg,
-                          ARGS.size, ARGS.out_file)
+                   ARGS.size, ARGS.out_file)
     except IOError as err:
         print(err)
