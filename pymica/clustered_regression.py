@@ -54,17 +54,6 @@ class ClusteredRegression:
                 self.final_cluster_file = cluster_file
                 self.mse = file_mse
 
-    def get_mse(self):
-        '''Returns the calculated Mean Square Error for all the points
-        after getting the residuals. If using clusters, each cluster mse
-        is weighted by the number of points
-
-        Returns:
-            float: The mse value
-        '''
-
-        return self.mse
-
     def predict_points(self, x_data):
         '''Returns the predicted values for multiple points given the
            x variables (predictors). The formula applied will depend on

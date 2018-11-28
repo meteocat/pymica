@@ -14,7 +14,7 @@ class TestClusteredRegression(unittest.TestCase):
         inst = ClusteredRegression(data,
                                    ["./test/data/clusters.json"])
         self.assertEqual(len(inst.final_data), 3)
-        self.assertAlmostEqual(inst.get_mse(), 2.1828, 3)
+        self.assertAlmostEqual(inst.mse, 2.1828, 3)
 
     def test_predict_points(self):
         f_p = open("./test/data/sample_data.json")
