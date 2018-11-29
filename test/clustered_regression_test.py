@@ -16,6 +16,29 @@ class TestClusteredRegression(unittest.TestCase):
         self.assertEqual(len(inst.final_data), 3)
         self.assertAlmostEqual(inst.mse, 2.1828, 3)
 
+        with self.assertRaises(FileNotFoundError) as cm:
+            ClusteredRegression(data, ["BadFile"])
+        self.assertEqual(
+            "File not found, or not ogr compatible BadFile",
+            str(cm.exception))
+
+        with self.assertRaises(ValueError) as cm:
+            ClusteredRegression(data, 23)
+        self.assertEqual(
+            "cluster file must be a list",
+            str(cm.exception))
+
+    def test_get_residuals(self):
+        f_p = open("./test/data/sample_data.json")
+        data = json.load(f_p)
+        f_p.close()
+        inst = ClusteredRegression(data,
+                                   ["./test/data/clusters.json"])
+        result = inst.get_residuals()
+        self.assertEqual(len(data), len(result))
+        for point in data:
+            self.assertTrue(point['id'] in result)
+
     def test_predict_points(self):
         f_p = open("./test/data/sample_data.json")
         data = json.load(f_p)

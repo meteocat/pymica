@@ -28,31 +28,46 @@ class ClusteredRegression:
         self.final_data = [data]
         self.final_cluster_file = None
 
-        for cluster_file in clusters_files:
-            cluster_file_regressions = []
-            file_mse = 0
-            clustered_data = __filter_data_by_cluster__(data,
-                                                        cluster_file)
-            for data_in_cluster in clustered_data:
-                mse_all = __get_cluster_mse__(residuals_all,
-                                              data_in_cluster)
+        try:
+            for cluster_file in clusters_files:
+                cluster_file_regressions = []
+                file_mse = 0
+                clustered_data = __filter_data_by_cluster__(data,
+                                                            cluster_file)
+                for data_in_cluster in clustered_data:
+                    mse_all = __get_cluster_mse__(residuals_all,
+                                                data_in_cluster)
 
-                cluster_regression = MultiRegressionSigma(data_in_cluster)
-                mse_cluster = __get_residuals_mse__(cluster_regression
-                                                    .get_residuals())
-                if mse_all > mse_cluster:
-                    cluster_file_regressions.append(cluster_regression)
-                    file_mse += (mse_cluster * len(data_in_cluster))
-                else:
-                    cluster_file_regressions.append(regr_all)
-                    file_mse += mse_all * len(data_in_cluster)
+                    cluster_regression = MultiRegressionSigma(data_in_cluster)
+                    mse_cluster = __get_residuals_mse__(cluster_regression
+                                                        .get_residuals())
+                    if mse_all > mse_cluster:
+                        cluster_file_regressions.append(cluster_regression)
+                        file_mse += (mse_cluster * len(data_in_cluster))
+                    else:
+                        cluster_file_regressions.append(regr_all)
+                        file_mse += mse_all * len(data_in_cluster)
 
-            file_mse = file_mse / len(data)
-            if file_mse < self.mse:
-                self.final_regr = cluster_file_regressions
-                self.final_data = clustered_data
-                self.final_cluster_file = cluster_file
-                self.mse = file_mse
+                file_mse = file_mse / len(data)
+                if file_mse < self.mse:
+                    self.final_regr = cluster_file_regressions
+                    self.final_data = clustered_data
+                    self.final_cluster_file = cluster_file
+                    self.mse = file_mse
+        except TypeError:
+            raise ValueError("cluster file must be a list")
+
+    def get_residuals(self):
+        '''Gets the residuals for each point, using the cluster regresion
+        
+        Returns:
+            dict: The residuals with the id of the point as a key
+        '''
+
+        out = {}
+        for regr in self.final_regr:
+            out = {**out, **regr.get_residuals()}
+        return out
 
     def predict_points(self, x_data):
         '''Returns the predicted values for multiple points given the
@@ -85,6 +100,8 @@ class ClusteredRegression:
 
 def __filter_data_by_cluster__(data, cluster):
     ds_in = ogr.Open(cluster)
+    if not ds_in:
+        raise FileNotFoundError("File not found, or not ogr compatible {}".format(cluster))
     layer = ds_in.GetLayer()
     num_clusters = layer.GetFeatureCount()
     classified_data = []
