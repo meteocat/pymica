@@ -13,6 +13,7 @@
         "defn",
         "dtree",
         "ellps",
+        "errno",
         "gtiff",
         "httpd",
         "k",
