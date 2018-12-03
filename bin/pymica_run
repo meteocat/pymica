@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+'''Creates a GeoTIFF file from station data interpolated wit altitude,
+distance to the shore and other variables.
+'''
+import argparse
+
+from pymica.pymica import PyMica
+
+
+if __name__ == '__main__':
+    PARSER = argparse.ArgumentParser(description='Creates a GeoTIFF file ' +
+                                     'with an interpolated variable from ' +
+                                     'station data.')
+    PARSER.add_argument('data_file', type=str,
+                        help='The file path with the station data')
+    PARSER.add_argument('variables_file', type=str,
+                        help='The file path with the variables data')
+    PARSER.add_argument('clusters_file', type=str,
+                        help='The file path with the clusters data')
+    PARSER.add_argument('mask_file', type=str,
+                        help='The file path with the clusters mask data')
+    PARSER.add_argument('outfile', type=str,
+                        help='The out GeoTIFF file')
+    ARGS = PARSER.parse_args()
+
+    try:
+        INST = PyMica(ARGS.data_file,
+                      ["./test/data/dem.tiff", "./test/data/distance.tiff"],
+                      ["./test/data/clusters.json"], "/tmp/mask.tiff")
+        INST.save_file("/tmp/uuu.tiff")
+    except Exception as err:
+        print(err)

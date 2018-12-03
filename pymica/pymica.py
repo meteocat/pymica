@@ -4,11 +4,13 @@ clusters multi-linear regressions corrected with residuals.
 import json
 
 import gdal
-import osr
 import ogr
+import osr
+from numpy import concatenate, newaxis
+
+from interpolation.inverse_distance import inverse_distance
 from pymica.apply_regression import apply_clustered_regression
 from pymica.clustered_regression import ClusteredRegression
-from interpolation.inverse_distance import inverse_distance
 
 
 class PyMica:
@@ -21,8 +23,19 @@ class PyMica:
         with open(data_file, "r") as f_p:
             data = json.load(f_p)
 
-        d_s = gdal.Open(variables_file)
-        variables = d_s.ReadAsArray()
+        if isinstance(variables_file, (list,)):
+            variables = None
+            for layer_file in variables_file:
+                d_s = gdal.Open(layer_file)
+                layer_data = d_s.ReadAsArray()[newaxis, :, :]
+                if variables is None:
+                    variables = layer_data
+                else:
+                    variables = concatenate((variables, layer_data),
+                                            axis=0)
+        else:
+            d_s = gdal.Open(variables_file)
+            variables = d_s.ReadAsArray()
         self.out_proj = osr.SpatialReference()
         self.out_proj.ImportFromWkt(d_s.GetProjection())
         self.size = (d_s.RasterXSize, d_s.RasterYSize)

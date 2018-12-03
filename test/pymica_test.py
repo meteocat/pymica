@@ -49,6 +49,10 @@ class TestPyMica(unittest.TestCase):
 
         inst.save_file("/tmp/out.tiff")
 
+        # Test passing multiple variables files instead of one with all the layers
+        inst = PyMica("./test/data/sample_data.json", [variables_file],
+                      ["./test/data/clusters.json"], mask_file)
+
         '''
         with self.assertRaises(FileNotFoundError) as cm:
             PyMica("BadFile", variables_file,

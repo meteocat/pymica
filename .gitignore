@@ -104,3 +104,6 @@ venv.bak/
 .mypy_cache/
 
 .fuse_*
+
+test/data/distance.tiff
+test/data/dem.tiff
