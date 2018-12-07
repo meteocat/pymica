@@ -1,18 +1,26 @@
 {
     "autoDocstring.docstringFormat": "google",
     "cSpell.words": [
+<<<<<<< HEAD
         "autocorrelation",
         "catalunya",
         "circum",
         "circumcentres",
         "circumcircle",
         "circumcircles",
+=======
+        "astype",
+        "asyncio",
+        "catalunya",
+        "chdir",
+>>>>>>> master
         "clustered",
         "clusters",
         "coef",
         "coefs",
         "cython",
         "cythonize",
+<<<<<<< HEAD
         "delane",
         "delaunay",
         "dtree",
@@ -26,10 +34,26 @@
         "meteorològic",
         "minkowski",
         "mlrs",
+=======
+        "defn",
+        "dtree",
+        "ellps",
+        "gtiff",
+        "httpd",
+        "k",
+        "kmeans",
+        "layer",
+        "meteorològic",
+        "minkowski",
+        "mkdtemp",
+        "nargs",
+>>>>>>> master
         "ndarray",
+        "ndimage",
         "neighbour",
         "neighbours",
         "numpy",
+<<<<<<< HEAD
         "numref",
         "predictand",
         "py",
@@ -38,12 +62,31 @@
         "pynterpolate",
         "rasterized",
         "rmse",
+=======
+        "osgeo",
+        "pylint",
+        "pymica",
+        "pynterpolate",
+        "pyproj",
+        "rasterize",
+        "rasterizes",
+        "reproject",
+        "reprojected",
+        "reprojects",
+        "rmtree",
+>>>>>>> master
         "scipy",
         "semivariogram",
         "servei",
+<<<<<<< HEAD
         "sklearn",
         "voronoi",
         "xema"
+=======
+        "shutil",
+        "sklearn",
+        "transf"
+>>>>>>> master
     ],
     "python.pythonPath": "/home/ecm/anaconda3/envs/pymica/bin/python",
     "python.unitTest.unittestArgs": [

@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+'''Script to generate the clusters raster from the GeoJSON
+'''
+
+import argparse
+import sys
+
+from cluster.create_cluster_files import (create_reprojected_geoms,
+                                          rasterize_clusters)
+
+if __name__ == '__main__':
+    PARSER = argparse.ArgumentParser(description='Creates the cluster files ' +
+                                     'to be used by PyMICA.')
+    PARSER.add_argument('clusters_file', type=str,
+                        help='The GeoJSON file path with the ' +
+                        'clusters definition')
+    PARSER.add_argument('out_file', type=str,
+                        help='The output file name')
+    PARSER.add_argument('--epsg', type=int,
+                        help='The output file projection EPSG code. ' +
+                        'By default, 25831',
+                        default=25831)
+    PARSER.add_argument('--size', type=int,
+                        nargs=2,
+                        metavar=('x_size', 'y_size'),
+                        help='The output file size in pixels',
+                        default=[1000, 1000])
+    PARSER.add_argument('--origin', type=float,
+                        nargs=2,
+                        metavar=('x', 'y'),
+                        help='The output file origin coordinates',
+                        default=[260000.0, 4750000.0])
+    PARSER.add_argument('--pixel_size', type=float,
+                        nargs=2,
+                        metavar=('pixel_x', 'pixel_y'),
+                        help='The output file pixel size',
+                        default=[270.0, -270.0])
+
+    ARGS = PARSER.parse_args()
+
+    try:
+        LAYER = create_reprojected_geoms(ARGS.clusters_file, ARGS.epsg)
+    except IOError as err:
+        print(err)
+        sys.exit()
+
+    rasterize_clusters(LAYER,
+                       {'size': ARGS.size,
+                        'geotransform': (ARGS.origin[0], ARGS.pixel_size[0],
+                                         0, ARGS.origin[1], 0,
+                                         ARGS.pixel_size[1]),
+                        'out_file': ARGS.out_file})

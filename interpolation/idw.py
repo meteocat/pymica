@@ -4,6 +4,8 @@ Inverse distance weighting (IDW)
 Compute the score of query points based on the scores of their k-nearest
 neighbours, weighted by the inverse of their distances.
 
+For more information, see :ref:`Inverse of the distance weighting - IDW`
+
 Credits:
 https://en.wikipedia.org/wiki/Inverse_distance_weighting
 """

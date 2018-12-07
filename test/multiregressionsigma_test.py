@@ -57,3 +57,10 @@ class TestMultiRegressionSigma(unittest.TestCase):
         self.assertAlmostEqual(coefs2[0][0], 3)
         self.assertAlmostEqual(coefs2[1], 1)
         self.assertAlmostEqual(inst_regression.get_score(), 1)
+        # The Multiregression sigma must return the residuals for all the data,
+        # not only the one inside the sigma values
+        self.assertAlmostEqual(len(data), len(inst_regression.get_residuals()))
+
+        inst_regression.predict_points([{'id': 'AA', 'hr': 0, 'temp': 0,
+                                         'dist': 0, 'altitude': 0}])
+        inst_regression.regr.predict([[0, 0, 0]])

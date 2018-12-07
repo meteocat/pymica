@@ -1,16 +1,25 @@
 Interpolation
 =============
+The MICA software obtains an interpolated field through applying the
+regression coefficients to a raster and an anomaly correction. This
+correction is obtained interpolation the regression residuals before
+adding the field to the interpolation result, which can be done using 
+several methods:
 
-The MICA software interpolates the regression residuals before adding the field to the interpolation result.
-This can be done using several methods:
+- :ref:`Inverse of the distance (2D)`
+- :ref:`IDW`
 
-- IDW
-- Inverse of the distance
 
-Inverse of the distance
------------------------
+Apply regression
+----------------
 
-.. automodule:: inverse_distance
+.. automodule:: pymica.apply_regression
+    :members:
+
+Inverse of the distance (2D)
+----------------------------
+
+.. automodule:: interpolation.inverse_distance
     :members:
 
 IDW

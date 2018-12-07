@@ -13,7 +13,8 @@ now = datetime.datetime.now()
 
 try:
     from Cython.Build import cythonize
-    # If called before, it fails: https://github.com/pypa/setuptools/issues/309#issuecomment-202915959
+    # If called before, it fails:
+    # https://github.com/pypa/setuptools/issues/309#issuecomment-202915959
     from distutils.extension import Extension
 except ImportError:
     from distutils.extension import Extension
@@ -24,14 +25,14 @@ else:
     ext_extention = 'pyx'
 
 ext_modules = [Extension("interpolation.inverse_distance",
-               ['interpolation/inverse_distance.' + ext_extention])]
+                         ['interpolation/inverse_distance.' + ext_extention])]
 
 for e in ext_modules:
     e.cython_directives = {"embedsignature": True}
 
 if has_cython is True:
     ext_modules = cythonize(ext_modules)
-    
+
 setuptools.setup(
     name=name,
     version=version,
@@ -42,7 +43,8 @@ setuptools.setup(
     url="https://github.com/pypa/sampleproject",
     packages=setuptools.find_packages(),
     install_requires=['cython', 'numpy', 'scipy', 'scikit-learn'],
-    scripts=['bin/distance_to_coast_calculator'],
+    scripts=['bin/distance_to_sea_calculator', 'bin/create_clusters_file',
+             'bin/generate_clusters'],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Science/Research',

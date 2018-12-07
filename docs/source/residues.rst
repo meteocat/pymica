@@ -4,12 +4,12 @@ There are different residues interpolation techniques available in pyMICA:
 
 - :ref:`Inverse of the distance - 2D`
 - :ref:`Inverse of the distance - 3D`
-- :ref:`Inverse of the distance weighted - IDW`
+- :ref:`Inverse of the distance weighting - IDW`
 - :ref:`3D Ordinary Kriging - OK3D`
 
 Inverse of the distance - 2D
 ----------------------------
-The starting point of MICA used this interpolation technique which takes into account
+This interpolation technique which takes into account
 the Euclidean distance between points and stations. A residue value is calculated for
 every point of the region considering the quadratic inverse of the distance between 
 the point and all the stations. A resultant example map is shown in :numref:`iod_2d`.
@@ -74,8 +74,8 @@ for altitude difference, :math:`W_{ij}` is the sum of station weights and
 
     Plot of the interpolated residues considering Inverse of the distance - 3D.
 
-Inverse of the distance weighted - IDW
---------------------------------------
+Inverse of the distance weighting - IDW
+---------------------------------------
 This is an interpolation method that computes the score of query points 
 based on the scores of their k-nearest neighbours, weighted by the inverse of 
 their distances. It is density dependant as sharp gradient variations are captured
@@ -100,8 +100,7 @@ and an IDW residues interpolation map is shown in :numref:`idw_2d`
 3D Ordinary Kriging - OK3D
 --------------------------
 The last option available for residues interpolation is kriging. In this case, 
-three-dimensional ordinary kriging was selected in order to account for altitude rather than
-horizontal distances only. This methodology is implemented using 
+three-dimensional ordinary kriging was selected. This methodology is implemented using 
 `pyKrige <https://github.com/bsmurphy/PyKrige>`_.
 
 Kriging is similar to IDW as it accounts for the nearest observed values, where observations
