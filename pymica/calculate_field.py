@@ -1,4 +1,5 @@
-'''Calculates the interpolation for a field, using the points data,
+'''
+Calculates the interpolation for a field, using the points data,
 the interpolation options and the residuals calculation.
 '''
 import numpy as np

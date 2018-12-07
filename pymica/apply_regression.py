@@ -1,6 +1,6 @@
 '''
 Once the regression coefficients are calculated, this function applies them
-to a raster
+to a raster.
 '''
 import numpy as np
 
