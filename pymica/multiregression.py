@@ -1,6 +1,8 @@
 """
 Calculates a multiple linear regression recursively adding variables,
 until the score is under a threshold
+
+For more information, please see :ref:`Multiple Linear Regression`.
 """
 from numpy import array, std
 from sklearn.linear_model import LinearRegression

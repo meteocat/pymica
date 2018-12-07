@@ -44,7 +44,7 @@
         "sklearn",
         "transf"
     ],
-    "python.pythonPath": "/home/rvr/anaconda3/envs/pymica/bin/python",
+    "python.pythonPath": "/home/ecm/anaconda3/envs/pymica/bin/python",
     "python.unitTest.unittestArgs": [
         "-v",
         "-s",
