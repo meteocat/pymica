@@ -71,12 +71,12 @@
         "servei",
         "sklearn",
         "voronoi",
-        "xema"
+        "xema",
         "shutil",
         "sklearn",
         "transf"
     ],
-    "python.pythonPath": "~/anaconda3/envs/pymica/bin/python",
+    "python.pythonPath": "/home/ecm/anaconda3/envs/pymica/bin/python",
     "python.unitTest.unittestArgs": [
         "-v",
         "-s",
