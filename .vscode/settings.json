@@ -93,5 +93,6 @@
     "python.linting.pylintPath": "~/anaconda3/envs/pymica/bin/python",
     "python.linting.pylintArgs": [
         "--extension-pkg-whitelist=numpy,scipy"
-    ]
+    ],
+    "restructuredtext.confPath": "${workspaceFolder}/docs/source"
 }

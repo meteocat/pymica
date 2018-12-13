@@ -38,8 +38,8 @@ def apply_regression(regr, raster_data, raster_fields):
 
 
 def apply_clustered_regression(regressions, raster_data, raster_fields, mask):
-    '''The same as apply_regression, but using a "clustered regresion". The result is
-    weighed by a mask array.
+    '''The same as apply_regression, but using a "clustered regresion".
+    The result is weighed by a mask array.
 
     Args:
         regressions (ClusteredRegression): The ClusteredRegression instance

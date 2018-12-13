@@ -67,6 +67,12 @@ class PyMica:
         self.result = out_data - residuals_field
 
     def save_file(self, file_name):
+        '''Saves the calculate field data into a file
+        
+        Args:
+            file_name (str): The output file path
+        '''
+
         driver = gdal.GetDriverByName('GTiff')
         d_s = driver.Create(file_name, self.size[0], self.size[1], 1,
                             gdal.GDT_Float32)

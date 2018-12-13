@@ -22,11 +22,9 @@ the one that performs the best, in terms of RMSE, is selected.
    :caption: Contents:
    
    installation
-   calculate_field
-   regression
-   interpolation
    howitworks
    theory
+   api
 
 
 Indices and tables

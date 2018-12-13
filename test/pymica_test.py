@@ -56,6 +56,8 @@ class TestPyMica(unittest.TestCase):
         inst = PyMica("./test/data/sample_data.json", [self.variables_file],
                       ["./test/data/clusters.json"], self.mask_file)
 
+    
+
     def test_errors(self):
 
         with self.assertRaises(FileNotFoundError) as cm:
@@ -71,4 +73,5 @@ class TestPyMica(unittest.TestCase):
             "[Errno 2] No such file or directory: 'BadFile'",
             str(cm.exception))
         # TODO : mask doesn't exist
+        # TODO : Bad variable names passed
     
