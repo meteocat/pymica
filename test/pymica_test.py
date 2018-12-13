@@ -11,6 +11,8 @@ class TestPyMica(unittest.TestCase):
     def setUpClass(cls):
         cls.variables_file = '/tmp/variables.tiff'
         cls.mask_file = '/tmp/mask.tiff'
+        cls.clusters = {'clusters_files': ["./test/data/clusters.json"],
+                    'mask_file': cls.mask_file}
         size = [1000, 1000]
         alt_data = np.ones(size)
         alt_data[2][2] = 12
@@ -44,18 +46,20 @@ class TestPyMica(unittest.TestCase):
             d_s.GetRasterBand(i + 1).WriteArray(mask[i])
         d_s = None
 
-    @unittest.skip
     def test_init(self):
         inst = PyMica("./test/data/sample_data.json", self.variables_file,
-                      ["./test/data/clusters.json"], self.mask_file)
+                      self.clusters)
         self.assertEqual(inst.result.shape, (1000, 1000))
 
         inst.save_file("/tmp/out.tiff")
 
         # Test passing multiple variable files instead
         # of one with all the layers
-        inst = PyMica("./test/data/sample_data.json", [self.variables_file],
-                      ["./test/data/clusters.json"], self.mask_file)
+        PyMica("./test/data/sample_data.json", [self.variables_file],
+               self.clusters)
+
+        # No clusters
+        PyMica("./test/data/sample_data.json", [self.variables_file])
 
     def test_init_different_vars(self):
         with open("./test/data/sample_data.json") as d_s:
@@ -70,8 +74,7 @@ class TestPyMica(unittest.TestCase):
                        'y_var': 'other_var',
                        'x_vars': ('altitude', 'other_x_var')}
         inst = PyMica("/tmp/sample_data.json", self.variables_file,
-                      ["./test/data/clusters.json"], self.mask_file,
-                      data_format)
+                      self.clusters, data_format)
         self.assertEqual(inst.result.shape, (1000, 1000))
 
     @unittest.skip
@@ -79,7 +82,7 @@ class TestPyMica(unittest.TestCase):
 
         with self.assertRaises(FileNotFoundError) as cm:
             PyMica("BadFile", self.variables_file,
-                   ["./test/data/clusters.json"], self.mask_file)
+                   self.clusters)
         self.assertEqual(
             "[Errno 2] No such file or directory: 'BadFile'",
             str(cm.exception))
@@ -89,6 +92,6 @@ class TestPyMica(unittest.TestCase):
         self.assertEqual(
             "[Errno 2] No such file or directory: 'BadFile'",
             str(cm.exception))
-        # TODO : mask doesn't exist
+        # TODO : mask doesn't exist or clusters bad formatted
         # TODO : Bad variable names passed
     

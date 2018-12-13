@@ -6,11 +6,12 @@ import json
 import gdal
 import ogr
 import osr
-from numpy import concatenate, newaxis
-
 from interpolation.inverse_distance import inverse_distance
-from pymica.apply_regression import apply_clustered_regression
-from pymica.clustered_regression import ClusteredRegression
+from numpy import concatenate, newaxis
+from pymica.apply_regression import (apply_clustered_regression,
+                                     apply_regression)
+from pymica.clustered_regression import (ClusteredRegression,
+                                         MultiRegressionSigma)
 
 
 class PyMica:
@@ -19,9 +20,7 @@ class PyMica:
     errors.
     '''
     def __init__(self, data_file, variables_file,
-                 clusters_files=None, mask_file=None,
-                 data_format=None):
-
+                 clusters=None, data_format=None):
         if data_format is None:
             self.data_format = {'loc_vars': ('lon', 'lat'),
                                 'id_key': 'id',
@@ -35,23 +34,30 @@ class PyMica:
 
         self.__read_variables_files__(variables_file)
 
-        d_s = gdal.Open(mask_file)
-        mask = d_s.ReadAsArray()
-        d_s = None
-
         in_proj = osr.SpatialReference()
         in_proj.ImportFromEPSG(4326)
 
         transf = osr.CoordinateTransformation(in_proj, self.out_proj)
 
-        cl_reg = ClusteredRegression(data, clusters_files,
-                                     data_format=self.data_format)
+        if clusters:
+            d_s = gdal.Open(clusters['mask_file'])
+            mask = d_s.ReadAsArray()
+            d_s = None
 
-        out_data = apply_clustered_regression(cl_reg, self.variables,
-                                              self.data_format['x_vars'], mask)
+            cl_reg = ClusteredRegression(data, clusters['clusters_files'],
+                                         data_format=self.data_format)
+
+            out_data = apply_clustered_regression(cl_reg, self.variables,
+                                                  self.data_format['x_vars'],
+                                                  mask)
+        else:
+            cl_reg = MultiRegressionSigma(data)
+            out_data = apply_regression(cl_reg, self.variables,
+                                        self.data_format['x_vars'])
+
         residuals = cl_reg.get_residuals()
-
         residuals_data = {}
+
         for point in data:
             geom = ogr.Geometry(ogr.wkbPoint)
             geom.AddPoint(point[self.data_format['loc_vars'][0]],
