@@ -17,7 +17,7 @@ def calculate_field(points_data, raster_data, geotransform, sigma=True,
     Args:
         points_data (list): The point data to create the field calculation.
                             All the needed variables must be here, including:
-                            id, y_variable, x_variables, x and y positions
+                            id, y_variable, x_variables, x, y and z positions
         raster_data (np.ndarray): a 3D array with all the x_variables values,
                                   ordered as the x_vars definition
         geotransform (list): The geotransform to translate the points
@@ -54,6 +54,7 @@ def calculate_field(points_data, raster_data, geotransform, sigma=True,
     interpolation_values = {}
     for point in points_data:
         interpolation_values[point['id']] = {'x': point['x'], 'y': point['y'],
+                                             'z': point['z'],
                                              'value': residuals[point['id']]}
 
     residuals = interpolate_residuals([interpolation_values,

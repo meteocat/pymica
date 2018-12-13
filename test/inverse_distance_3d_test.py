@@ -1,10 +1,8 @@
 '''Testing inverse_distance_3d.py file
 '''
-import sys
 import unittest
 from datetime import datetime
 from numpy import array, zeros
-sys.path.append('/home/ecm/Doctorat/MICA/Software/pymica')
 from interpolation.inverse_distance_3d import inverse_distance_3d  # pylint: disable=E0611
 
 
