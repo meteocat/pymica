@@ -44,6 +44,7 @@ class TestPyMica(unittest.TestCase):
             d_s.GetRasterBand(i + 1).WriteArray(mask[i])
         d_s = None
 
+    @unittest.skip
     def test_init(self):
         inst = PyMica("./test/data/sample_data.json", self.variables_file,
                       ["./test/data/clusters.json"], self.mask_file)
@@ -56,8 +57,24 @@ class TestPyMica(unittest.TestCase):
         inst = PyMica("./test/data/sample_data.json", [self.variables_file],
                       ["./test/data/clusters.json"], self.mask_file)
 
-    
+    def test_init_different_vars(self):
+        with open("./test/data/sample_data.json") as d_s:
+            data = d_s.read()
+        with open("/tmp/sample_data.json", "w") as d_s:
+            d_s.write(data.replace('id', 'other_id')
+                          .replace('temp', 'other_var')
+                          .replace('dist', 'other_x_var'))
 
+        data_format = {'loc_vars': ('lon', 'lat'),
+                       'id_key': 'other_id',
+                       'y_var': 'other_var',
+                       'x_vars': ('altitude', 'other_x_var')}
+        inst = PyMica("/tmp/sample_data.json", self.variables_file,
+                      ["./test/data/clusters.json"], self.mask_file,
+                      data_format)
+        self.assertEqual(inst.result.shape, (1000, 1000))
+
+    @unittest.skip
     def test_errors(self):
 
         with self.assertRaises(FileNotFoundError) as cm:

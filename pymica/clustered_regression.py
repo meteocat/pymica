@@ -15,11 +15,19 @@ class ClusteredRegression:
             self.data_format = {'id_key': 'id',
                                 'y_var': 'temp',
                                 'x_vars': ('altitude', 'dist')}
+        else: 
+            self.data_format = data_format
+
         if regression_params is None:
             self.regression_params = {'sigma_limit': 1.5,
                                       'score_threshold': 0.05}
+        else:
+            self.regression_params = regression_params
 
-        regr_all = MultiRegressionSigma(data)
+        regr_all = MultiRegressionSigma(data,
+                                        id_key=self.data_format['id_key'],
+                                        y_var=self.data_format['y_var'],
+                                        x_vars=self.data_format['x_vars'])
         residuals_all = regr_all.get_residuals()
 
         self.mse = __get_residuals_mse__(residuals_all)
@@ -36,9 +44,14 @@ class ClusteredRegression:
                                                             cluster_file)
                 for data_in_cluster in clustered_data:
                     mse_all = __get_cluster_mse__(residuals_all,
-                                                data_in_cluster)
+                                                  data_in_cluster,
+                                                  self.data_format['id_key'])
 
-                    cluster_regression = MultiRegressionSigma(data_in_cluster)
+                    cluster_regression = MultiRegressionSigma(
+                                            data_in_cluster,
+                                            id_key=self.data_format['id_key'],
+                                            y_var=self.data_format['y_var'],
+                                            x_vars=self.data_format['x_vars'])
                     mse_cluster = __get_residuals_mse__(cluster_regression
                                                         .get_residuals())
                     if mse_all > mse_cluster:
@@ -127,8 +140,8 @@ def __get_residuals_mse__(residuals):
     return mse/len(residuals)
 
 
-def __get_cluster_mse__(residuals_all, data_in_cluster):
+def __get_cluster_mse__(residuals_all, data_in_cluster, id_key):
     residuals_sum = 0
     for element in data_in_cluster:
-        residuals_sum += residuals_all[element['id']]**2
+        residuals_sum += residuals_all[element[id_key]]**2
     return residuals_sum/len(data_in_cluster)

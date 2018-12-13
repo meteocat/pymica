@@ -27,6 +27,9 @@ class PyMica:
                                 'id_key': 'id',
                                 'y_var': 'temp',
                                 'x_vars': ('altitude', 'dist')}
+        else:
+            self.data_format = data_format
+
         with open(data_file, "r") as f_p:
             data = json.load(f_p)
 
@@ -55,11 +58,11 @@ class PyMica:
                           point[self.data_format['loc_vars'][1]])
             geom.Transform(transf)
 
-            residuals_data[point['id']] = {'value':
-                                           residuals[point[
-                                               self.data_format[
-                                                   'id_key']]],
-                                           'x': geom.GetX(), 'y': geom.GetY()}
+            residuals_data[point[
+                           self.data_format['id_key']]] = {
+                               'value': residuals[point[
+                                    self.data_format['id_key']]],
+                               'x': geom.GetX(), 'y': geom.GetY()}
 
         residuals_field = inverse_distance(residuals_data, self.size,
                                            self.geotransform)
@@ -68,7 +71,7 @@ class PyMica:
 
     def save_file(self, file_name):
         '''Saves the calculate field data into a file
-        
+
         Args:
             file_name (str): The output file path
         '''
