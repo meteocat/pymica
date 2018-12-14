@@ -21,6 +21,23 @@ class PyMica:
     '''
     def __init__(self, data_file, variables_file,
                  clusters=None, data_format=None):
+        '''
+        Args:
+            data_file (str): The path with the point data
+            variables_file (str, list): The file(s) path(s) containing the
+                                        fields used in the regression
+            clusters (dict, optional): Defaults to None. Two keys,
+                                        clusters_files and mask_files,
+                                        with the paths for the
+                                        cluster definitions and merging data
+            data_format (dict, optional): Defaults to None. The name of the
+                                          variables in the data files.
+                                          Defaults to:
+                                          {'loc_vars': ('lon', 'lat'),
+                                          'id_key': 'id',
+                                          'y_var': 'temp',
+                                          'x_vars': ('altitude', 'dist')}
+        '''
         if data_format is None:
             self.data_format = {'loc_vars': ('lon', 'lat'),
                                 'id_key': 'id',

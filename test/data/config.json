@@ -1,0 +1,9 @@
+{
+    "loc_vars": ["lon", "lat"],
+    "id_key": "id",
+    "y_var": "temp",
+    "x_vars": ["altitude", "dist"],
+    "variables_file": "/tmp/variables.tiff",
+    "clusters_files": ["./test/data/clusters.json"],                
+    "mask_files": ["/tmp/mask.tiff"]
+}
