@@ -15,11 +15,19 @@ class ClusteredRegression:
             self.data_format = {'id_key': 'id',
                                 'y_var': 'temp',
                                 'x_vars': ('altitude', 'dist')}
+        else: 
+            self.data_format = data_format
+
         if regression_params is None:
             self.regression_params = {'sigma_limit': 1.5,
                                       'score_threshold': 0.05}
+        else:
+            self.regression_params = regression_params
 
-        regr_all = MultiRegressionSigma(data)
+        regr_all = MultiRegressionSigma(data,
+                                        id_key=self.data_format['id_key'],
+                                        y_var=self.data_format['y_var'],
+                                        x_vars=self.data_format['x_vars'])
         residuals_all = regr_all.get_residuals()
 
         self.mse = __get_residuals_mse__(residuals_all)
@@ -28,42 +36,51 @@ class ClusteredRegression:
         self.final_data = [data]
         self.final_cluster_file = None
 
-        for cluster_file in clusters_files:
-            cluster_file_regressions = []
-            file_mse = 0
-            clustered_data = __filter_data_by_cluster__(data,
-                                                        cluster_file)
-            for data_in_cluster in clustered_data:
-                mse_all = __get_cluster_mse__(residuals_all,
-                                              data_in_cluster)
+        try:
+            for cluster_file in clusters_files:
+                cluster_file_regressions = []
+                file_mse = 0
+                clustered_data = __filter_data_by_cluster__(data,
+                                                            cluster_file)
+                for data_in_cluster in clustered_data:
+                    mse_all = __get_cluster_mse__(residuals_all,
+                                                  data_in_cluster,
+                                                  self.data_format['id_key'])
 
-                cluster_regression = MultiRegressionSigma(data_in_cluster)
-                mse_cluster = __get_residuals_mse__(cluster_regression
-                                                    .get_residuals())
-                if mse_all > mse_cluster:
-                    cluster_file_regressions.append(cluster_regression)
-                    file_mse += (mse_cluster * len(data_in_cluster))
-                else:
-                    cluster_file_regressions.append(regr_all)
-                    file_mse += mse_all * len(data_in_cluster)
+                    cluster_regression = MultiRegressionSigma(
+                                            data_in_cluster,
+                                            id_key=self.data_format['id_key'],
+                                            y_var=self.data_format['y_var'],
+                                            x_vars=self.data_format['x_vars'])
+                    mse_cluster = __get_residuals_mse__(cluster_regression
+                                                        .get_residuals())
+                    if mse_all > mse_cluster:
+                        cluster_file_regressions.append(cluster_regression)
+                        file_mse += (mse_cluster * len(data_in_cluster))
+                    else:
+                        cluster_file_regressions.append(regr_all)
+                        file_mse += mse_all * len(data_in_cluster)
 
-            file_mse = file_mse / len(data)
-            if file_mse < self.mse:
-                self.final_regr = cluster_file_regressions
-                self.final_data = clustered_data
-                self.final_cluster_file = cluster_file
-                self.mse = file_mse
+                file_mse = file_mse / len(data)
+                if file_mse < self.mse:
+                    self.final_regr = cluster_file_regressions
+                    self.final_data = clustered_data
+                    self.final_cluster_file = cluster_file
+                    self.mse = file_mse
+        except TypeError:
+            raise ValueError("cluster file must be a list")
 
-    def get_mse(self):
-        '''Returns the calculated Mean Square Error for all the points
-        after getting the residuals. If using clusters, each cluster mse
-        is weighted by the number of points
-
+    def get_residuals(self):
+        '''Gets the residuals for each point, using the cluster regresion
+        
         Returns:
-            float: The mse value
+            dict: The residuals with the id of the point as a key
         '''
 
-        return self.mse
+        out = {}
+        for regr in self.final_regr:
+            out = {**out, **regr.get_residuals()}
+        return out
 
     def predict_points(self, x_data):
         '''Returns the predicted values for multiple points given the
@@ -96,6 +113,8 @@ class ClusteredRegression:
 
 def __filter_data_by_cluster__(data, cluster):
     ds_in = ogr.Open(cluster)
+    if not ds_in:
+        raise FileNotFoundError("File not found, or not ogr compatible {}".format(cluster))
     layer = ds_in.GetLayer()
     num_clusters = layer.GetFeatureCount()
     classified_data = []
@@ -121,8 +140,8 @@ def __get_residuals_mse__(residuals):
     return mse/len(residuals)
 
 
-def __get_cluster_mse__(residuals_all, data_in_cluster):
+def __get_cluster_mse__(residuals_all, data_in_cluster, id_key):
     residuals_sum = 0
     for element in data_in_cluster:
-        residuals_sum += residuals_all[element['id']]**2
+        residuals_sum += residuals_all[element[id_key]]**2
     return residuals_sum/len(data_in_cluster)

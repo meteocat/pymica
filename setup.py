@@ -43,8 +43,9 @@ setuptools.setup(
     url="https://github.com/pypa/sampleproject",
     packages=setuptools.find_packages(),
     install_requires=['cython', 'numpy', 'scipy', 'scikit-learn'],
-    scripts=['bin/distance_to_sea_calculator', 'bin/create_clusters_file',
-             'bin/generate_clusters'],
+    scripts=['bin/pymica_distance_to_sea_calculator',
+             'bin/pymica_create_clusters_file',
+             'pymica_bin/generate_clusters'],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Science/Research',

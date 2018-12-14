@@ -3,6 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. image:: _static/logo.svg
+
 Welcome to pyMICA's documentation!
 ==================================
 
@@ -22,11 +24,9 @@ the one that performs the best, in terms of RMSE, is selected.
    :caption: Contents:
    
    installation
-   calculate_field
-   regression
-   interpolation
    howitworks
    theory
+   api
 
 
 Indices and tables
