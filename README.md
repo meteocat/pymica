@@ -1,5 +1,7 @@
 [![GitHub release](https://img.shields.io/github/release-pre/meteocat/pymica.svg)](https://github.com/meteocat/pymica/releases)
 
+[![Logo](docs/source/_static/logo.svg)](#)
+
 (py)Meteorological variable Interpolation based on Clustered Analysis
 =====================================================================
 
