@@ -12,7 +12,7 @@ class TestPyMica(unittest.TestCase):
         cls.variables_file = '/tmp/variables.tiff'
         cls.mask_file = '/tmp/mask.tiff'
         cls.clusters = {'clusters_files': ["./test/data/clusters.json"],
-                    'mask_file': cls.mask_file}
+                    'mask_files': [cls.mask_file]}
         size = [1000, 1000]
         alt_data = np.ones(size)
         alt_data[2][2] = 12
@@ -60,6 +60,13 @@ class TestPyMica(unittest.TestCase):
 
         # No clusters
         PyMica("./test/data/sample_data.json", [self.variables_file])
+
+        # Multiple clusters
+        clusters2 = {'clusters_files': ["./test/data/clusters.json",
+                                        "./test/data/clusters5.json"],
+                     'mask_files': [self.mask_file, self.mask_file]}
+        PyMica("./test/data/sample_data.json", [self.variables_file],
+               clusters2)
 
     def test_init_different_vars(self):
         with open("./test/data/sample_data.json") as d_s:
