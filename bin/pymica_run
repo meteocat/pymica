@@ -4,8 +4,8 @@ distance to the shore and other variables.
 '''
 import argparse
 import json
-import sys
 
+from pymica.pymica import PyMica
 
 def pymica_run(data_file, out_file, config_file):
     '''Runs the pymica program, by selecting and checking the configuration
