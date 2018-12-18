@@ -1,8 +1,11 @@
+import json
 import unittest
-from pymica.apply_regression import apply_regression
-from pymica.multiregression import MultiRegressionSigma
-import numpy as np
 from datetime import datetime
+
+import numpy as np
+from pymica.apply_regression import apply_regression, apply_clustered_regression
+from pymica.clustered_regression import ClusteredRegression
+from pymica.multiregression import MultiRegressionSigma
 
 
 class ApplyRegressionTest(unittest.TestCase):
@@ -20,11 +23,10 @@ class ApplyRegressionTest(unittest.TestCase):
         dist_data = np.ones(size)
 
         inst = MultiRegressionSigma(data, y_var='temp', x_vars=['altitude', 'dist'])
-        coefs = inst.get_coefs()
 
         in_data = alt_data.reshape([1, 5, 5])
 
-        result = apply_regression(coefs, in_data)
+        result = apply_regression(inst, in_data, ['altitude', 'dist'])
 
         self.assertEqual(result.shape[0], size[1])
         self.assertEqual(result.shape[1], size[0])
@@ -40,10 +42,9 @@ class ApplyRegressionTest(unittest.TestCase):
 
         inst = MultiRegressionSigma(data, y_var='temp',
                                     x_vars=['altitude', 'dist'])
-        coefs = inst.get_coefs()
         in_data = np.array([alt_data, dist_data])
 
-        result = apply_regression(coefs, in_data)
+        result = apply_regression(inst, in_data, ['altitude', 'dist'])
 
         self.assertEqual(result.shape[0], size[1])
         self.assertEqual(result.shape[1], size[0])
@@ -56,7 +57,7 @@ class ApplyRegressionTest(unittest.TestCase):
         dist_data = np.ones(size)
         in_data = np.array([alt_data, dist_data])
         now = datetime.utcnow()
-        result = apply_regression(coefs, in_data)
+        result = apply_regression(inst, in_data, ['altitude', 'dist'])
 
         spent_time = datetime.utcnow() - now
         print("Time for 1000x1000:", spent_time.total_seconds(), "s")
@@ -69,12 +70,11 @@ class ApplyRegressionTest(unittest.TestCase):
                 ]
         inst = MultiRegressionSigma(data, y_var='temp',
                                     x_vars=['altitude', 'dist'])
-        coefs = inst.get_coefs()
 
         in_data = np.ones([5, 5])
 
         with self.assertRaises(ValueError) as cm:
-            apply_regression(coefs, in_data)
+            apply_regression(inst, in_data, ['altitude', 'dist'])
         self.assertEqual(
             "raster_data must be a 3 dimensional array",
             str(cm.exception))
@@ -82,7 +82,32 @@ class ApplyRegressionTest(unittest.TestCase):
         in_data = [5, 5]
 
         with self.assertRaises(ValueError) as cm:
-            apply_regression(coefs, in_data)
+            apply_regression(inst, in_data, ['altitude', 'dist'])
         self.assertEqual(
             "raster_data must be a 3 dimensional array",
             str(cm.exception))
+
+    def test_apply_clustered_regression(self):
+        f_p = open("./test/data/sample_data.json")
+        data = json.load(f_p)
+        f_p.close()
+        inst = ClusteredRegression(data,
+                                   ["./test/data/clusters.json"])
+
+        size = [1000, 1000]
+        alt_data = np.ones(size)
+        alt_data[2][2] = 12
+
+        dist_data = np.ones(size)
+
+        in_data = np.array([alt_data, dist_data])
+
+        # An arbitrary mask to check the effect
+        mask = np.zeros([3, 1000, 1000])
+        for i in range(3):
+            for j in range(500):
+                mask[i][i*250 + j][:] = 1 - j/550
+
+        result = apply_clustered_regression(inst, in_data, ['altitude', 'dist'],
+                                            mask)
+        self.assertEqual(list(result.shape), size) 

@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+'''Creates a GeoTIFF file from station data interpolated wit altitude,
+distance to the shore and other variables.
+'''
+import argparse
+import json
+
+from pymica.pymica import PyMica
+
+
+def pymica_run(data_file, out_file, config_file):
+    '''Runs the pymica program, by selecting and checking the configuration
+    
+    Args:
+        data_file (str): The data file path
+        out_file (str): The output file path
+        config_file (str): The configuration file path
+    '''
+    with open(config_file) as f_p:
+        config = json.load(f_p)
+
+        try:
+            data_format = {'loc_vars': config['loc_vars'],
+                           'id_key': config['id_key'],
+                           'y_var': config['y_var'],
+                           'x_vars': config['x_vars']}
+            clusters = {'clusters_files': config['clusters_files'],
+                        'mask_files': config['mask_files']}
+        except KeyError as err:
+            raise ValueError("The configuration file has some " +
+                             "missing key: {}".format(err))
+
+        inst = PyMica(data_file, config['variables_file'],
+                      clusters, data_format)
+
+        inst.save_file(out_file)
+
+
+if __name__ == '__main__':
+    PARSER = argparse.ArgumentParser(description='Creates a GeoTIFF file ' +
+                                     'with an interpolated variable from ' +
+                                     'station data.')
+    PARSER.add_argument('data_file', type=str,
+                        help='The file path with the station data')
+    PARSER.add_argument('out_file', type=str,
+                        help='The out GeoTIFF file')
+    PARSER.add_argument('config_file', type=str,
+                        help='The configuration file')
+    ARGS = PARSER.parse_args()
+
+    try:
+        pymica_run(ARGS.data_file, ARGS.out_file, ARGS.config_file)
+    except Exception as err:
+        print(err)

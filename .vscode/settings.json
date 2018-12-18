@@ -33,6 +33,7 @@
         "defn",
         "dtree",
         "ellps",
+        "errno",
         "gtiff",
         "httpd",
         "k",
@@ -89,7 +90,9 @@
     "python.unitTest.unittestEnabled": true,
     "python.linting.flake8Enabled": true,
     "python.linting.pep8Enabled": false,
+    "python.linting.pylintPath": "~/anaconda3/envs/pymica/bin/python",
     "python.linting.pylintArgs": [
         "--extension-pkg-whitelist=numpy,scipy"
-    ]
+    ],
+    "restructuredtext.confPath": "${workspaceFolder}/docs/source"
 }
