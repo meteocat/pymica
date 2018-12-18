@@ -4,8 +4,7 @@ distance to the shore and other variables.
 '''
 import argparse
 import json
-
-from pymica.pymica import PyMica
+import sys
 
 
 def pymica_run(data_file, out_file, config_file):
@@ -31,7 +30,7 @@ def pymica_run(data_file, out_file, config_file):
                              "missing key: {}".format(err))
 
         inst = PyMica(data_file, config['variables_file'],
-                      clusters, data_format)
+                      clusters, data_format, config['residuals_int'])
 
         inst.save_file(out_file)
 

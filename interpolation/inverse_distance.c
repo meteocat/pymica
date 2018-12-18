@@ -3097,11 +3097,11 @@ static PyObject *__pyx_pf_13interpolation_16inverse_distance_inverse_distance(CY
   /* "interpolation/inverse_distance.pyx":60
  * 
  *     cdef int i, j
- *     cdef int xsize = size[0]             # <<<<<<<<<<<<<<
- *     cdef int ysize = size[1]
+ *     cdef int xsize = size[1]             # <<<<<<<<<<<<<<
+ *     cdef int ysize = size[0]
  *     cdef double y
  */
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_size, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_size, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 60, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 60, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3109,12 +3109,12 @@ static PyObject *__pyx_pf_13interpolation_16inverse_distance_inverse_distance(CY
 
   /* "interpolation/inverse_distance.pyx":61
  *     cdef int i, j
- *     cdef int xsize = size[0]
- *     cdef int ysize = size[1]             # <<<<<<<<<<<<<<
+ *     cdef int xsize = size[1]
+ *     cdef int ysize = size[0]             # <<<<<<<<<<<<<<
  *     cdef double y
  *     cdef double x
  */
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_size, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_size, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;

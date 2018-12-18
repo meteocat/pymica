@@ -7,6 +7,7 @@ API
 * :ref:`Calculate Field`
 * :ref:`Interpolation`
     * :ref:`Inverse of the distance (2D)`
+    * :ref:`Inverse of the distance (3D)`
     * :ref:`IDW`
 * :ref:`Cluster creation`
     * :ref:`Create clusters`
@@ -54,6 +55,12 @@ Inverse of the distance (2D)
 ############################
 
 .. automodule:: interpolation.inverse_distance
+    :members:
+
+Inverse of the distance (3D)
+############################
+
+.. automodule:: interpolation.inverse_distance_3d
     :members:
 
 IDW

@@ -57,8 +57,8 @@ def inverse_distance(residues, size, geotransform):
     cdef double[:] cvalues = values
 
     cdef int i, j
-    cdef int xsize = size[0]
-    cdef int ysize = size[1]
+    cdef int xsize = size[1]
+    cdef int ysize = size[0]
     cdef double y
     cdef double x
 

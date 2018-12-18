@@ -47,7 +47,7 @@ setuptools.setup(
     install_requires=['cython', 'numpy', 'scipy', 'scikit-learn'],
     scripts=['bin/pymica_distance_to_sea_calculator',
              'bin/pymica_create_clusters_file',
-             'pymica_bin/generate_clusters'],
+             'bin/pymica_generate_clusters'],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Science/Research',

@@ -1,8 +1,9 @@
 #cython: boundscheck=False, wraparound=False, nonecheck=False, cdivision=True
 """
-A residue value is calculated for a point considering the quadratic inverse
-of the distance between the point and all the stations. For more information,
-see :ref:`Inverse of the distance - 2D`.
+A residue value is calculated for a point considering not only the distance 
+between the point and all the stations, but also their altitude difference. 
+
+For more information, see :ref:`Inverse of the distance - 3D`.
 """
 
 import numpy as np
@@ -63,8 +64,8 @@ def inverse_distance_3d(residues: Dict[str, Dict[str, float]],
     cdef double[:] cvalues = values
 
     cdef int i, j
-    cdef int xsize = size[0]
-    cdef int ysize = size[1]
+    cdef int xsize = size[1]
+    cdef int ysize = size[0]
     cdef double y
     cdef double x
     cdef double z
