@@ -25,7 +25,9 @@ else:
     ext_extention = 'pyx'
 
 ext_modules = [Extension("interpolation.inverse_distance",
-                         ['interpolation/inverse_distance.' + ext_extention])]
+                         ['interpolation/inverse_distance.' + ext_extention]),
+               Extension("interpolation.inverse_distance_3d",
+                         ['interpolation/inverse_distance_3d.' + ext_extention])]
 
 for e in ext_modules:
     e.cython_directives = {"embedsignature": True}
@@ -45,7 +47,7 @@ setuptools.setup(
     install_requires=['cython', 'numpy', 'scipy', 'scikit-learn'],
     scripts=['bin/pymica_distance_to_sea_calculator',
              'bin/pymica_create_clusters_file',
-             'pymica_bin/generate_clusters'],
+             'bin/pymica_generate_clusters'],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Science/Research',

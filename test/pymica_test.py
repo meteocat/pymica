@@ -99,6 +99,15 @@ class TestPyMica(unittest.TestCase):
         self.assertEqual(
             "[Errno 2] No such file or directory: 'BadFile'",
             str(cm.exception))
+
+        with self.assertRaises(ValueError) as cm:
+            PyMica("./test/data/sample_data.json", self.variables_file,
+                   residuals_int='BadMethdology')
+        self.assertEqual(
+            "[Errno 2]residuals_int must be \"id2d\"," +
+            " \"id3d\" or \"idw\"",
+            str(cm.exception)
+            )
         # TODO : mask doesn't exist or clusters bad formatted
         # TODO : Bad variable names passed
     

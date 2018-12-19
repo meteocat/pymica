@@ -7,6 +7,8 @@ import gdal
 import ogr
 import osr
 from interpolation.inverse_distance import inverse_distance
+from interpolation.inverse_distance_3d import inverse_distance_3d
+from interpolation.idw import Tree
 from numpy import concatenate, newaxis
 from pymica.apply_regression import (apply_clustered_regression,
                                      apply_regression)
@@ -20,7 +22,7 @@ class PyMica:
     errors.
     '''
     def __init__(self, data_file, variables_file,
-                 clusters=None, data_format=None):
+                 clusters=None, data_format=None, residuals_int='id2d'):
         '''
         Args:
             data_file (str): The path with the point data
@@ -37,6 +39,9 @@ class PyMica:
                                           'id_key': 'id',
                                           'y_var': 'temp',
                                           'x_vars': ('altitude', 'dist')}
+            residuals_int (str) = The indicator of the residuals interpolation
+                                  methodology. Defaults to 'id2d'.
+                                  Methodologies available: id2d, id3d and idw.
         '''
         if data_format is None:
             self.data_format = {'loc_vars': ('lon', 'lat'),
@@ -88,10 +93,24 @@ class PyMica:
                            self.data_format['id_key']]] = {
                                'value': residuals[point[
                                     self.data_format['id_key']]],
-                               'x': geom.GetX(), 'y': geom.GetY()}
+                               'x': geom.GetX(), 'y': geom.GetY(),
+                               'z': point['altitude']}
 
-        residuals_field = inverse_distance(residuals_data, self.size,
-                                           self.geotransform)
+        if residuals_int == 'id2d':
+            residuals_field = inverse_distance(residuals_data, self.size,
+                                               self.geotransform)
+        elif residuals_int == 'id3d':
+            dem = gdal.Open(variables_file[self.data_format['x_vars'].index('altitude')])
+            dem = dem.ReadAsArray()
+            residuals_field = inverse_distance_3d(residuals_data, self.size,
+                                                  self.geotransform, dem)
+        elif residuals_int == 'idw':
+            inst_tree = Tree()
+            residuals_field = inst_tree.idw(residuals_data, self.size,
+                                            self.geotransform)
+        else:
+            raise ValueError("[Errno 2]residuals_int must be \"id2d\"," +
+                             " \"id3d\" or \"idw\"")
 
         self.result = out_data - residuals_field
 
@@ -103,7 +122,7 @@ class PyMica:
         '''
 
         driver = gdal.GetDriverByName('GTiff')
-        d_s = driver.Create(file_name, self.size[0], self.size[1], 1,
+        d_s = driver.Create(file_name, self.size[1], self.size[0], 1,
                             gdal.GDT_Float32)
         d_s.SetGeoTransform(self.geotransform)
         d_s.SetProjection(self.out_proj.ExportToWkt())
@@ -132,6 +151,6 @@ class PyMica:
 
         self.out_proj = osr.SpatialReference()
         self.out_proj.ImportFromWkt(d_s.GetProjection())
-        self.size = (d_s.RasterXSize, d_s.RasterYSize)
+        self.size = (d_s.RasterYSize, d_s.RasterXSize)
         self.geotransform = d_s.GetGeoTransform()
         d_s = None

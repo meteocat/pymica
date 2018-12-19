@@ -66,5 +66,5 @@ dependencies:
   - zlib=1.2.11=ha838bed_2
   - pip:
     - sphinx-rtd-theme==0.4.2
-prefix: /home/rvr/anaconda3/envs/pymica
+prefix: ~/anaconda3/envs/pymica
 

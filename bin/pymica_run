@@ -7,7 +7,6 @@ import json
 
 from pymica.pymica import PyMica
 
-
 def pymica_run(data_file, out_file, config_file):
     '''Runs the pymica program, by selecting and checking the configuration
     
@@ -31,7 +30,7 @@ def pymica_run(data_file, out_file, config_file):
                              "missing key: {}".format(err))
 
         inst = PyMica(data_file, config['variables_file'],
-                      clusters, data_format)
+                      clusters, data_format, config['residuals_int'])
 
         inst.save_file(out_file)
 

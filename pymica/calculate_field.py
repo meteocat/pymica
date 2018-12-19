@@ -3,7 +3,7 @@ Calculates the interpolation for a field, using the points data,
 the interpolation options and the residuals calculation.
 '''
 import numpy as np
-from interpolation.inverse_distance import inverse_distance  # pylint: disable=E0611
+from interpolation.inverse_distance import inverse_distance
 from pymica.apply_regression import apply_regression
 from pymica.multiregression import MultiRegression, MultiRegressionSigma
 
@@ -16,7 +16,7 @@ def calculate_field(points_data, raster_data, geotransform, sigma=True):
     Args:
         points_data (list): The point data to create the field calculation.
                             All the needed variables must be here, including:
-                            id, y_variable, x_variables, x and y positions
+                            id, y_variable, x_variables, x, y and z positions
         raster_data (np.ndarray): a 3D array with all the x_variables values,
                                   ordered as the x_vars definition
         geotransform (list): The geotransform to translate the points
@@ -53,8 +53,10 @@ def calculate_field(points_data, raster_data, geotransform, sigma=True):
         interpolation_values[point['id']] = {'x': point['x'], 'y': point['y'],
                                              'value': residuals[point['id']]}
 
-    residuals = inverse_distance(interpolation_values,
+    residuals = inverse_distance([interpolation_values,
                                  [raster_data[0].shape[1],
-                                  raster_data[0].shape[0]],
-                                 geotransform)
+                                  raster_data[1].shape[0]],
+                                  geotransform],
+                                 )
+
     return regression_field - residuals
