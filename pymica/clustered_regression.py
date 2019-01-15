@@ -58,6 +58,7 @@ class ClusteredRegression:
                         cluster_file_regressions.append(cluster_regression)
                         file_mse += (mse_cluster * len(data_in_cluster))
                     else:
+                        regr_all.original_data = cluster_regression.original_data
                         cluster_file_regressions.append(regr_all)
                         file_mse += mse_all * len(data_in_cluster)
 
