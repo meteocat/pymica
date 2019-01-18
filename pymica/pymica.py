@@ -76,7 +76,10 @@ class PyMica:
                                                   self.data_format['x_vars'],
                                                   mask)
         else:
-            cl_reg = MultiRegressionSigma(data)
+            cl_reg = MultiRegressionSigma(data,
+                                          id_key=self.data_format['id_key'],
+                                          y_var=self.data_format['y_var'],
+                                          x_vars=self.data_format['x_vars'])
             out_data = apply_regression(cl_reg, self.variables,
                                         self.data_format['x_vars'])
 
