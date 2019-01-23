@@ -22,7 +22,8 @@ class PyMica:
     errors.
     '''
     def __init__(self, data_file, variables_file,
-                 clusters=None, data_format=None, residuals_int='id2d'):
+                 clusters=None, data_format=None, residuals_int='id2d',
+                 z_field='altitude'):
         '''
         Args:
             data_file (str): The path with the point data
@@ -39,9 +40,11 @@ class PyMica:
                                           'id_key': 'id',
                                           'y_var': 'temp',
                                           'x_vars': ('altitude', 'dist')}
-            residuals_int (str) = The indicator of the residuals interpolation
+            residuals_int (str): The indicator of the residuals interpolation
                                   methodology. Defaults to 'id2d'.
                                   Methodologies available: id2d, id3d and idw.
+            z_field (str): The field used as the z variable when using the id3d
+                           value as the residuals_int method. Defaults to 'altitude'
         '''
         if data_format is None:
             self.data_format = {'loc_vars': ('lon', 'lat'),
@@ -96,14 +99,17 @@ class PyMica:
                            self.data_format['id_key']]] = {
                                'value': residuals[point[
                                     self.data_format['id_key']]],
-                               'x': geom.GetX(), 'y': geom.GetY(),
-                               'z': point['altitude']}
+                               'x': geom.GetX(), 'y': geom.GetY()}
+            if residuals_int == 'id3d':
+                residuals_data[point[
+                               self.data_format['id_key']]]['z'] = point[z_field]
+
 
         if residuals_int == 'id2d':
             residuals_field = inverse_distance(residuals_data, self.size,
                                                self.geotransform)
         elif residuals_int == 'id3d':
-            dem = gdal.Open(variables_file[self.data_format['x_vars'].index('altitude')])
+            dem = gdal.Open(variables_file[self.data_format['x_vars'].index(z_field)])
             dem = dem.ReadAsArray()
             residuals_field = inverse_distance_3d(residuals_data, self.size,
                                                   self.geotransform, dem)
