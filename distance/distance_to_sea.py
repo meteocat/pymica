@@ -127,7 +127,8 @@ def get_dist_array(proj, geotransform, size, dist_file, verbose=True):
 
     for i in range(size[0]):
         if verbose:
-            print("\rProgress: {:.1f}%".format(100*(i/size[0])), end='', flush=True)
+            print("\rProgress: {:.1f}%".format(100*(i/size[0])), end='',
+                  flush=True)
         for j in range(size[1]):
             x_coord = i * geotransform[1] + geotransform[0]
             y_coord = j * geotransform[5] + geotransform[3]

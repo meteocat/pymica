@@ -82,6 +82,9 @@ class MultiRegression:
                     final_score = max_score
                     self.used_vars.append(chosen_var)
 
+        if len(self.used_vars) == 0:
+            raise ValueError("No variable fits properly")
+
         self.x_final_data = self._prepare_x_data(None)
         self.regr.fit(self.x_final_data, self.y_data)
         self.score = self.regr.score(self.x_final_data, self.y_data)
