@@ -1,6 +1,8 @@
 '''Runs multiple regressions clustering the data in all the ways is asked for
 and takes the best option for each zone
 '''
+import sys
+
 import ogr
 from pymica.multiregression import MultiRegressionSigma
 
@@ -47,13 +49,17 @@ class ClusteredRegression:
                                                   data_in_cluster,
                                                   self.data_format['id_key'])
 
-                    cluster_regression = MultiRegressionSigma(
-                                            data_in_cluster,
-                                            id_key=self.data_format['id_key'],
-                                            y_var=self.data_format['y_var'],
-                                            x_vars=self.data_format['x_vars'])
-                    mse_cluster = __get_residuals_mse__(cluster_regression
-                                                        .get_residuals())
+                    try:
+                        cluster_regression = MultiRegressionSigma(
+                                                data_in_cluster,
+                                                id_key=self.data_format['id_key'],
+                                                y_var=self.data_format['y_var'],
+                                                x_vars=self.data_format['x_vars'])
+                        mse_cluster = __get_residuals_mse__(cluster_regression
+                                                            .get_residuals())
+                    except ValueError:
+                        mse_cluster = sys.float_info.max
+
                     if mse_all > mse_cluster:
                         cluster_file_regressions.append(cluster_regression)
                         file_mse += (mse_cluster * len(data_in_cluster))
