@@ -2,7 +2,7 @@
 Run python setup.py --help for options
 '''
 import datetime
-
+import numpy
 import setuptools
 
 version = "0.0"
@@ -25,9 +25,9 @@ else:
     ext_extention = 'pyx'
 
 ext_modules = [Extension("interpolation.inverse_distance",
-                         ['interpolation/inverse_distance.' + ext_extention]),
+                         ['interpolation/inverse_distance.' + ext_extention], include_dirs=[numpy.get_include()]),
                Extension("interpolation.inverse_distance_3d",
-                         ['interpolation/inverse_distance_3d.' + ext_extention])]
+                         ['interpolation/inverse_distance_3d.' + ext_extention], include_dirs=[numpy.get_include()])]
 
 for e in ext_modules:
     e.cython_directives = {"embedsignature": True}
