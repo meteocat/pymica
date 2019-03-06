@@ -86,7 +86,7 @@ class ClusteredRegression:
 
         out = {}
         for regr in self.final_regr:
-            out = {**out, **regr.get_residuals()}
+            out.update(regr.get_residuals())
         return out
 
     def predict_points(self, x_data):
