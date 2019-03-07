@@ -95,11 +95,13 @@ class PyMica:
                           point[self.data_format['loc_vars'][1]])
             geom.Transform(transf)
 
-            residuals_data[point[
+            if point[self.data_format['id_key']] in residuals:
+                    residuals_data[point[
                            self.data_format['id_key']]] = {
                                'value': residuals[point[
                                     self.data_format['id_key']]],
                                'x': geom.GetX(), 'y': geom.GetY()}
+
             if residuals_int == 'id3d':
                 residuals_data[point[
                                self.data_format['id_key']]]['z'] = point[z_field]
