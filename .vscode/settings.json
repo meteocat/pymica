@@ -23,6 +23,7 @@
         "delaunay",
         "dtree",
         "ellps",
+        "envs",
         "errno",
         "figclass",
         "gdal",
