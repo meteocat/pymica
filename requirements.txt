@@ -12,7 +12,7 @@ flake8==3.5.0
 idna==2.7
 imagesize==1.1.0
 isort==4.3.4
-Jinja2==2.10
+Jinja2==2.10.1
 lazy-object-proxy==1.3.1
 MarkupSafe==1.0
 mccabe==0.6.1
@@ -25,12 +25,11 @@ pycparser==2.19
 pyflakes==1.6.0
 Pygments==2.2.0
 pylint==2.1.1
-pyMICA==0.0
 pyOpenSSL==18.0.0
 pyparsing==2.2.2
 PySocks==1.6.8
 pytz==2018.5
-requests==2.19.1
+requests==2.20.0
 scikit-learn==0.20.0
 scipy==1.1.0
 six==1.11.0
@@ -38,5 +37,5 @@ snowballstemmer==1.2.1
 Sphinx==1.8.1
 sphinx-rtd-theme==0.4.2
 sphinxcontrib-websupport==1.1.0
-urllib3==1.23
+urllib3==1.24.2
 wrapt==1.10.11
