@@ -15,8 +15,9 @@ before_install:
 env:
   - GDAL_DATA=/usr/share/gdal/2.2/
 install:
-  - conda create -n test-environment -c conda-forge python=$TRAVIS_PYTHON_VERSION cython numpy scipy scikit-learn gdal
+  - conda create -n test-environment -c conda-forge python=$TRAVIS_PYTHON_VERSION cython numpy scipy scikit-learn gdal pyproj
   - source activate test-environment
   
 script:
+  - python setup.py build_ext
   - python -m unittest discover -s project_directory -p "*_test.py" -s test
