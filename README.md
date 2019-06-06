@@ -1,4 +1,5 @@
 [![GitHub release](https://img.shields.io/github/release-pre/meteocat/pymica.svg)](https://github.com/meteocat/pymica/releases)
+[![Documentation Status](https://readthedocs.org/projects/pymica/badge/?version=latest)](https://pymica.readthedocs.io/en/latest/?badge=latest)
 
 [![Logo](docs/source/_static/logo.svg)](#)
 

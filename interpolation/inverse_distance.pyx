@@ -75,7 +75,7 @@ def inverse_distance(residues, size, geotransform):
     return data_array.reshape(size)
 
 cdef float point_residue(double x, double y, double[:] xpos, double[:] ypos, double[:] values, int N):
-    cdef int power = 2
+    cdef float power = 2.5
     cdef int smoothing = 0
     cdef double numerator = 0
     cdef int i

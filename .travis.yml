@@ -1,0 +1,22 @@
+language: python
+python:
+  - "3.6"
+before_install:
+  - sudo apt-get update
+  # - sudo apt-get install libgdal-dev gdal-bin
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+  - conda list
+env:
+  - GDAL_DATA=/usr/share/gdal/2.2/
+install:
+  - conda create -n test-environment -c conda-forge python=$TRAVIS_PYTHON_VERSION cython numpy scipy scikit-learn gdal
+  - source activate test-environment
+  
+script:
+  - python -m unittest discover -s project_directory -p "*_test.py" -s test
