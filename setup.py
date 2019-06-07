@@ -7,7 +7,7 @@ import setuptools
 
 version = "0.0"
 release = "0.0.1"
-name = "pyMICA"
+name = "pymica"
 
 now = datetime.datetime.now()
 
