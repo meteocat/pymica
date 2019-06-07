@@ -21,6 +21,9 @@ install:
 script:
 - python setup.py build_ext
 - python -m unittest discover -s project_directory -p "*_test.py" -s test
+after_success:
+  - conda install conda-build && conda install anaconda-client
+
 deploy:
   provider: pypi
   user: "meteoadmin"
