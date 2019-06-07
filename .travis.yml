@@ -1,23 +1,30 @@
 language: python
 python:
-  - "3.6"
+- '3.6'
 before_install:
-  - sudo apt-get update
-  # - sudo apt-get install libgdal-dev gdal-bin
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda info -a
-  - conda list
+- sudo apt-get update
+- wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+- bash miniconda.sh -b -p $HOME/miniconda
+- export PATH="$HOME/miniconda/bin:$PATH"
+- hash -r
+- conda config --set always_yes yes --set changeps1 no
+- conda update -q conda
+- conda info -a
 env:
-  - GDAL_DATA=$HOME/miniconda/envs/test-environment/share/gdal
+- GDAL_DATA=$HOME/miniconda/envs/test-environment/share/gdal
 install:
-  - conda create -n test-environment -c conda-forge python=$TRAVIS_PYTHON_VERSION cython numpy scipy scikit-learn gdal pyproj
-  - source activate test-environment
-  
+- conda create -n test-environment -c conda-forge python=$TRAVIS_PYTHON_VERSION cython
+  numpy scipy scikit-learn pyproj
+- source activate test-environment
+- conda install -y gdal
+- conda list
 script:
-  - python setup.py build_ext
-  - python -m unittest discover -s project_directory -p "*_test.py" -s test
+- python setup.py build_ext
+- python -m unittest discover -s project_directory -p "*_test.py" -s test
+deploy:
+  provider: pypi
+  user: "meteoadmin"
+  password:
+    secure: Fci3dLSY+3BA/bHmulMq4mJ3rn9zo3eF1yGp3eppe344SRCJYfwL2aXgBts8LfiVK/Vxgju/PEciFWuRYR60Ds8BaeVMiivwv0DMzlveBnxswks1v57Bmx6Cfwk1Gs5KbFRuuZhuFfrIG6jQN4N7G43J/InLYLJT5Mw18d8+wtRtOVp84uV/0GAUAUyN7evqhqRYRDWsX/0mF2cyzVas8Vi/vzPCnkeXTDmx9e4sxbrCfsNmwLLTP3IO9nSbymk9edQhqmNun0NItGnhZE0b4uIakJtLO8VDJPXbnG37g8YkrOXar1BnZvtYNPeWivtfwr0zTft3bZFHnNSqaV2UAijV7mqJ3cM+VnbvEplE/1ILB0sKRO7zKoOKvOhFwmc41kpwFLcSPjo4x6RmWfUycjhLze+6pNU2keUNBP58kg4y/hqsuDNO/MzlppFXcNbvK8rPiyYBoSrGnixPHvO1bJ59yQrt9WqhuDD8PGfrO486Fx+j/+tKy1Ycua5ICmkpDhg+e4bf4iKzAo5zpBwwC1YbZWMmFO3hC/w/fzwOt8G8clgoJylkIJjfEwSrMY3ndBmL0KIzCH2SnvX4UswB3YJ159+SX0Js17dgjb8lAkuYKdyf0F3mwYM8SmvuIUaMpGZchN7eCMpfWf69mrERe2ZgI8ektvPBJBdZ2rj93H8=
+  on:
+    tags: true
