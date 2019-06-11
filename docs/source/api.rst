@@ -4,7 +4,6 @@ API
 * :ref:`The PyMICA module`
 * :ref:`Multiregression`
 * :ref:`Clustered regression`
-* :ref:`Calculate Field`
 * :ref:`Interpolation`
     * :ref:`Inverse of the distance (2D)`
     * :ref:`Inverse of the distance (3D)`
@@ -35,12 +34,6 @@ Clustered regression
 --------------------
 
 .. automodule:: pymica.clustered_regression
-    :members:
-
-Calculate Field
----------------
-
-.. automodule:: pymica.calculate_field
     :members:
 
 Interpolation
