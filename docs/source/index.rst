@@ -26,6 +26,7 @@ the one that performs the best, in terms of RMSE, is selected.
    installation
    howitworks
    theory
+   scripts
    api
 
 

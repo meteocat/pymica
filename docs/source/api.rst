@@ -8,6 +8,7 @@ API
     * :ref:`Inverse of the distance (2D)`
     * :ref:`Inverse of the distance (3D)`
     * :ref:`IDW`
+* :ref:`Distance to sea`
 * :ref:`Cluster creation`
     * :ref:`Create clusters`
     * :ref:`Create cluster files`
@@ -60,6 +61,12 @@ IDW
 ###
 
 .. automodule:: interpolation.idw
+    :members:
+
+Distance to sea
+---------------
+
+.. automodule:: distance.distance_to_sea
     :members:
 
 Cluster creation
