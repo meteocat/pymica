@@ -1,0 +1,26 @@
+package:
+  name: 'pymica'
+  version: "{{ environ.get('GIT_DESCRIBE_TAG', 'default') }}"
+
+source: 
+  git_url: https://github.com/meteocat/pymica.git
+  git_branch: master
+
+requirements:
+  build:
+    - python
+    - cython
+    - numpy >=1.15.2
+    - scipy >=1.1.0
+    - scikit-learn >=0.20.0
+  run:
+    - python
+    - numpy >=1.15.2
+    - scipy >=1.1.0
+    - scikit-learn >=0.20.0
+
+about:
+  home: https://github.com/meteocat/pymica
+  license: MIT
+  license_family: MIT
+  summary: (py)Meteorological variable Interpolation based on Clustered Analysis

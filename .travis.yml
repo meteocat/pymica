@@ -21,10 +21,19 @@ install:
 script:
 - python setup.py build_ext
 - python -m unittest discover -s project_directory -p "*_test.py" -s test
+
+before_deploy:
+  - conda install conda-build && conda install anaconda-client
+
 deploy:
-  provider: pypi
-  user: "meteoadmin"
-  password:
-    secure: Fci3dLSY+3BA/bHmulMq4mJ3rn9zo3eF1yGp3eppe344SRCJYfwL2aXgBts8LfiVK/Vxgju/PEciFWuRYR60Ds8BaeVMiivwv0DMzlveBnxswks1v57Bmx6Cfwk1Gs5KbFRuuZhuFfrIG6jQN4N7G43J/InLYLJT5Mw18d8+wtRtOVp84uV/0GAUAUyN7evqhqRYRDWsX/0mF2cyzVas8Vi/vzPCnkeXTDmx9e4sxbrCfsNmwLLTP3IO9nSbymk9edQhqmNun0NItGnhZE0b4uIakJtLO8VDJPXbnG37g8YkrOXar1BnZvtYNPeWivtfwr0zTft3bZFHnNSqaV2UAijV7mqJ3cM+VnbvEplE/1ILB0sKRO7zKoOKvOhFwmc41kpwFLcSPjo4x6RmWfUycjhLze+6pNU2keUNBP58kg4y/hqsuDNO/MzlppFXcNbvK8rPiyYBoSrGnixPHvO1bJ59yQrt9WqhuDD8PGfrO486Fx+j/+tKy1Ycua5ICmkpDhg+e4bf4iKzAo5zpBwwC1YbZWMmFO3hC/w/fzwOt8G8clgoJylkIJjfEwSrMY3ndBmL0KIzCH2SnvX4UswB3YJ159+SX0Js17dgjb8lAkuYKdyf0F3mwYM8SmvuIUaMpGZchN7eCMpfWf69mrERe2ZgI8ektvPBJBdZ2rj93H8=
-  on:
-    tags: true
+  - provider: pypi
+    user: "meteoadmin"
+    password:
+      secure: Fci3dLSY+3BA/bHmulMq4mJ3rn9zo3eF1yGp3eppe344SRCJYfwL2aXgBts8LfiVK/Vxgju/PEciFWuRYR60Ds8BaeVMiivwv0DMzlveBnxswks1v57Bmx6Cfwk1Gs5KbFRuuZhuFfrIG6jQN4N7G43J/InLYLJT5Mw18d8+wtRtOVp84uV/0GAUAUyN7evqhqRYRDWsX/0mF2cyzVas8Vi/vzPCnkeXTDmx9e4sxbrCfsNmwLLTP3IO9nSbymk9edQhqmNun0NItGnhZE0b4uIakJtLO8VDJPXbnG37g8YkrOXar1BnZvtYNPeWivtfwr0zTft3bZFHnNSqaV2UAijV7mqJ3cM+VnbvEplE/1ILB0sKRO7zKoOKvOhFwmc41kpwFLcSPjo4x6RmWfUycjhLze+6pNU2keUNBP58kg4y/hqsuDNO/MzlppFXcNbvK8rPiyYBoSrGnixPHvO1bJ59yQrt9WqhuDD8PGfrO486Fx+j/+tKy1Ycua5ICmkpDhg+e4bf4iKzAo5zpBwwC1YbZWMmFO3hC/w/fzwOt8G8clgoJylkIJjfEwSrMY3ndBmL0KIzCH2SnvX4UswB3YJ159+SX0Js17dgjb8lAkuYKdyf0F3mwYM8SmvuIUaMpGZchN7eCMpfWf69mrERe2ZgI8ektvPBJBdZ2rj93H8=
+    on:
+      tags: true
+  
+  - provider: script
+    script: conda build . && anaconda -t $CONDA_UPLOAD_TOKEN upload -u meteocat -l nightly {HOME}/miniconda/conda-bld/*/pymica-*.tar.bz2 --force
+    on:
+      tags: true

@@ -2,11 +2,13 @@
 Run python setup.py --help for options
 '''
 import datetime
+import subprocess
+
 import numpy
 import setuptools
 
-version = "0.0"
-release = "0.0.1"
+release = subprocess.check_output(['git', 'tag']).decode('utf-8').strip()
+version = ".".join(release.split('.')[0:2])
 name = "pymica"
 
 now = datetime.datetime.now()
@@ -42,7 +44,7 @@ setuptools.setup(
     "on Clustered Analysis",
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/meteocat/pymica",
     packages=setuptools.find_packages(),
     install_requires=['cython', 'numpy', 'scipy', 'scikit-learn'],
     scripts=['bin/pymica_distance_to_sea_calculator',
@@ -53,7 +55,7 @@ setuptools.setup(
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Atmospheric Science',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6'],
     command_options={
