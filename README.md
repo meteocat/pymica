@@ -1,8 +1,9 @@
 [![GitHub release](https://img.shields.io/github/release-pre/meteocat/pymica.svg)](https://github.com/meteocat/pymica/releases)
-[![Documentation Status](https://readthedocs.org/projects/pymica/badge/?version=latest)](https://pymica.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/pymica/badge/?version=stable)](https://pymica.readthedocs.io/en/stable/?badge=stable)
 [![Build Status](https://travis-ci.org/meteocat/pymica.svg?branch=master)](https://travis-ci.org/meteocat/pymica)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/meteocat/pymica-examples/master?urlpath=/lab/tree/index.ipynb)
 
-[![Logo](docs/source/_static/logo.svg)](#)
+[![Logo](https://github.com/meteocat/pymica/blob/master/docs/source/_static/logo.svg)](#)
 
 (py)Meteorological variable Interpolation based on Clustered Analysis
 =====================================================================
@@ -16,7 +17,7 @@ What is MICA and how it works?
 ================================
 MICA spatially interpolates meteorological surface observations through multiple linear regressions (MLR) and residual corrections. Two options are available: using a simple MLR for all the surface observations or divide them in clusters.
 
-The first option implies the calculation of a MLR considering all the observations at once and using explanatory variables, such as altitude, distance to coast, latitude and longitude. The second option, uses clusters to classify stations in different groups. This allows to separate stations that may behave differently due to the presence of dissimilar weather conditions. For example, weather stations placed at similar altitude, but ones under the effects of fog and others with clear sky conditions.
+The first option implies the calculation of a MLR considering all the observations at once and using explanatory variables, such as altitude, distance to coast, latitude and longitude. The second option, uses clusters to classify stations in different groups. This allows to separate stations that may behave differently due to the presence of dissimilar weather conditions. For example, weather stations placed at a similar altitude, ones under the effects of fog and others with clear sky conditions.
 
 A complete explanation of how it works and the idea behind MICA can be found in [pyMICA documentation](https://pymica.readthedocs.io/en/latest/howitworks.html)
 
@@ -24,16 +25,16 @@ A complete explanation of how it works and the idea behind MICA can be found in 
 Installation
 ============
 
-To install pyMICA you can have a look at [pyMICA installation](https://pymica.readthedocs.io/en/latest/installation.html).
+To install pyMICA you can have a look at [pyMICA installation](https://pymica.readthedocs.io/en/latest/installation.html) documentation.
 
 
 Use
 ===
 
-A set of [examples]() were designed to explore the different possibilities of MICA.
+A set of examples were designed to explore the different possibilities of MICA.
 
-Another repository was created to store jupyter notebooks [examples]()
+Another repository was created to store sample data and the examples in jupyter notebooks [pymica-examples](https://github.com/meteocat/pymica-examples)
 
 
-[Try the demo]() |
-[Read the docs](https://pymica.readthedocs.io/en/latest)
+[Try the demo](https://mybinder.org/v2/gh/meteocat/pymica-examples/master?urlpath=/lab/tree/index.ipynb) |
+[Read the docs](https://pymica.readthedocs.io/en/stable)
