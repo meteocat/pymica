@@ -7,7 +7,7 @@ import subprocess
 import numpy
 import setuptools
 
-release = subprocess.check_output(['git', 'tag']).decode('utf-8').strip()
+release = subprocess.check_output(['git', 'describe', '--abbrev=0', '--tags']).decode('utf-8').strip()
 version = ".".join(release.split('.')[0:2])
 name = "pymica"
 
@@ -39,7 +39,7 @@ if has_cython is True:
 
 setuptools.setup(
     name=name,
-    version=version,
+    version=release,
     description="pyMICA, Meteorological variable Interpolation based" +
     "on Clustered Analysis",
     long_description=open('README.md').read(),
