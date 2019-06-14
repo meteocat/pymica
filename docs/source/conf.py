@@ -19,8 +19,8 @@
 
 # -- Project information -----------------------------------------------------
 
-project = ''
-copyright = ''
+project = 'pymica'
+copyright = 'Servei Meteorològic de Catalunya'
 author = 'SMC'
 
 # The short X.Y version

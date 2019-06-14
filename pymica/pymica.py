@@ -44,7 +44,8 @@ class PyMica:
                                   methodology. Defaults to 'id2d'.
                                   Methodologies available: id2d, id3d and idw.
             z_field (str): The field used as the z variable when using the id3d
-                           value as the residuals_int method. Defaults to 'altitude'
+                           value as the residuals_int method.
+                           Defaults to 'altitude'
         '''
         if data_format is None:
             self.data_format = {'loc_vars': ('lon', 'lat'),
@@ -64,27 +65,7 @@ class PyMica:
 
         transf = osr.CoordinateTransformation(in_proj, self.out_proj)
 
-        if clusters:
-            cl_reg = ClusteredRegression(data, clusters['clusters_files'],
-                                         data_format=self.data_format)
-
-            cluster_file_index = clusters['clusters_files'].index(
-                cl_reg.final_cluster_file)
-
-            d_s = gdal.Open(clusters['mask_files'][cluster_file_index])
-            mask = d_s.ReadAsArray()
-            d_s = None
-
-            out_data = apply_clustered_regression(cl_reg, self.variables,
-                                                  self.data_format['x_vars'],
-                                                  mask)
-        else:
-            cl_reg = MultiRegressionSigma(data,
-                                          id_key=self.data_format['id_key'],
-                                          y_var=self.data_format['y_var'],
-                                          x_vars=self.data_format['x_vars'])
-            out_data = apply_regression(cl_reg, self.variables,
-                                        self.data_format['x_vars'])
+        cl_reg, out_data = self.__get_regression_results(clusters, data)
 
         residuals = cl_reg.get_residuals()
         residuals_data = {}
@@ -103,15 +84,15 @@ class PyMica:
                                'x': geom.GetX(), 'y': geom.GetY()}
 
             if residuals_int == 'id3d':
-                residuals_data[point[
-                               self.data_format['id_key']]]['z'] = point[z_field]
-
+                residuals_data[point[self.data_format['id_key']]
+                               ]['z'] = point[z_field]
 
         if residuals_int == 'id2d':
             residuals_field = inverse_distance(residuals_data, self.size,
                                                self.geotransform)
         elif residuals_int == 'id3d':
-            dem = gdal.Open(variables_file[self.data_format['x_vars'].index(z_field)])
+            dem = gdal.Open(
+                variables_file[self.data_format['x_vars'].index(z_field)])
             dem = dem.ReadAsArray()
             residuals_field = inverse_distance_3d(residuals_data, self.size,
                                                   self.geotransform, dem)
@@ -139,6 +120,31 @@ class PyMica:
         d_s.SetProjection(self.out_proj.ExportToWkt())
 
         d_s.GetRasterBand(1).WriteArray(self.result)
+
+    def __get_regression_results(self, clusters, data):
+        if clusters:
+            cl_reg = ClusteredRegression(data, clusters['clusters_files'],
+                                         data_format=self.data_format)
+
+            cluster_file_index = clusters['clusters_files'].index(
+                cl_reg.final_cluster_file)
+
+            d_s = gdal.Open(clusters['mask_files'][cluster_file_index])
+            mask = d_s.ReadAsArray()
+            d_s = None
+
+            out_data = apply_clustered_regression(cl_reg, self.variables,
+                                                  self.data_format['x_vars'],
+                                                  mask)
+        else:
+            cl_reg = MultiRegressionSigma(data,
+                                          id_key=self.data_format['id_key'],
+                                          y_var=self.data_format['y_var'],
+                                          x_vars=self.data_format['x_vars'])
+            out_data = apply_regression(cl_reg, self.variables,
+                                        self.data_format['x_vars'])
+
+        return cl_reg, out_data
 
     def __read_variables_files__(self, variables_file):
         if isinstance(variables_file, (list,)):
