@@ -17,7 +17,7 @@ class ClusteredRegression:
             self.data_format = {'id_key': 'id',
                                 'y_var': 'temp',
                                 'x_vars': ('altitude', 'dist')}
-        else: 
+        else:
             self.data_format = data_format
 
         if regression_params is None:
@@ -51,10 +51,10 @@ class ClusteredRegression:
 
                     try:
                         cluster_regression = MultiRegressionSigma(
-                                                data_in_cluster,
-                                                id_key=self.data_format['id_key'],
-                                                y_var=self.data_format['y_var'],
-                                                x_vars=self.data_format['x_vars'])
+                            data_in_cluster,
+                            id_key=self.data_format['id_key'],
+                            y_var=self.data_format['y_var'],
+                            x_vars=self.data_format['x_vars'])
                         mse_cluster = __get_residuals_mse__(cluster_regression
                                                             .get_residuals())
                     except ValueError:
@@ -79,7 +79,7 @@ class ClusteredRegression:
 
     def get_residuals(self):
         '''Gets the residuals for each point, using the cluster regresion
-        
+
         Returns:
             dict: The residuals with the id of the point as a key
         '''
@@ -121,7 +121,8 @@ class ClusteredRegression:
 def __filter_data_by_cluster__(data, cluster):
     ds_in = ogr.Open(cluster)
     if not ds_in:
-        raise FileNotFoundError("File not found, or not ogr compatible {}".format(cluster))
+        raise FileNotFoundError(
+            "File not found, or not ogr compatible {}".format(cluster))
     layer = ds_in.GetLayer()
     num_clusters = layer.GetFeatureCount()
     classified_data = []
@@ -131,7 +132,8 @@ def __filter_data_by_cluster__(data, cluster):
         cluster_geom = feat.GetGeometryRef()
         for point in data:
             point_geom = ogr.Geometry(ogr.wkbPoint)
-            point_geom.AddPoint(point['lon'], point['lat'])  # TODO: lon and lat must be configurable keys
+            # TODO: lon and lat must be configurable keys
+            point_geom.AddPoint(point['lon'], point['lat'])
             if point_geom.Within(cluster_geom):
                 cluster_points.append(point)
         classified_data.append(cluster_points)

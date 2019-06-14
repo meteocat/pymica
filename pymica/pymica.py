@@ -8,7 +8,7 @@ import ogr
 import osr
 from interpolation.inverse_distance import inverse_distance
 from interpolation.inverse_distance_3d import inverse_distance_3d
-from interpolation.idw import Tree
+from interpolation.idw import idw
 from numpy import concatenate, newaxis
 from pymica.apply_regression import (apply_clustered_regression,
                                      apply_regression)
@@ -97,9 +97,7 @@ class PyMica:
             residuals_field = inverse_distance_3d(residuals_data, self.size,
                                                   self.geotransform, dem)
         elif residuals_int == 'idw':
-            inst_tree = Tree()
-            residuals_field = inst_tree.idw(residuals_data, self.size,
-                                            self.geotransform)
+            residuals_field = idw(residuals_data, self.size, self.geotransform)
         else:
             raise ValueError("[Errno 2]residuals_int must be \"id2d\"," +
                              " \"id3d\" or \"idw\"")

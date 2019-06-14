@@ -1,6 +1,7 @@
 {
     "autoDocstring.docstringFormat": "google",
     "cSpell.words": [
+        "arange",
         "astype",
         "asyncio",
         "autocorrelation",
@@ -22,6 +23,7 @@
         "delane",
         "delaunay",
         "dtree",
+        "dtype",
         "ellps",
         "envs",
         "errno",
@@ -38,6 +40,7 @@
         "libgdal",
         "mathjax",
         "meteorològic",
+        "methdology",
         "miniconda",
         "minkowski",
         "mkdtemp",

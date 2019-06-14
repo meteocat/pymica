@@ -121,44 +121,45 @@ class Tree(object):
         return self.__call__(coordinates, num_nearest, eps,
                              p_norm, regularize_by)
 
-    def idw(self, residues, size, geotransform, num_nearest=6):
-        '''Interpolates the residues field using the inverse of the distance
-           weighting method
 
-        Args:
-            residues (dict): The residues dict
-            size (list): x X y
-            geotransform (list): The geotransform to apply to relate the
-                                 residues coordinates and the position in
-                                 the matrix.
-                                 See https://www.gdal.org/gdal_datamodel.html
-                                 for more information
-        Returns:
-            list: The interpolated residues
+def idw(residues, size, geotransform, num_nearest=6):
+    '''Interpolates the residues field using the inverse of the distance
+        weighting method
 
-        '''
-        coords = []
-        values = []
-        for key in residues.keys():
-            coords.append([residues[key]['x'], residues[key]['y']])
-            values.append(residues[key]['value'])
-        coords = np.array(coords)
-        values = np.array(values)
+    Args:
+        residues (dict): The residues dict
+        size (list): x X y
+        geotransform (list): The geotransform to apply to relate the
+                                residues coordinates and the position in
+                                the matrix.
+                                See https://www.gdal.org/gdal_datamodel.html
+                                for more information
+    Returns:
+        list: The interpolated residues
 
-        idw_tree = Tree(coords, values)
+    '''
+    coords = []
+    values = []
+    for key in residues.keys():
+        coords.append([residues[key]['x'], residues[key]['y']])
+        values.append(residues[key]['value'])
+    coords = np.array(coords)
+    values = np.array(values)
 
-        x_coords = np.arange(geotransform[0],
-                             geotransform[0]+size[1]*geotransform[1],
-                             geotransform[1])
+    idw_tree = Tree(coords, values)
 
-        y_coords = np.arange(geotransform[3],
-                             geotransform[3]+size[0]*geotransform[5],
-                             geotransform[5])
+    x_coords = np.arange(geotransform[0],
+                         geotransform[0]+size[1]*geotransform[1],
+                         geotransform[1])
 
-        xy_coords = np.meshgrid(x_coords, y_coords)
-        xy_coords = np.reshape(xy_coords, (2, -1)).T
+    y_coords = np.arange(geotransform[3],
+                         geotransform[3]+size[0]*geotransform[5],
+                         geotransform[5])
 
-        idw_array = idw_tree(xy_coords, num_nearest)
-        idw_array = idw_array.reshape(size)
+    xy_coords = np.meshgrid(x_coords, y_coords)
+    xy_coords = np.reshape(xy_coords, (2, -1)).T
 
-        return idw_array
+    idw_array = idw_tree(xy_coords, num_nearest)
+    idw_array = idw_array.reshape(size)
+
+    return idw_array

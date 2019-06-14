@@ -91,17 +91,17 @@ def calculate_utm_def(point):
 def get_dist_array(proj, geotransform, size, dist_file, verbose=True):
     '''Creates a numpy array with the distance to the coast values applying
     the dist2func to all the actual distances so the values go from 0 to 1
-    
+
     Args:
         proj (int): The EPSG code for the output matrix values projection
         geotransform (list): The geotransform as defined in the gdal data model
         size (list): A two element list with the longitude and latitude values
         dist_file (str): The path to an ogr compatible file with a line
                          containing the shore geometry.
-    
+
     Raises:
         IOError: The dist_file doesn't exist
-    
+
     Returns:
         numpy.ndarray: The matrix with the function values
     '''
@@ -139,6 +139,6 @@ def get_dist_array(proj, geotransform, size, dist_file, verbose=True):
             dist = point.Distance(geom)
 
             out_array[j, i] = dist2func(dist)
-    if verbose:  
+    if verbose:
         print("\rProgress: 100%  ")
     return out_array

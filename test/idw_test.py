@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime
 from numpy import array
-from interpolation.idw import Tree  # pylint: disable=E0611
+from interpolation.idw import idw
 
 
 class TestInverseDistanceWeighting(unittest.TestCase):
@@ -12,8 +12,7 @@ class TestInverseDistanceWeighting(unittest.TestCase):
                     'CC': {'value': 2, 'y': 2, 'x': 2}}
         geotransform = [0, 0.5, 0, 2, 0, -0.5]
         size = [5, 5]
-        inst_tree = Tree()
-        result = inst_tree.idw(residues, size, geotransform, 2)
+        result = idw(residues, size, geotransform, 2)
 
         self.assertIsInstance(result, type(array((0, 0))))
 
@@ -25,7 +24,7 @@ class TestInverseDistanceWeighting(unittest.TestCase):
         geotransform = [0, 0.002002, 0, 2, 0, -0.002002]
         size = [1000, 1000]
 
-        result = inst_tree.idw(residues, size, geotransform, 2)
+        result = idw(residues, size, geotransform, 2)
 
         spent_time = datetime.utcnow() - now
 
