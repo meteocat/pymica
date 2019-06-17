@@ -28,18 +28,18 @@ def create_clusters(locations, n_clusters):
     positions = np.zeros([len(locations), 2])
     utm = calculate_utm_def([locations[0]['lon'], locations[0]['lat']])
     positions_list = []
-    for i in range(len(locations)):
-        positions[i][0] = locations[i]['lon']
-        positions[i][1] = locations[i]['lat']
-        value = utm(locations[i]['lon'], locations[i]['lat'])
+    for i, loc_value in enumerate(locations):
+        positions[i][0] = loc_value['lon']
+        positions[i][1] = loc_value['lat']
+        value = utm(loc_value['lon'], loc_value['lat'])
         positions_list.append(value)
     positions_list = np.array(positions_list)
     kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(positions_list)
 
     out_geojson = {"type": "FeatureCollection",
                    "features": []}
-    for i in range(len(kmeans.labels_)):
-        locations[i]['cluster'] = kmeans.labels_[i]
+    for i, labels_value in enumerate(kmeans.labels_):
+        locations[i]['cluster'] = labels_value
         out_geojson['features'].append({
             "type": "Feature",
             "geometry": {
@@ -47,7 +47,7 @@ def create_clusters(locations, n_clusters):
                 "coordinates": [locations[i]['lon'], locations[i]['lat']]
             },
             "properties": {
-                "cluster": int(kmeans.labels_[i]),
+                "cluster": int(labels_value),
                 "id": locations[i]['id'],
                 "alt": locations[i]['alt']
             }

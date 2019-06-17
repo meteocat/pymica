@@ -1,18 +1,20 @@
 import unittest
+from tempfile import gettempdir
 
 import gdal
 import numpy as np
 import osr
+
 from pymica.pymica import PyMica
 
 
 class TestPyMica(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.variables_file = '/tmp/variables.tiff'
-        cls.mask_file = '/tmp/mask.tiff'
+        cls.variables_file = gettempdir() + '/variables.tiff'
+        cls.mask_file = gettempdir() + '/mask.tiff'
         cls.clusters = {'clusters_files': ["./test/data/clusters.json"],
-                    'mask_files': [cls.mask_file]}
+                        'mask_files': [cls.mask_file]}
         size = [1000, 1000]
         alt_data = np.ones(size)
         alt_data[2][2] = 12
@@ -51,7 +53,7 @@ class TestPyMica(unittest.TestCase):
                       self.clusters)
         self.assertEqual(inst.result.shape, (1000, 1000))
 
-        inst.save_file("/tmp/out.tiff")
+        inst.save_file(gettempdir() + "/out.tiff")
 
         # Test passing multiple variable files instead
         # of one with all the layers
@@ -71,7 +73,7 @@ class TestPyMica(unittest.TestCase):
     def test_init_different_vars(self):
         with open("./test/data/sample_data.json") as d_s:
             data = d_s.read()
-        with open("/tmp/sample_data.json", "w") as d_s:
+        with open(gettempdir() + "/sample_data.json", "w") as d_s:
             d_s.write(data.replace('id', 'other_id')
                           .replace('temp', 'other_var')
                           .replace('dist', 'other_x_var'))
@@ -80,7 +82,7 @@ class TestPyMica(unittest.TestCase):
                        'id_key': 'other_id',
                        'y_var': 'other_var',
                        'x_vars': ('altitude', 'other_x_var')}
-        inst = PyMica("/tmp/sample_data.json", self.variables_file,
+        inst = PyMica(gettempdir() + "/sample_data.json", self.variables_file,
                       self.clusters, data_format)
         self.assertEqual(inst.result.shape, (1000, 1000))
 
@@ -110,4 +112,3 @@ class TestPyMica(unittest.TestCase):
             )
         # TODO : mask doesn't exist or clusters bad formatted
         # TODO : Bad variable names passed
-    

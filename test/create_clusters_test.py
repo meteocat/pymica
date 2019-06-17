@@ -1,8 +1,7 @@
-import json
 import unittest
 from pyproj import Proj
 
-from cluster.create_clusters import calculate_utm_def, create_clusters
+from cluster.create_clusters import calculate_utm_def
 
 
 class TestCreateClusters(unittest.TestCase):

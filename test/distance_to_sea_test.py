@@ -21,7 +21,7 @@ class TestDistSea(unittest.TestCase):
         self.assertEqual(
             "File /bad_file.json doesn't exist",
             str(c_m.exception))
-    
+
     def test_get_dist_array(self):
         result = get_dist_array(25831, (420244, 30, 0, 4581058, 0, -30),
                                 (1000, 10),

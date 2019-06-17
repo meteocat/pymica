@@ -8,7 +8,7 @@ import ogr
 import osr
 from interpolation.inverse_distance import inverse_distance
 from interpolation.inverse_distance_3d import inverse_distance_3d
-from interpolation.idw import Tree
+from interpolation.idw import idw
 from numpy import concatenate, newaxis
 from pymica.apply_regression import (apply_clustered_regression,
                                      apply_regression)
@@ -44,7 +44,8 @@ class PyMica:
                                   methodology. Defaults to 'id2d'.
                                   Methodologies available: id2d, id3d and idw.
             z_field (str): The field used as the z variable when using the id3d
-                           value as the residuals_int method. Defaults to 'altitude'
+                           value as the residuals_int method.
+                           Defaults to 'altitude'
         '''
         if data_format is None:
             self.data_format = {'loc_vars': ('lon', 'lat'),
@@ -64,6 +65,61 @@ class PyMica:
 
         transf = osr.CoordinateTransformation(in_proj, self.out_proj)
 
+        cl_reg, out_data = self.__get_regression_results(clusters, data)
+
+        residuals = cl_reg.get_residuals()
+        residuals_data = {}
+
+        for point in data:
+            geom = ogr.Geometry(ogr.wkbPoint)
+            geom.AddPoint(point[self.data_format['loc_vars'][0]],
+                          point[self.data_format['loc_vars'][1]])
+            geom.Transform(transf)
+
+            if point[self.data_format['id_key']] in residuals:
+                    residuals_data[point[
+                           self.data_format['id_key']]] = {
+                               'value': residuals[point[
+                                    self.data_format['id_key']]],
+                               'x': geom.GetX(), 'y': geom.GetY()}
+
+            if residuals_int == 'id3d':
+                residuals_data[point[self.data_format['id_key']]
+                               ]['z'] = point[z_field]
+
+        if residuals_int == 'id2d':
+            residuals_field = inverse_distance(residuals_data, self.size,
+                                               self.geotransform)
+        elif residuals_int == 'id3d':
+            dem = gdal.Open(
+                variables_file[self.data_format['x_vars'].index(z_field)])
+            dem = dem.ReadAsArray()
+            residuals_field = inverse_distance_3d(residuals_data, self.size,
+                                                  self.geotransform, dem)
+        elif residuals_int == 'idw':
+            residuals_field = idw(residuals_data, self.size, self.geotransform)
+        else:
+            raise ValueError("[Errno 2]residuals_int must be \"id2d\"," +
+                             " \"id3d\" or \"idw\"")
+
+        self.result = out_data - residuals_field
+
+    def save_file(self, file_name):
+        '''Saves the calculate field data into a file
+
+        Args:
+            file_name (str): The output file path
+        '''
+
+        driver = gdal.GetDriverByName('GTiff')
+        d_s = driver.Create(file_name, self.size[1], self.size[0], 1,
+                            gdal.GDT_Float32)
+        d_s.SetGeoTransform(self.geotransform)
+        d_s.SetProjection(self.out_proj.ExportToWkt())
+
+        d_s.GetRasterBand(1).WriteArray(self.result)
+
+    def __get_regression_results(self, clusters, data):
         if clusters:
             cl_reg = ClusteredRegression(data, clusters['clusters_files'],
                                          data_format=self.data_format)
@@ -86,59 +142,7 @@ class PyMica:
             out_data = apply_regression(cl_reg, self.variables,
                                         self.data_format['x_vars'])
 
-        residuals = cl_reg.get_residuals()
-        residuals_data = {}
-
-        for point in data:
-            geom = ogr.Geometry(ogr.wkbPoint)
-            geom.AddPoint(point[self.data_format['loc_vars'][0]],
-                          point[self.data_format['loc_vars'][1]])
-            geom.Transform(transf)
-
-            if point[self.data_format['id_key']] in residuals:
-                    residuals_data[point[
-                           self.data_format['id_key']]] = {
-                               'value': residuals[point[
-                                    self.data_format['id_key']]],
-                               'x': geom.GetX(), 'y': geom.GetY()}
-
-            if residuals_int == 'id3d':
-                residuals_data[point[
-                               self.data_format['id_key']]]['z'] = point[z_field]
-
-
-        if residuals_int == 'id2d':
-            residuals_field = inverse_distance(residuals_data, self.size,
-                                               self.geotransform)
-        elif residuals_int == 'id3d':
-            dem = gdal.Open(variables_file[self.data_format['x_vars'].index(z_field)])
-            dem = dem.ReadAsArray()
-            residuals_field = inverse_distance_3d(residuals_data, self.size,
-                                                  self.geotransform, dem)
-        elif residuals_int == 'idw':
-            inst_tree = Tree()
-            residuals_field = inst_tree.idw(residuals_data, self.size,
-                                            self.geotransform)
-        else:
-            raise ValueError("[Errno 2]residuals_int must be \"id2d\"," +
-                             " \"id3d\" or \"idw\"")
-
-        self.result = out_data - residuals_field
-
-    def save_file(self, file_name):
-        '''Saves the calculate field data into a file
-
-        Args:
-            file_name (str): The output file path
-        '''
-
-        driver = gdal.GetDriverByName('GTiff')
-        d_s = driver.Create(file_name, self.size[1], self.size[0], 1,
-                            gdal.GDT_Float32)
-        d_s.SetGeoTransform(self.geotransform)
-        d_s.SetProjection(self.out_proj.ExportToWkt())
-
-        d_s.GetRasterBand(1).WriteArray(self.result)
+        return cl_reg, out_data
 
     def __read_variables_files__(self, variables_file):
         if isinstance(variables_file, (list,)):

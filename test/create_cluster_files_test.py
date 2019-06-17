@@ -4,6 +4,8 @@
 import unittest
 from os import remove
 from os.path import exists
+from tempfile import gettempdir
+
 from osgeo import gdal, ogr
 
 from cluster.create_cluster_files import (create_reprojected_geoms,
@@ -33,7 +35,7 @@ class TestCreateClustersFiles(unittest.TestCase):
             str(c_m.exception))
 
     def test_rasterize_clusters(self):
-        out_file = "/tmp/test.tiff"
+        out_file = gettempdir() + "/test.tiff"
         geotransform = (260000, 270, 0, 4750000, 0, -270)
         if exists(out_file):
             remove(out_file)
@@ -61,7 +63,7 @@ class TestCreateClustersFiles(unittest.TestCase):
 
         with self.assertRaises(ValueError) as c_m:
             rasterize_clusters(layer,
-                               {'out_file': '/tmp/test.tiff',
+                               {'out_file': gettempdir() + '/test.tiff',
                                 'geotransform': geotransform
                                 })
         self.assertEqual(
@@ -70,7 +72,7 @@ class TestCreateClustersFiles(unittest.TestCase):
 
         with self.assertRaises(ValueError) as c_m:
             rasterize_clusters(layer,
-                               {'out_file': '/tmp/test.tiff',
+                               {'out_file': gettempdir() + '/test.tiff',
                                 'size': [1000, 1000]
                                 })
         self.assertEqual(

@@ -16,13 +16,14 @@ class ApplyRegressionTest(unittest.TestCase):
                 {'id': 'CC', 'hr': 1, 'temp': 1, 'dist': 0, 'altitude': 1}
                 ]
         size = [5, 5]
-        
+
         alt_data = np.ones(size)
         alt_data[2][2] = 12
 
         dist_data = np.ones(size)
 
-        inst = MultiRegressionSigma(data, y_var='temp', x_vars=['altitude', 'dist'])
+        inst = MultiRegressionSigma(
+            data, y_var='temp', x_vars=['altitude', 'dist'])
 
         in_data = alt_data.reshape([1, 5, 5])
 
@@ -48,7 +49,7 @@ class ApplyRegressionTest(unittest.TestCase):
 
         self.assertEqual(result.shape[0], size[1])
         self.assertEqual(result.shape[1], size[0])
-        self.assertAlmostEqual(result[2][2], 39) # t = 1 + 2*dist + 3*alt
+        self.assertAlmostEqual(result[2][2], 39)  # t = 1 + 2*dist + 3*alt
 
         size = [1000, 1000]
         alt_data = np.ones(size)
@@ -108,6 +109,6 @@ class ApplyRegressionTest(unittest.TestCase):
             for j in range(500):
                 mask[i][i*250 + j][:] = 1 - j/550
 
-        result = apply_clustered_regression(inst, in_data, ['altitude', 'dist'],
-                                            mask)
-        self.assertEqual(list(result.shape), size) 
+        result = apply_clustered_regression(
+            inst, in_data, ['altitude', 'dist'], mask)
+        self.assertEqual(list(result.shape), size)
