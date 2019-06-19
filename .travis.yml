@@ -34,6 +34,6 @@ deploy:
       tags: true
   
   - provider: script
-    script: conda build . && anaconda -t $CONDA_UPLOAD_TOKEN upload -u meteocat -l nightly {HOME}/miniconda/conda-bld/*/pymica-*.tar.bz2 --force
+    script: conda build . && anaconda -t $CONDA_UPLOAD_TOKEN upload -u meteocat -l nightly {HOME}/miniconda/*/conda-bld/*/pymica-*.tar.bz2 --force
     on:
       tags: true
