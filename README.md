@@ -1,4 +1,5 @@
 ![PyPI](https://img.shields.io/pypi/v/pymica.svg)
+[![Anaconda-Server Badge](https://anaconda.org/meteocat/pymica/badges/version.svg)](https://anaconda.org/meteocat/pymica)
 [![Documentation Status](https://readthedocs.org/projects/pymica/badge/?version=latest)](https://pymica.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://travis-ci.org/meteocat/pymica.svg?branch=master)](https://travis-ci.org/meteocat/pymica)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/meteocat/pymica-examples/master?urlpath=/lab/tree/index.ipynb)
