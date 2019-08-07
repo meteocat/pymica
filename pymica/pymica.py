@@ -21,6 +21,7 @@ class PyMica:
     them with the interpolated residuals and saves files and gives
     errors.
     '''
+
     def __init__(self, data_file, variables_file,
                  clusters=None, data_format=None, residuals_int='id2d',
                  z_field='altitude'):
@@ -77,11 +78,11 @@ class PyMica:
             geom.Transform(transf)
 
             if point[self.data_format['id_key']] in residuals:
-                    residuals_data[point[
-                           self.data_format['id_key']]] = {
-                               'value': residuals[point[
-                                    self.data_format['id_key']]],
-                               'x': geom.GetX(), 'y': geom.GetY()}
+                residuals_data[point[
+                    self.data_format['id_key']]] = {
+                    'value': residuals[point[
+                        self.data_format['id_key']]],
+                    'x': geom.GetX(), 'y': geom.GetY()}
 
             if residuals_int == 'id3d':
                 residuals_data[point[self.data_format['id_key']]
@@ -154,12 +155,12 @@ class PyMica:
                                             "directory: 'BadFile'")
                 for i in range(d_s.RasterCount):
                     layer_data = d_s.GetRasterBand(i + 1)\
-                                 .ReadAsArray()[newaxis, :, :]
+                        .ReadAsArray()[newaxis, :, :]
                     if self.variables is None:
                         self.variables = layer_data
                     else:
                         self.variables = concatenate((self.variables,
-                                                     layer_data), axis=0)
+                                                      layer_data), axis=0)
         else:
             d_s = gdal.Open(variables_file)
             self.variables = d_s.ReadAsArray()
