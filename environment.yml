@@ -3,5 +3,5 @@ dependencies:
   - numpy
   - scipy
   - scikit-learn
-  - gdal
+  - gdal=2.4.1
   - pyproj
