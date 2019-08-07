@@ -6,7 +6,7 @@ from cluster.create_clusters import calculate_utm_def
 
 class TestCreateClusters(unittest.TestCase):
     '''
-    ### Not possible to open a browser in TravisCI
+    # Not possible to open a browser in TravisCI
     def test_create_clusters(self):
         fp = open("./test/data/sample_station_metadata.json")
         data = json.load(fp)
