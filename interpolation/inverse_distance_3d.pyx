@@ -86,7 +86,7 @@ def inverse_distance_3d(residues: Dict[str, Dict[str, float]],
 cdef float point_residue(double x, double y, double z, double[:] xpos, double[:] ypos, double[:] zpos, double[:] values, int N):
     cdef int power = 2
     cdef int smoothing = 0
-    cdef int penalization = 100
+    cdef int penalization = 40
     cdef double numerator = 0
     cdef int i
     cdef double dist_3d
