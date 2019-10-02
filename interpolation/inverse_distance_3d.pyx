@@ -98,12 +98,10 @@ cdef float point_residue(double x, double y, double z, double[:] xpos, double[:]
             y - ypos[i]) ** 2)
 
         if dist < 0.00000000001:
-            print('asdadsadasdasd')
             return values[i]
         
         dist_3d = sqrt(dist ** 2 + (penalization * (z - zpos[i])) ** 2 + smoothing*smoothing)
-        #print('dist:' + str(dist))
-        #print('3dist:' + str(dist_3d))
+
         numerator = numerator + (values[i] / pow(dist_3d, power))
         denominator = denominator + (1 / pow(dist_3d, power))
 
