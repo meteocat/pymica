@@ -7,7 +7,8 @@ import subprocess
 import numpy
 import setuptools
 
-release = subprocess.check_output(['git', 'describe', '--abbrev=0', '--tags']).decode('utf-8').strip()
+release = subprocess.check_output(
+    ['git', 'describe', '--abbrev=0', '--tags']).decode('utf-8').strip()
 version = ".".join(release.split('.')[0:2])
 name = "pymica"
 
@@ -27,9 +28,12 @@ else:
     ext_extention = 'pyx'
 
 ext_modules = [Extension("interpolation.inverse_distance",
-                         ['interpolation/inverse_distance.' + ext_extention], include_dirs=[numpy.get_include()]),
+                         ['interpolation/inverse_distance.' + ext_extention],
+                         include_dirs=[numpy.get_include()]),
                Extension("interpolation.inverse_distance_3d",
-                         ['interpolation/inverse_distance_3d.' + ext_extention], include_dirs=[numpy.get_include()])]
+                         ['interpolation/inverse_distance_3d.'
+                          + ext_extention],
+                         include_dirs=[numpy.get_include()])]
 
 for e in ext_modules:
     e.cython_directives = {"embedsignature": True}
