@@ -7,8 +7,7 @@ import subprocess
 import numpy
 import setuptools
 
-release = subprocess.check_output(
-    ['git', 'describe', '--abbrev=0', '--tags']).decode('utf-8').strip()
+release = subprocess.check_output(['git', 'describe', '--abbrev=0', '--tags']).decode('utf-8').strip()
 version = ".".join(release.split('.')[0:2])
 name = "pymica"
 
