@@ -2,8 +2,10 @@
 and takes the best option for each zone
 '''
 import sys
+from copy import deepcopy
 
 import ogr
+
 from pymica.multiregression import MultiRegressionSigma
 
 
@@ -64,8 +66,9 @@ class ClusteredRegression:
                         cluster_file_regressions.append(cluster_regression)
                         file_mse += (mse_cluster * len(data_in_cluster))
                     else:
-                        regr_all.original_data = cluster_regression.original_data
-                        cluster_file_regressions.append(regr_all)
+                        new_regr_all = deepcopy(regr_all)
+                        new_regr_all.original_data = data_in_cluster
+                        cluster_file_regressions.append(new_regr_all)
                         file_mse += mse_all * len(data_in_cluster)
 
                 file_mse = file_mse / len(data)
