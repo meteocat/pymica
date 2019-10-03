@@ -13,7 +13,7 @@ setup.py
 pip
 ---
 
-pip install -r requirements.txt
+:code:`pip install -r requirements.txt`
 
 :code:`pip install pymica`
 
