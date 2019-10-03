@@ -1,5 +1,4 @@
-"""
-Calculates a multiple linear regression recursively adding variables,
+"""Calculates a multiple linear regression recursively adding variables,
 until the score is under a threshold
 
 For more information, see :ref:`Multiple Linear Regression`.
