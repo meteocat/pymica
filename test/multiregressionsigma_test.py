@@ -1,6 +1,8 @@
+'''Tests for pymica.multiregression.py
+'''
 import unittest
-from pymica.multiregression import MultiRegressionSigma
-from pymica.multiregression import MultiRegression
+
+from pymica.multiregression import MultiRegression, MultiRegressionSigma
 
 
 class TestMultiRegressionSigma(unittest.TestCase):

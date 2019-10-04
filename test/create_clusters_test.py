@@ -1,3 +1,5 @@
+'''Tests for cluster.create_clusters.py
+'''
 import unittest
 
 from cluster.create_clusters import calculate_utm_def

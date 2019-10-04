@@ -1,6 +1,5 @@
 '''Tests fot create_cluster_files.py
 '''
-
 import unittest
 from os import remove
 from os.path import exists

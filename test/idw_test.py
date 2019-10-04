@@ -1,6 +1,10 @@
+'''Tests for interpolation.idw.py
+'''
 import unittest
 from datetime import datetime
+
 from numpy import array
+
 from interpolation.idw import idw
 
 

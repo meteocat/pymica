@@ -1,4 +1,7 @@
+'''Tests for pymica.multiregression.py
+'''
 import unittest
+
 from pymica.multiregression import MultiRegression
 
 

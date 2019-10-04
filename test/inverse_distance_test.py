@@ -1,7 +1,12 @@
+'''Tests for inverse_distance.py
+'''
 import unittest
-from interpolation.inverse_distance import inverse_distance  # pylint: disable=E0611
-from numpy import array
 from datetime import datetime
+
+from numpy import array
+
+from interpolation.inverse_distance import \
+    inverse_distance  # pylint: disable=E0611
 
 
 class TestInverseDistance(unittest.TestCase):

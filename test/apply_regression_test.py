@@ -1,9 +1,13 @@
+'''Testing pymica.apply_regression.py
+'''
 import json
 import unittest
 from datetime import datetime
 
 import numpy as np
-from pymica.apply_regression import apply_regression, apply_clustered_regression
+
+from pymica.apply_regression import (apply_clustered_regression,
+                                     apply_regression)
 from pymica.clustered_regression import ClusteredRegression
 from pymica.multiregression import MultiRegressionSigma
 

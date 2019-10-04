@@ -1,8 +1,8 @@
 '''Testing pymica.clustered_regression.py
 '''
-
-import unittest
 import json
+import unittest
+
 from pymica.clustered_regression import ClusteredRegression
 
 

@@ -1,3 +1,5 @@
+'''Tests for pymica.pymica.py
+'''
 import unittest
 from tempfile import gettempdir
 

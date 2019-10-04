@@ -1,3 +1,5 @@
+'''Tests for distance_to_sea.py
+'''
 import unittest
 
 from distance.distance_to_sea import dist2func, get_distances, get_dist_array

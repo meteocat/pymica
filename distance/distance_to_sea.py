@@ -1,8 +1,7 @@
 '''Calculations to get the distance to the coast values
 '''
+from math import exp, floor
 
-from math import exp
-from math import floor
 import ogr
 import osr
 from numpy import ones
