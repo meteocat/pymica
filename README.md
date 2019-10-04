@@ -33,6 +33,5 @@ A set of examples were designed to explore the different possibilities of MICA.
 
 Another repository was created to store sample data and the examples in jupyter notebooks [pymica-examples](https://github.com/meteocat/pymica-examples)
 
-
 [Try the demo](https://mybinder.org/v2/gh/meteocat/pymica-examples/master?urlpath=/lab/tree/index.ipynb) |
 [Read the docs](https://pymica.readthedocs.io/en/stable)
