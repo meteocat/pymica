@@ -65,7 +65,7 @@ path.
 
     id_2d.save_file('../envmodsoft/output/residuals_id2d.tif')
 
-Or we can plot a quicklook of it using the plot_temp function with the
+Or we can plot a quick look of it using the plot_temp function with the
 ``result`` attribute of the ``pymica`` class instance.
 
 .. code:: ipython3
@@ -96,7 +96,7 @@ path.
 
     id_3d.save_file('../envmodsoft/output/residuals_id3d.tif')
 
-Or we can plot a quicklook of it using the plot_temp function with the
+Or we can plot a quick look of it using the plot_temp function with the
 ``result`` attribute of the ``pymica`` class instance.
 
 .. code:: ipython3
@@ -127,7 +127,7 @@ path.
 
     id_w.save_file('../envmodsoft/output/residuals_idw.tif')
 
-Or we can plot a quicklook of it using the plot_temp function with the
+Or we can plot a quick look of it using the plot_temp function with the
 ``result`` attribute of the ``pymica`` class instance.
 
 .. code:: ipython3

@@ -6,7 +6,7 @@ But before the application of the models, the regions must be defined.
 These regions can be delimited by administrative boundaries,
 climatically or as in the present case, automatically.
 
-We’ll use the K-Means algorithm to group statations. It is implemented
+We’ll use the K-Means algorithm to group stations. It is implemented
 using `SciKit-Learn <https://scikit-learn.org/stable/>`__ package.
 
 First, we’ll load the required modules from PyMica package, in this
@@ -25,7 +25,7 @@ The ``create_clusters`` function receives two parameters:
    latitude (lat) and altitude (alt). An example can be seen in
    sample_station_metadata.json which contains
    the automatic weather stations network of the Meteorological Service
-   of Catalonia. The first element of the list in the abovementioned
+   of Catalonia. The first element of the list in the above-mentioned
    file is the following:
 
    .. code:: json

@@ -25,9 +25,9 @@ The ``create_clusters`` function receives two parameters:
    The path of a .json file containing a list of the stations to group.
    Each station must have its identification (id) longitude (lon),
    latitude (lat) and altitude (alt). An example can be seen in
-   sample_station_metadata.json (REF github al fitxer) which contains
+   sample_station_metadata.json which contains
    the automatic weather stations network of the Meteorological Service
-   of Catalonia. The first element of the list in the abovementioned
+   of Catalonia. The first element of the list in the above-mentioned
    file is the following:
 
    .. code:: json
@@ -49,7 +49,7 @@ path and with 3 as the resultant number of clusters.
 
 After executing the previous code line, a webservice prompts up, where
 the build clusters are shown and can be downloaded in a GeoJSON format
-for further applications. Once downladed, they can be opened by a GIS
+for further applications. Once downloaded, they can be opened by a GIS
 software and easily modified.
 
 In this case, we did not make the last code line executable since it is
@@ -58,8 +58,9 @@ this script must be executed from command line after cloning the github
 `pymica-examples <https://github.com/meteocat/pymica-examples>`__
 repository in your computer.
 
-However, the follwing image shows how the webservice looks like:
+However, the following image shows how the webservice looks like:
 
+.. image:: _static/clustering_3.png
 
 
 In this case, we downloaded the clusters file and save it into
@@ -77,9 +78,9 @@ transition when clusters are merged.
 
 For this purpose we will use the ``rasterize_clusters`` function which
 receives a .json file path and a ``Dict`` with the output properties as
-parameters. Therfore, we will import ``rasterize_clusters`` function
+parameters. Therefore, we will import ``rasterize_clusters`` function
 from ``create_cluster_files`` module. In addition,
-``create_repreojected_geoms`` will be also imported to transform
+``create_reprojected_geoms`` will be also imported to transform
 longitude and latitude coordinates projection into UTM.
 
 .. code:: ipython3

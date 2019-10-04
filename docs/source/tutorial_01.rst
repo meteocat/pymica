@@ -12,7 +12,7 @@ preparation of weather station data and explanatory variable fields.
 
 The data format of weather stations data used by PyMica is a list
 containing a dictionary for each weather station including, at least,
-the following vairables:
+the following variables:
 
 -  Longitude
 -  Latitude
@@ -99,7 +99,7 @@ Now, we’ll save this data into a .json file to use it later.
     with open('../sample-data/data/smc_data.json', 'w') as outfile:
         json.dump(data, outfile)
 
-It is also important to creata a file with station metadata information.
+It is also important to create a file with station metadata information.
 Then, we’ll use ``metadata`` variable to build a .json file.
 
 .. code:: ipython3

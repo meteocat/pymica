@@ -25,7 +25,7 @@ we’ll import the required libraries.
 The ``create_clusters`` function requires two parameters: a .json file
 including station metadata and the number of clusters we want to obtain.
 
-Firstly, we’ll create two clusters. When calling ``create_clsuters``
+Firstly, we’ll create two clusters. When calling ``create_clusters``
 function, a new tab will be opened in your browser from which clusters
 can be downloaded in a .json file which we’ll save in
 ./docs/notebooks/tutorials/cat/clusters/.

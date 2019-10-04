@@ -52,7 +52,7 @@ And now, we can call the PyMica class.
 
     cluster_2_4_int = PyMica(data_file, variables_file, clusters, data_format)
 
-We can plot a quicklook of the resultant air temperature interpolated
+We can plot a quick look of the resultant air temperature interpolated
 field using imshow function.
 
 .. code:: ipython3

@@ -54,7 +54,7 @@ First, we calculate the distances to coast in meters.
 
 
 Now, with the ``dcoast_points``, we can call ``dist2func`` which apply
-the abovementioned logarithmic function.
+the above-mentioned logarithmic function.
 
 .. code:: ipython3
 

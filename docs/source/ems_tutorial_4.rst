@@ -5,7 +5,7 @@ In this example we will show how to obtain interpolated fields
 considering clusters or not. In this case data from the automatic
 weather station network of the Meteorological Service of Catalonia (SMC)
 will be used. Particularly, data from 31st December 2018, which
-corresponds to a persitent fog situation.
+corresponds to a persistent fog situation.
 
 The interpolated fields are obtained through the application of the main
 class of the pyMICA library, PyMica. Therefore, we import it:
@@ -76,7 +76,7 @@ we chose the inverse of the 3D distance, ``id3d``.
 
     residuals_int = 'id3d'
 
-Now, we have initializated the three parameters that are common for the
+Now, we have initialized the three parameters that are common for the
 interpolation process that will be described below, either with or
 without clusters.
 

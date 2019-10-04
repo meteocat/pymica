@@ -18,8 +18,8 @@ functions to obtain an air temperature interpolated field.
    tutorial_03
 
 
-MICA how to's
-~~~~~~~~~~~~~
+MICA how to
+~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 1
