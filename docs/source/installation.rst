@@ -3,12 +3,10 @@ Installation
 
 There are several ways to install this package
 
-setup.py
+Anaconda
 --------
 
-:code:`python3 setup.py build`
-
-:code:`python3 setup.py install`
+:code:`conda install -c meteocat pymica`
 
 pip
 ---
@@ -17,9 +15,9 @@ pip
 
 :code:`pip install pymica`
 
-Anaconda
+setup.py
 --------
 
-You can first install the dependencies by running:
+:code:`python3 setup.py build`
 
-:code:`conda env create -f environment.yml`
+:code:`python3 setup.py install`
