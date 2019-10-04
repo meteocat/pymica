@@ -6,8 +6,8 @@
 
 [![Logo](https://github.com/meteocat/pymica/blob/master/docs/source/_static/logo.svg)](#)
 
-(py)Meteorological variable Interpolation based on Clustered Analysis
-=====================================================================
+(py)Meteorological variable Interpolation based on Clustered data Analysis
+==========================================================================
 
 pyMICA is an interpolation system that combines multiple linear regressions and clustering. The philosophy of MICA is based on an iterative process to reduce the final error of the interpolated field.
 
