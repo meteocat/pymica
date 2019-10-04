@@ -15,12 +15,13 @@
 <script src="d3-geo-voronoi.min.js"></script>
 <script src="d3-delaunay.min.js"></script>
 <script src="FileSaver.min.js"></script>
+<script src="d3-geo-projection.v1.min.js"></script>
 <div id="content"></div>
 
 <script>
 var width = 960,
     height = 700,
-    margin = 30;
+    margin = 80;
 
 var outJSON;
 var colors = d3.schemeCategory10;
@@ -49,14 +50,41 @@ Promise.all([
                 .fitExtent([[margin, margin], [width-margin, height-margin]], points);
  var path = d3.geoPath()
     .projection(projection);
- var path2 = d3.geoPath(d3.geoIdentity().clipExtent([[100, 100], [500, 400]]))
+ var path2 = d3.geoPath(d3.geoIdentity().clipExtent([[100, 100], [300, 300]]))
     .projection(projection);
  
+
+
+var padding = 80;
+var projection = d3.geoMercator()
+    .fitExtent([[padding,padding], [width-padding, height-padding]], points);
+
+// Clip the features to a certain paper extent around a center.
+var projection_invert = d3.geoTransform({
+                      point: function(x, y) {
+                      let u = projection.invert([x,y]);
+                      this.stream.point(u[0], u[1]);
+                      }
+    });
+
+var clip_padding = 0	;
+var clip2paper = d3.geoIdentity()
+   .clipExtent([[clip_padding,clip_padding], [width-clip_padding, height-clip_padding]])
+
+var clip = function(d) {
+    d = d3.geoProject(d, projection);
+    d = d3.geoProject(d, clip2paper);
+    d = d3.geoProject(d, projection_invert);
+    return d;
+    }
+
+var _path = d3.geoPath().projection(projection);
+var path2 = function(d) { return _path(clip(d)); };
 
   maxCluster = points.features.reduce((a,b) => {return a.properties.cluster<b.properties.cluster?b:a;});
   var clusters = Array.apply(null, {length: 1 + maxCluster.properties.cluster}).map(Number.call, Number);
 
-  calculateZones(points, clusters, path2);
+  calculateZones(points, clusters, path2, projection);
 
   downloadDiv.append("button").text("Download clusters file")
             .on("click", () => {
@@ -90,7 +118,7 @@ Promise.all([
             let newValue = d3.select(this).property('value');
             //d3.select(this).property('value', newValue);
             points.features[i].properties.cluster = parseInt(newValue);
-            calculateZones(points, clusters, path);
+            calculateZones(points, clusters, path2);
 
         });
     })
@@ -114,10 +142,9 @@ Promise.all([
     console.error(err)
 });
 
-const calculateZones = (points, clusters, path) => {
+const calculateZones = (points, clusters, path, projection) => {
 
     let voronoi = d3.geoVoronoi().polygons(points);
-
 
     let topology = topojson.topology({'regions': voronoi});
 
@@ -139,6 +166,22 @@ const calculateZones = (points, clusters, path) => {
         .style("stroke", "#000");
     
     voronoiZones.attr("d", path);
+    var n;
+    var j;
+    nodes = voronoiZones._enter[0][0]._parent.childNodes;
+    for (n = 0; n < nodes.length; n++) {
+        node = voronoiZones._enter[0][0]._parent.childNodes[n];
+        var clip_coords = new Array;
+        for (j = 0 ; j < node.pathSegList.length-1; j++) {
+    	    var point = node.pathSegList[j];
+	        clip_coords = clip_coords.concat(Array([projection.invert([point['x'], point['y']])])[0]);
+        }
+        if (clip_coords[clip_coords.length-1][0] != clip_coords[0][0] ||
+            clip_coords[clip_coords.length-1][1] != clip_coords[0][1]) {   
+            clip_coords = clip_coords.concat(Array([clip_coords[0][0], clip_coords[0][1]]));
+        }
+        merged[n].coordinates[0][0] = clip_coords;
+    }
      
     outJSON = {
     "type": "FeatureCollection",

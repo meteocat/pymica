@@ -1,18 +1,20 @@
 import unittest
-from pyproj import Proj
 
 from cluster.create_clusters import calculate_utm_def
+from pyproj import Proj
 
 
 class TestCreateClusters(unittest.TestCase):
-    '''
+
     # Not possible to open a browser in TravisCI
+    '''
     def test_create_clusters(self):
         fp = open("./test/data/sample_station_metadata.json")
         data = json.load(fp)
-        create_clusters(data, 3)
+        create_clusters(data, 6)
         fp.close()
     '''
+
     def test_calculate_utm_def(self):
         point = [0, 0]
         result = calculate_utm_def(point)

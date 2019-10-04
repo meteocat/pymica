@@ -1,7 +1,9 @@
 '''Tool for creating and editing clusters with the K-Means method
 '''
+import http.server
+import os
+import socketserver
 import webbrowser
-
 from json import dumps, load
 from math import floor
 from shutil import copytree
@@ -52,13 +54,21 @@ def create_clusters(locations, n_clusters):
                 "alt": locations[i]['alt']
             }
         })
+
     web_dir = mkdtemp()
     copytree("./cluster/web", web_dir+"/web")
     f_p = open(web_dir+"/web/points.json", "w")
     f_p.write(dumps(out_geojson))
     f_p.close()
 
-    webbrowser.get('firefox').open_new_tab(web_dir + "/web/index.html")
+    os.chdir(web_dir + "/web")
+    socketserver.socket.setdefaulttimeout(5)
+    Handler = http.server.SimpleHTTPRequestHandler
+    httpd = socketserver.TCPServer(("", 8000), Handler)
+    print("serving at port", 8000)
+    webbrowser.get('firefox').open_new_tab("localhost:8000")
+
+    httpd.serve_forever()
 
 
 def calculate_utm_def(point):

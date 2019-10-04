@@ -8,16 +8,21 @@
 Welcome to pyMICA's documentation!
 ==================================
 
-MICA, the acronym of Meteorological field Interpolation based on Clustered Analysis is
-an interpolation system that combines multiple linear regressions and clustering. The 
-philosophy of MICA is based on an iterative process to reduce the final error of the 
-interpolated field.
+MICA, the acronym of Meteorological field Interpolation based on Clustered 
+data Analysis is a Python library which interpolates meteorological surface 
+observations through multiple linear regressions (MLR) and residual corrections.
+Two options are available: using a simple MLR for all the surface observations
+or divide them in clusters.
 
-The iterativeness of MICA is that there is not a defined number of clusters in which 
-stations are grouped or divided but several number of clusters are considered and 
-the one that performs the best, in terms of RMSE, is selected. 
+The first option implies the calculation of a MLR considering all the observations
+at once and using explanatory variables, such as altitude, distance to coast,
+latitude and longitude. The second option, uses clusters to classify stations
+in different groups. This allows to separate stations that may behave differently
+due to the presence of dissimilar weather conditions. 
+For example, weather stations placed at a similar altitude, ones under the effects
+of fog and others with clear sky conditions.
 
-#TODO: Try it yourself! Jupyter Notebooks
+Try it yourself! `Jupyter Notebooks <https://github.com/meteocat/pymica-examples>`__
 
 .. toctree::
    :maxdepth: 2
@@ -28,6 +33,7 @@ the one that performs the best, in terms of RMSE, is selected.
    theory
    scripts
    api
+   tutorials
 
 
 Indices and tables
