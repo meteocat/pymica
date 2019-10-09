@@ -14,7 +14,7 @@ algorithm to classify stations, which is implemented using the
 First, we will load the required modules from PyMica package, in this
 case, ``create_clusters``.
 
-.. code:: ipython3
+.. code-block:: python
 
     from cluster.create_clusters import create_clusters
 
@@ -83,7 +83,7 @@ from ``create_cluster_files`` module. In addition,
 ``create_reprojected_geoms`` will be also imported to transform
 longitude and latitude coordinates projection into UTM.
 
-.. code:: ipython3
+.. code-block:: python
 
     from cluster.create_cluster_files import rasterize_clusters, create_reprojected_geoms
 
@@ -93,7 +93,7 @@ coordinates to a desired EPSG. In the present case, 25831. We will keep
 the output of this function to pass it as a parameter in
 ``rasterize_clusters`` function.
 
-.. code:: ipython3
+.. code-block:: python
 
     clusters_layer = create_reprojected_geoms('../envmodsoft/clusters/clusters-3.json', 25831)
 
@@ -121,7 +121,7 @@ The two remaining parameters will be set in accordance with the extent
 and resolution of the final interpolated field we want to obtain. In
 this case:
 
-.. code:: ipython3
+.. code-block:: python
 
     out_properties = {'out_file'    : '../envmodsoft/clusters/rasterized-clusters-3',
                       'size'        : [1000, 970],
@@ -129,7 +129,7 @@ this case:
 
 Now, we call the ``rasterize_clusters`` function.
 
-.. code:: ipython3
+.. code-block:: python
 
     rasterize_clusters(clusters_layer, out_properties)
 

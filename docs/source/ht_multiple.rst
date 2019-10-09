@@ -13,7 +13,7 @@ in `Clusters <https://pymica.readthedocs.io/en/latest/ht_clusters.html>`__ Secti
 
 First, we’ll import the PyMica class.
 
-.. code:: ipython3
+.. code-block:: python
 
     from pymica.pymica import PyMica
 
@@ -38,7 +38,7 @@ Defining parameters of PyMica class
 First, we have to define ``data_file``, ``variables_file``, ``clusters``
 and ``data_format`` parameters of PyMica class.
 
-.. code:: ipython3
+.. code-block:: python
 
     data_file = '../sample-data/data/xema_20181231_1400.json'
     variables_file = ['../sample-data/explanatory/cat_dem_25831.tif', '../sample-data/explanatory/cat_distance_coast.tif']
@@ -48,14 +48,14 @@ and ``data_format`` parameters of PyMica class.
 
 And now, we can call the PyMica class.
 
-.. code:: ipython3
+.. code-block:: python
 
     cluster_2_4_int = PyMica(data_file, variables_file, clusters, data_format)
 
 We can plot a quick look of the resultant air temperature interpolated
 field using imshow function.
 
-.. code:: ipython3
+.. code-block:: python
 
     import matplotlib.pyplot as plt
     plt.imshow(cluster_2_4_int.result)
@@ -71,6 +71,6 @@ field using imshow function.
 Or we can just save the result into a .tif file using ``save_file``
 function of PyMica class.
 
-.. code:: ipython3
+.. code-block:: python
 
     cluster_2_4_int.save_file('../sample-data/results/clusters_2_4_int.tif')

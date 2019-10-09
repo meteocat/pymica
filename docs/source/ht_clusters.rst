@@ -12,7 +12,7 @@ using `SciKit-Learn <https://scikit-learn.org/stable/>`__ package.
 First, we’ll load the required modules from PyMica package, in this
 case, ``create_clusters``.
 
-.. code:: ipython3
+.. code-block:: python
 
     from cluster.create_clusters import create_clusters
 
@@ -48,7 +48,7 @@ in a GeoJSON format. In addition, it’s possible to modify the automatic
 classification made by K-Means and then download them with the
 modifications.
 
-.. code:: ipython3
+.. code-block:: python
 
     create_clusters('../sample-data/data/smc_metadata.json', 3)
 

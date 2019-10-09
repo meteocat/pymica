@@ -22,7 +22,7 @@ as parameters the following ones:
 Before starting with different interpolation examples, we must import
 the PyMica class. We also import matplotlib in order to plot the result.
 
-.. code:: ipython3
+.. code-block:: python
 
     import matplotlib.pyplot as plt
     from pymica.pymica import PyMica
@@ -30,7 +30,7 @@ the PyMica class. We also import matplotlib in order to plot the result.
 Since data_file, variables_file and data_format will be the same for the
 examples below, we’ll define them now.
 
-.. code:: ipython3
+.. code-block:: python
 
     data_file = '../sample-data/data/xema_20181231_1400.json'
     variables_file = ['../sample-data/explanatory/cat_dem_25831.tif',
@@ -52,27 +52,27 @@ The examples in this tutorial are:
 In this example, no clusters will be considered, then ``clusters``
 PyMica class parameter will be set to ``None``.
 
-.. code:: ipython3
+.. code-block:: python
 
     clusters = None
 
 Now, we’re ready to call PyMica class!
 
-.. code:: ipython3
+.. code-block:: python
 
     noclusters_int = PyMica(data_file, variables_file, clusters, data_format)
 
 Now we can save the result into a .tif file using PyMica ``save_file``
 function:
 
-.. code:: ipython3
+.. code-block:: python
 
     noclusters_int.save_file('../sample-data/results/no_cluster_int.tif')
 
 But, we can also plot a quick look of the interpolated field, with
 ``noclusters_int`` result attribute.
 
-.. code:: ipython3
+.. code-block:: python
 
     plt.imshow(noclusters_int.result)
     cbar = plt.colorbar()
@@ -93,28 +93,28 @@ when no clusters are considered.
 
 Then, we set ``clusters`` parameters as follows:
 
-.. code:: ipython3
+.. code-block:: python
 
     clusters = {'clusters_files':['../sample-data/clusters/clusters_2.json'],
                 'mask_files':['../sample-data/clusters/clusters_2_mask']}
 
 And now, we call PyMica class:
 
-.. code:: ipython3
+.. code-block:: python
 
     cluster_2_int = PyMica(data_file, variables_file, clusters, data_format)
 
 Now we can save the result into a .tif file using PyMica ``save_file``
 function:
 
-.. code:: ipython3
+.. code-block:: python
 
     cluster_2_int.save_file('../sample-data/results/cluster_2_int.tif')
 
 But, we can also plot a quick look of the interpolated field, with
 ``cluster_2_int`` result attribute.
 
-.. code:: ipython3
+.. code-block:: python
 
     plt.imshow(cluster_2_int.result)
     cbar = plt.colorbar()
@@ -135,7 +135,7 @@ field obtained when no clusters are considered.
 
 Then, we set ``clusters`` parameters as follows:
 
-.. code:: ipython3
+.. code-block:: python
 
     clusters = {'clusters_files':['../sample-data/clusters/clusters_2.json',
                                   '../sample-data/clusters/clusters_4.json'],
@@ -144,21 +144,21 @@ Then, we set ``clusters`` parameters as follows:
 
 And now, we call PyMica class:
 
-.. code:: ipython3
+.. code-block:: python
 
     clusters_int = PyMica(data_file, variables_file, clusters, data_format)
 
 Now we can save the result into a .tif file using PyMica ``save_file``
 function:
 
-.. code:: ipython3
+.. code-block:: python
 
     clusters_int.save_file('../sample-data/results/clusters_4_int.tif')
 
 But, we can also plot a quick look of the interpolated field, with
 ``clusters_int`` result attribute.
 
-.. code:: ipython3
+.. code-block:: python
 
     plt.imshow(clusters_int.result)
     cbar = plt.colorbar()

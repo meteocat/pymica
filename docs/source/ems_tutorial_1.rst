@@ -12,7 +12,7 @@ In order to show the performance of the different interpolation
 methodologies, we will call the ``pymica`` class. For this purpose we
 will import it first.
 
-.. code:: ipython3
+.. code-block:: python
 
     from pymica.pymica import PyMica
 
@@ -40,7 +40,7 @@ Defining the parameters of PyMica class
 First, we have to define ``data_file``, ``variables_file``, ``clusters``
 and ``data_format`` parameters of PyMica class.
 
-.. code:: ipython3
+.. code-block:: python
 
     data_file = '../envmodsoft/data/observations/xema_20181024_0500.json'
     variables_file = ['../sample-data/explanatory/cat_dem_25831.tif', '../sample-data/explanatory/cat_distance_coast.tif']
@@ -53,7 +53,7 @@ Inverse of the 2D distance
 To obtain the interpolated field with the anomaly correction using the
 inverse of the 2D distance we must set ``residuals_int`` to ``id2d``.
 
-.. code:: ipython3
+.. code-block:: python
 
     id_2d = PyMica(data_file, variables_file, clusters, data_format, residuals_int='id2d')
 
@@ -61,14 +61,14 @@ Now we can save the interpolated field into a .tif file calling the
 ``save_file`` function of ``pymica`` class and specifying the output
 path.
 
-.. code:: ipython3
+.. code-block:: python
 
     id_2d.save_file('../envmodsoft/output/residuals_id2d.tif')
 
 Or we can plot a quick look of it using the plot_temp function with the
 ``result`` attribute of the ``pymica`` class instance.
 
-.. code:: ipython3
+.. code-block:: python
 
     from plot_interpolation import plot_interpolation
     plot_interpolation('../envmodsoft/output/residuals_id2d.tif', 'temp')
@@ -84,7 +84,7 @@ Inverse of the 3D distance
 To obtain the interpolated field with the anomaly correction using the
 inverse of the 3D distance we must set ``residuals_int`` to ``id3d``.
 
-.. code:: ipython3
+.. code-block:: python
 
     id_3d = PyMica(data_file, variables_file, clusters, data_format, residuals_int='id3d')
 
@@ -92,14 +92,14 @@ Now we can save the interpolated field into a .tif file calling the
 ``save_file`` function of ``pymica`` class and specifying the output
 path.
 
-.. code:: ipython3
+.. code-block:: python
 
     id_3d.save_file('../envmodsoft/output/residuals_id3d.tif')
 
 Or we can plot a quick look of it using the plot_temp function with the
 ``result`` attribute of the ``pymica`` class instance.
 
-.. code:: ipython3
+.. code-block:: python
 
     plot_interpolation('../envmodsoft/output/residuals_id3d.tif', 'temp')
 
@@ -115,7 +115,7 @@ To obtain the interpolated field with the anomaly correction using the
 inverse of the distance weighting we must set ``residuals_int`` to
 ``idw``.
 
-.. code:: ipython3
+.. code-block:: python
 
     id_w = PyMica(data_file, variables_file, clusters, data_format, residuals_int='idw')
 
@@ -123,14 +123,14 @@ Now we can save the interpolated field into a .tif file calling the
 ``save_file`` function of ``pymica`` class and specifying the output
 path.
 
-.. code:: ipython3
+.. code-block:: python
 
     id_w.save_file('../envmodsoft/output/residuals_idw.tif')
 
 Or we can plot a quick look of it using the plot_temp function with the
 ``result`` attribute of the ``pymica`` class instance.
 
-.. code:: ipython3
+.. code-block:: python
 
     plot_interpolation('../envmodsoft/output/residuals_idw.tif', 'temp')
 

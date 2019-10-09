@@ -28,7 +28,7 @@ is the distance where the distance to coast is cancelled.
 The distance to coast raster is built using ``get_dist_array`` function.
 Now, we’ll import it.
 
-.. code:: ipython3
+.. code-block:: python
 
     from distance.distance_to_sea import get_dist_array
 
@@ -43,7 +43,7 @@ sea values. It receives as parameters:
 
 Now, we’ll call the ``get_dist_array_function``.
 
-.. code:: ipython3
+.. code-block:: python
 
     dist_file = '../sample-data/explanatory/cat_coast_line.json'
     dcoast_array = get_dist_array(proj=25831, geotransform=[260000, 270, 0, 4750000, 0, -270], size=[1000, 970], dist_file=dist_file)
@@ -61,7 +61,7 @@ destination file path with the name of the file included, the data to
 include in the .tiff, the geotransform and the EPSG projection of the
 .tif file.
 
-.. code:: ipython3
+.. code-block:: python
 
     from osgeo import gdal, osr
     
@@ -85,7 +85,7 @@ include in the .tiff, the geotransform and the EPSG projection of the
     
         ds_out = None
 
-.. code:: ipython3
+.. code-block:: python
 
     get_tif_from_array(file_path = '../sample-data/results/dcoast_sample.tif',
                        data = dcoast_array,
@@ -98,7 +98,7 @@ Now, a .tif file including the dcoast_array is saved in
 If we want to have a quick look on dcoast_array we can plot it using
 imshow.
 
-.. code:: ipython3
+.. code-block:: python
 
     import matplotlib.pyplot as plt
     plt.imshow(dcoast_array)

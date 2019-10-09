@@ -15,7 +15,7 @@ line and *D* is the distance where the distance to coast is cancelled.
 First we’ll import both functions (``get distances`` and ``dist2func``)
 and then call them.
 
-.. code:: ipython3
+.. code-block:: python
 
     from distance.distance_to_sea import get_distances, dist2func
 
@@ -28,7 +28,7 @@ latitude, respectively.
 
 First, we calculate the distances to coast in meters.
 
-.. code:: ipython3
+.. code-block:: python
 
     points = [[1, 41], [0.5, 40]]
     dist_file = '../sample-data/explanatory/cat_coast_line.json'
@@ -46,7 +46,7 @@ First, we calculate the distances to coast in meters.
 Now, with the ``dcoast_points``, we can call ``dist2func`` which apply
 the abovementioned logarithmic function.
 
-.. code:: ipython3
+.. code-block:: python
 
     print('Distance to coast function:')
     for i in range(len(dcoast_points)):

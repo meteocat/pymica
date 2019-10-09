@@ -11,12 +11,12 @@ effect is performed.
 
 For this purpose we’ll use the ``rasterize_clusters`` function which
 receives a .json file path and a ``Dict`` with the output properties as
-parameters. Therfore, we’ll import ``rasterize_clusters`` function from
+parameters. Therefore, we’ll import ``rasterize_clusters`` function from
 create_cluster_files.py module. In addition,
-``create_repreojected_geoms`` will be also imported to transform
+``create_reprojected_geoms`` will be also imported to transform
 longitude and latitude coordinates projection into UTM.
 
-.. code:: ipython3
+.. code-block:: python
 
     from cluster.create_cluster_files import rasterize_clusters, create_reprojected_geoms
 
@@ -25,7 +25,7 @@ First, we’ll use ``create_reprojected_geoms`` to transform the clusters
 desired EPSG. In the present case, 25831. We’ll keep the output of this
 function to pass it as a parameter in ``rasterize_clusters`` function.
 
-.. code:: ipython3
+.. code-block:: python
 
     clusters_layer = create_reprojected_geoms('../sample-data/clusters/clusters_4.json', 25831)
 
@@ -54,7 +54,7 @@ remaining parameters will be set in accordance with the extent and
 resolution of the final interpolated field we want to obtain. In this
 example:
 
-.. code:: ipython3
+.. code-block:: python
 
     out_properties = {'out_file'    : '../sample-data/clusters/rasterized_clusters_test',
                       'size'        : [1000, 970],
@@ -62,7 +62,7 @@ example:
 
 Now, we call the ``rasterize_clusters`` function.
 
-.. code:: ipython3
+.. code-block:: python
 
     rasterize_clusters(clusters_layer, out_properties)
 

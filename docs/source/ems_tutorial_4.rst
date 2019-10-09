@@ -10,7 +10,7 @@ corresponds to a persistent fog situation.
 The interpolated fields are obtained through the application of the main
 class of the pyMICA library, PyMica. Therefore, we import it:
 
-.. code:: ipython3
+.. code-block:: python
 
     from pymica.pymica import PyMica
 
@@ -43,7 +43,7 @@ For the interpolation we will consider two explanatory variables:
 altitude and distance to coast. But first, we define the path to the
 file containing the data.
 
-.. code:: ipython3
+.. code-block:: python
 
     data_file = '../envmodsoft/data/observations/xema_max_20161213.json'
 
@@ -56,7 +56,7 @@ The first element of ``xema_20181231_1400.json`` is the following:
 Now, we define the paths of the altitude and distance to coast
 explanatory fields:
 
-.. code:: ipython3
+.. code-block:: python
 
     variables_files = ['../envmodsoft/data/explanatory/cat_dem_25831.tif', '../envmodsoft/data/explanatory/cat_distance_coast.tif']
 
@@ -65,14 +65,14 @@ the variable to interpolate is air temperature and it is labelled as the
 default (``temp``) and the explanatory variables are also the default
 ones, we can set the ``data_format`` parameter to ``None``.
 
-.. code:: ipython3
+.. code-block:: python
 
     data_format = None
 
 Finally, we select the residuals interpolation methodology. In this case
 we chose the inverse of the 3D distance, ``id3d``.
 
-.. code:: ipython3
+.. code-block:: python
 
     residuals_int = 'id3d'
 
@@ -86,14 +86,14 @@ Tutorial 4.2: Interpolation without clusters
 In this interpolation process, no clusters will be considered.
 Therefore, the ``clusters`` parameter will be set to ``None``.
 
-.. code:: ipython3
+.. code-block:: python
 
     clusters = None
 
 Now, we call the PyMica class and save the result into what we called
 ``global_int``:
 
-.. code:: ipython3
+.. code-block:: python
 
     global_int = PyMica(data_file, variables_files, clusters, data_format, residuals_int)
 
@@ -101,7 +101,7 @@ We save the interpolated field into a .tif file calling the
 ``save_file`` function of ``PyMica`` class and specifying the output
 path.
 
-.. code:: ipython3
+.. code-block:: python
 
     global_int.save_file('../envmodsoft/output/tair_20161213_max_noclusters.tif')
 
@@ -110,7 +110,7 @@ And we can also plot the interpolated field using the
 which requires the path of the interpolated raster file and specifying
 the interpolated variable, in this case ``temp``:
 
-.. code:: ipython3
+.. code-block:: python
 
     from plot_interpolation import plot_interpolation
     plot_interpolation('../envmodsoft/output/tair_20161213_max_noclusters.tif', 'temp')
@@ -127,7 +127,7 @@ In this interpolation process, 3 and 6 clusters will be considered.
 Therefore, the ``clusters`` parameter will be set accordingly by
 defining the paths to the polygons and their rasters.
 
-.. code:: ipython3
+.. code-block:: python
 
     clusters = {'clusters_files': ['../envmodsoft/clusters/clusters-3.json', '../envmodsoft/clusters/clusters-6.json'], 
                 'mask_files': ['../envmodsoft/clusters/rasterized-clusters-3', '../envmodsoft/clusters/rasterized-clusters-6']}
@@ -135,7 +135,7 @@ defining the paths to the polygons and their rasters.
 Now, we call the PyMica class and save the result into what we called
 ``clusters_int``:
 
-.. code:: ipython3
+.. code-block:: python
 
     clusters_int = PyMica(data_file, variables_files, clusters, data_format, residuals_int)
 
@@ -143,7 +143,7 @@ We save the interpolated field into a .tif file calling the
 ``save_file`` function of ``PyMica`` class and specifying the output
 path.
 
-.. code:: ipython3
+.. code-block:: python
 
     clusters_int.save_file('../envmodsoft/output/tair_20161213_max_clusters.tif')
 
@@ -152,7 +152,7 @@ And we can also plot the interpolated field using the
 which requires the path of the interpolated raster file and specifying
 the interpolated variable, in this case ``temp``:
 
-.. code:: ipython3
+.. code-block:: python
 
     from plot_interpolation import plot_interpolation
     plot_interpolation('../envmodsoft/output/tair_20161213_max_clusters.tif', 'temp')

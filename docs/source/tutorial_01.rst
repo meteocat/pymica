@@ -42,7 +42,7 @@ own data to PyMica!
 
 First, we’ll import the required libraries.
 
-.. code:: ipython3
+.. code-block:: python
 
     import json
     import pandas as pd
@@ -57,7 +57,7 @@ preparation of .json files, just go to :ref:`1.2 Generate explanatory data field
 We’ll open both .csv files: XEMA_20170221_1200.csv and XEMA_metadata
 using pandas.
 
-.. code:: ipython3
+.. code-block:: python
 
     file_data = '../sample-data/data/XEMA_20170221_1200.csv'
     file_metadata = '../sample-data/data/XEMA_metadata.csv'
@@ -80,7 +80,7 @@ If we print the first element of ``data`` we can see all the required
 variables for a station (longitude, latitude, distance to coast line,
 value of temperature, identification code and altitude):
 
-.. code:: ipython3
+.. code-block:: python
 
     print('Sample data: ' + str(data[0]))
     print('Number of stations: ' + str(len(data)))
@@ -94,7 +94,7 @@ value of temperature, identification code and altitude):
 
 Now, we’ll save this data into a .json file to use it later.
 
-.. code:: ipython3
+.. code-block:: python
 
     with open('../sample-data/data/smc_data.json', 'w') as outfile:
         json.dump(data, outfile)
@@ -102,7 +102,7 @@ Now, we’ll save this data into a .json file to use it later.
 It is also important to create a file with station metadata information.
 Then, we’ll use ``metadata`` variable to build a .json file.
 
-.. code:: ipython3
+.. code-block:: python
 
     values = []
     for key in metadata['key']:
@@ -116,7 +116,7 @@ Then, we’ll use ``metadata`` variable to build a .json file.
 
 Now, we’ll save this data into a .json file to use it later.
 
-.. code:: ipython3
+.. code-block:: python
 
     with open('../sample-data/data/smc_metadata.json', 'w') as outfile:
         json.dump(values, outfile) 
@@ -148,7 +148,7 @@ the distance to coast raster.
 
 First, we’ll import the necessary libraries.
 
-.. code:: ipython3
+.. code-block:: python
 
     from osgeo import gdal, osr
     from distance.distance_to_sea import get_dist_array
@@ -157,7 +157,7 @@ For ``get_dist_array`` function we need four parameters: projection,
 geotransform, size and a coast line file. We’ll get the first three from
 the DEM and the coast line from explanatory folder.
 
-.. code:: ipython3
+.. code-block:: python
 
     dem_file = '../sample-data/explanatory/cat_dem_25831.tif'
     dem = gdal.Open(dem_file)
@@ -170,7 +170,7 @@ the DEM and the coast line from explanatory folder.
 Once all the parameters are set, we call the ``get_dist_array``
 function.
 
-.. code:: ipython3
+.. code-block:: python
 
     d_coast = get_dist_array(proj=projection, geotransform=geotransform, size=size, dist_file=coast_line)
 
@@ -182,7 +182,7 @@ function.
 
 Now we can get a quick look of the d_coast array:
 
-.. code:: ipython3
+.. code-block:: python
 
     import matplotlib.pyplot as plt
     plt.imshow(d_coast)
@@ -196,7 +196,7 @@ Now we can get a quick look of the d_coast array:
 And we must save the array into a .tif file to use it later. To do that,
 we’ll define first a function to accomplish that:
 
-.. code:: ipython3
+.. code-block:: python
 
     def get_tif_from_array(file_path, data, geotransform, projection):
         '''
@@ -218,7 +218,7 @@ we’ll define first a function to accomplish that:
     
         ds_out = None
 
-.. code:: ipython3
+.. code-block:: python
 
     get_tif_from_array(file_path = '../sample-data/explanatory/cat_distance_coast.tif',
                        data = d_coast,

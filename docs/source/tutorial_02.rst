@@ -18,7 +18,7 @@ What we need for this step? Station data including longitude, latitude
 and altitude that we’ll get from the smc_metadata.json file. But first, 
 we’ll import the required libraries.
 
-.. code:: ipython3
+.. code-block:: python
 
     from cluster.create_clusters import create_clusters
 
@@ -53,7 +53,7 @@ We’ll use the clusters saved in
 ./docs/notebooks/tutorials/cat/clusters/, but first we must import the
 required libraries.
 
-.. code:: ipython3
+.. code-block:: python
 
     from cluster.create_cluster_files import rasterize_clusters, create_reprojected_geoms
 
@@ -61,7 +61,7 @@ Now we call the ``create_reprojected_geoms`` which requires the clusters
 .json file path and an EPSG code. We call it twice for the two number of
 clusters chosen in :ref:`2.1 Creation of automatic clusters`.
 
-.. code:: ipython3
+.. code-block:: python
 
     clusters_2_layer = create_reprojected_geoms('../sample-data/clusters/clusters_2.json', 25831)
     clusters_4_layer = create_reprojected_geoms('../sample-data/clusters/clusters_4.json', 25831)
@@ -73,7 +73,7 @@ output file, size and geotransform.
 
 In this case we will use the same values of the DEM file.
 
-.. code:: ipython3
+.. code-block:: python
 
     from osgeo import gdal
     dem_file = '../sample-data/explanatory/cat_dem_25831.tif'
@@ -92,7 +92,7 @@ In this case we will use the same values of the DEM file.
 Now that the ``out_properties`` are defined for the two number of
 clusters considered, we call ``rasterize_clusters`` function.
 
-.. code:: ipython3
+.. code-block:: python
 
     rasterize_clusters(clusters_2_layer, out_properties_2)
     rasterize_clusters(clusters_4_layer, out_properties_4)

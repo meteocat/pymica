@@ -25,7 +25,7 @@ line and *D* is the distance where the distance to coast is cancelled.
 First we’ll import both functions (``get distances`` and ``dist2func``)
 and then call them.
 
-.. code:: ipython3
+.. code-block:: python
 
     from distance.distance_to_sea import get_distances, dist2func
 
@@ -38,7 +38,7 @@ latitude, respectively.
 
 First, we calculate the distances to coast in meters.
 
-.. code:: ipython3
+.. code-block:: python
 
     points = [[1, 41], [0.5, 40]]
     dist_file = '../sample-data/explanatory/cat_coast_line.json'
@@ -56,7 +56,7 @@ First, we calculate the distances to coast in meters.
 Now, with the ``dcoast_points``, we can call ``dist2func`` which apply
 the above-mentioned logarithmic function.
 
-.. code:: ipython3
+.. code-block:: python
 
     print('Distance to coast function:')
     for i in range(len(dcoast_points)):
@@ -76,7 +76,7 @@ Create distance to coast explanatory field
 The distance to coast raster is built using ``get_dist_array`` function.
 Now, we’ll import it.
 
-.. code:: ipython3
+.. code-block:: python
 
     from distance.distance_to_sea import get_dist_array
 
@@ -91,7 +91,7 @@ sea values. It receives as parameters:
 
 Now, we’ll call the ``get_dist_array_function``.
 
-.. code:: ipython3
+.. code-block:: python
 
     dist_file = '../sample-data/explanatory/cat_coast_line.json'
     dcoast_array = get_dist_array(proj=25831,
@@ -112,7 +112,7 @@ destination file path with the name of the file included, the data to
 include in the .tiff, the geotransform and the EPSG projection of the
 .tif file.
 
-.. code:: ipython3
+.. code-block:: python
 
     from osgeo import gdal, osr
     
@@ -136,7 +136,7 @@ include in the .tiff, the geotransform and the EPSG projection of the
     
         ds_out = None
 
-.. code:: ipython3
+.. code-block:: python
 
     get_tif_from_array(file_path = '../sample-data/results/dcoast_sample.tif',
                        data = dcoast_array,
@@ -149,7 +149,7 @@ Now, a .tif file including the dcoast_array is saved in
 If we want to have a quick look on dcoast_array we can plot it using
 imshow.
 
-.. code:: ipython3
+.. code-block:: python
 
     import matplotlib.pyplot as plt
     plt.imshow(dcoast_array)

@@ -12,7 +12,7 @@ notebook.
 
 Let’s start!
 
-.. code:: ipython3
+.. code-block:: python
 
     from pymica.pymica import PyMica
 
@@ -37,7 +37,7 @@ Defining the parameters of PyMica class
 First, we have to define ``data_file``, ``variables_file``, ``clusters``
 and ``data_format`` parameters of PyMica class.
 
-.. code:: ipython3
+.. code-block:: python
 
     data_file = '../sample-data/data/xema_20181231_1400.json'
 
@@ -47,7 +47,7 @@ The first element of sample_data.json is the following:
 
       {"id": "C6", "temp": 6.4, "altitude": 264, "lon": 0.95172, "lat": 41.6566, "dist": 0.8583929293407604}
 
-.. code:: ipython3
+.. code-block:: python
 
     variables_file = ['../sample-data/explanatory/cat_dem_25831.tif', '../sample-data/explanatory/cat_distance_coast.tif']
     clusters = None
@@ -55,14 +55,14 @@ The first element of sample_data.json is the following:
 
 And now, we can call the PyMica class.
 
-.. code:: ipython3
+.. code-block:: python
 
     global_int = PyMica(data_file, variables_file, clusters, data_format)
 
 We can plot a quick look of the resultant air temperature interpolated
 field using imshow function.
 
-.. code:: ipython3
+.. code-block:: python
 
     import matplotlib.pyplot as plt
     plt.imshow(global_int.result)
@@ -78,6 +78,6 @@ field using imshow function.
 Or we can just save the result into a .tif file using ``save_file``
 function of PyMica class.
 
-.. code:: ipython3
+.. code-block:: python
 
     global_int.save_file('../sample-data/results/global_int.tif')
