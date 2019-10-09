@@ -126,7 +126,8 @@ metadata .json file and in the .json field containing temperature data.
 The reason is that in the present case, we’ll consider distance to coast
 as a coefficient in the Multiple Linear Regression models. If you want
 your distance to coast values for your stations or know how they are
-obtained, please see HOWTO.
+obtained, please see `Explanatory
+   data <https://pymica.readthedocs.io/en/latest/ht_dcoast.html>`__ .
 
 This is for the Catalan region, but you can try it with data from any
 other region!
