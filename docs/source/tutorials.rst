@@ -34,8 +34,8 @@ MICA how to
 
 
 
-Env. Mod. & Soft. tutorials
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Specific tutorials
+~~~~~~~~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 1
