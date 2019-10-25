@@ -33,9 +33,9 @@ class TestInverseDistance3D(unittest.TestCase):
         self.assertEqual(result[4][0], 0)
         self.assertEqual(result[2][2], 1)
 
-        self.assertTrue(abs(result[0][0] - 0.001) < 0.001)
-        self.assertTrue(abs(result[4][4] - 0.705) < 0.001)
-        self.assertTrue(abs(result[4][1] - 1.166) < 0.001)
+        self.assertTrue(abs(result[0][0] - 0.013) < 0.001)
+        self.assertTrue(abs(result[4][4] - 0.706) < 0.001)
+        self.assertTrue(abs(result[4][1] - 1.165) < 0.001)
 
         now = datetime.utcnow()
         geotransform = [0, 0.002002, 0, 2, 0, -0.002002]
@@ -55,6 +55,6 @@ class TestInverseDistance3D(unittest.TestCase):
         self.assertAlmostEqual(result[size[0]-1][0], 0, places=5)
         self.assertAlmostEqual(result[int(size[0]/2)][int(size[1]/2)],
                                1, places=5)
-        self.assertAlmostEqual(result[0][0], 0.001, places=3)
-        self.assertAlmostEqual(result[size[0]-1][size[1]-1], 0.001,
+        self.assertAlmostEqual(result[0][0], 0.013, places=3)
+        self.assertAlmostEqual(result[size[0]-1][size[1]-1], 0.013,
                                places=3)

@@ -5,6 +5,7 @@ between the point and all the stations, but also their altitude difference.
 
 For more information, see :ref:`Inverse of the distance - 3D`.
 """
+
 import numpy as np
 cimport numpy as np
 from libc.math cimport sqrt
@@ -17,7 +18,7 @@ DTYPE = np.float64
 ctypedef np.float64_t DTYPE_t
 
 def inverse_distance_3d(residues: Dict[str, Dict[str, float]],
-                     size: List[int], geotransform: List[int], dem):
+                        size: List[int], geotransform: List[int], dem):
     """
     inverse_distance_3d(residues, size, geotransform, dem)
 
