@@ -11,11 +11,13 @@ from libc.math cimport sqrt
 from libc.math cimport pow
 from cpython cimport array
 import array
+from typing import Dict, List
 
 DTYPE = np.float64
 ctypedef np.float64_t DTYPE_t
 
-def inverse_distance(residues, size, geotransform):
+def inverse_distance(residues: Dict[str, Dict[str, float]],
+                     size: List[int], geotransform: List[int]):
     """
     inverse_distance(residues, size, geotransform)
 
