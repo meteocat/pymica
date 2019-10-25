@@ -35,7 +35,7 @@ class TestInverseDistance(unittest.TestCase):
         spent_time = datetime.utcnow() - now
         print("test_inverse_distance:")
         print("Time for 1000x1000:", spent_time.total_seconds(), "s")
-        self.assertLess(spent_time.total_seconds(), 1.0)
+        self.assertLess(spent_time.total_seconds(), 2.0)
 
         self.assertAlmostEqual(result[0][size[1]-1], 2)
         self.assertAlmostEqual(result[size[0]-1][0], 0)
