@@ -34,7 +34,12 @@ class ClusteredRegression:
                                         x_vars=self.data_format['x_vars'])
         residuals_all = regr_all.get_residuals()
 
-        self.mse = __get_residuals_mse__(residuals_all)
+        # Workaround for cases when different clusters share the same
+        # station. The mse calculated as
+        #       self.mse = __get_residuals_mse__(residuals_all),
+        # does not correspond to the mse when stations are in more
+        # than one cluster.
+        self.mse = sys.float_info.max
 
         self.final_regr = [regr_all]
         self.final_data = [data]
