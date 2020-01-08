@@ -14,7 +14,7 @@ class TestDistSea(unittest.TestCase):
 
     def test_get_distances(self):
         result = get_distances([[1, 41]], "./test/data/coast_line.json")
-        print(result)
+
         self.assertEqual(len(result), 1)
         self.assertTrue(abs(result[0] - 3910) < 1)
 
