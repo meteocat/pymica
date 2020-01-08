@@ -15,6 +15,7 @@ class TestPyMica(unittest.TestCase):
     def setUpClass(cls):
         cls.variables_file = gettempdir() + '/variables.tiff'
         cls.mask_file = gettempdir() + '/mask.tiff'
+        cls.mask5_file = gettempdir() + '/mask5.tiff'
         cls.clusters = {'clusters_files': ["./test/data/clusters.json"],
                         'mask_files': [cls.mask_file]}
         size = [1000, 1000]
@@ -50,6 +51,17 @@ class TestPyMica(unittest.TestCase):
             d_s.GetRasterBand(i + 1).WriteArray(mask[i])
         d_s = None
 
+        mask5 = np.zeros([5, 1000, 1000])
+        for i in range(5):
+            for j in range(200):
+                mask5[i][i*200 + j][:] = 1 - j/550
+        d_s = driver.Create(cls.mask5_file, size[1], size[0], 5,
+                            gdal.GDT_Float32)
+
+        for i in range(mask5.shape[0]):
+            d_s.GetRasterBand(i + 1).WriteArray(mask5[i])
+        d_s = None
+
     def test_init(self):
         inst = PyMica("./test/data/sample_data.json", self.variables_file,
                       self.clusters)
@@ -68,7 +80,7 @@ class TestPyMica(unittest.TestCase):
         # Multiple clusters
         clusters2 = {'clusters_files': ["./test/data/clusters.json",
                                         "./test/data/clusters5.json"],
-                     'mask_files': [self.mask_file, self.mask_file]}
+                     'mask_files': [self.mask_file, self.mask5_file]}
         PyMica("./test/data/sample_data.json", [self.variables_file],
                clusters2)
 

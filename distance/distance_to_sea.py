@@ -2,8 +2,8 @@
 '''
 from math import exp, floor
 
-import ogr
-import osr
+from osgeo import ogr
+from osgeo import osr
 from numpy import ones
 
 
