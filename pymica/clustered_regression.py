@@ -44,6 +44,7 @@ class ClusteredRegression:
             for cluster_file in clusters_files:
                 cluster_file_regressions = []
                 file_mse = 0
+                data_used = 0
                 clustered_data = __filter_data_by_cluster__(data,
                                                             cluster_file)
                 for data_in_cluster in clustered_data:
@@ -70,9 +71,10 @@ class ClusteredRegression:
                         new_regr_all.original_data = data_in_cluster
                         cluster_file_regressions.append(new_regr_all)
                         file_mse += mse_all * len(data_in_cluster)
+                    data_used = data_used + len(data_in_cluster)
 
-                file_mse = file_mse / len(data)
-                if file_mse < self.mse:
+                file_mse = file_mse / data_used
+                if file_mse <= self.mse:
                     self.final_regr = cluster_file_regressions
                     self.final_data = clustered_data
                     self.final_cluster_file = cluster_file
