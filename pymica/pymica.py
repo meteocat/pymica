@@ -125,17 +125,17 @@ class PyMica:
         if clusters:
             cl_reg = ClusteredRegression(data, clusters['clusters_files'],
                                          data_format=self.data_format)
-
             cluster_file_index = clusters['clusters_files'].index(
-                cl_reg.final_cluster_file)
+                    cl_reg.final_cluster_file)
 
             d_s = gdal.Open(clusters['mask_files'][cluster_file_index])
             mask = d_s.ReadAsArray()
             d_s = None
 
-            out_data = apply_clustered_regression(cl_reg, self.variables,
-                                                  self.data_format['x_vars'],
-                                                  mask)
+            out_data = apply_clustered_regression(
+                                cl_reg, self.variables,
+                                self.data_format['x_vars'],
+                                mask)
         else:
             cl_reg = MultiRegressionSigma(data,
                                           id_key=self.data_format['id_key'],
