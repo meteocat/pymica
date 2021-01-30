@@ -1,6 +1,6 @@
 language: python
 python:
-- '3.6'
+- '3.8'
 before_install:
 - sudo apt-get update
 - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
@@ -16,7 +16,7 @@ install:
 - conda create -n test-environment -c conda-forge python=$TRAVIS_PYTHON_VERSION cython
   numpy scipy scikit-learn pyproj
 - source activate test-environment
-- conda install -y gdal=2.3.3
+- conda install -y gdal=3.0.2
 - conda list
 script:
 - python setup.py build_ext
