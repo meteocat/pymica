@@ -17,9 +17,13 @@ What is MICA and how it works
 -----------------------------
 MICA spatially interpolates meteorological surface observations through multiple linear regressions (MLR) and residual corrections. Two options are available: using a simple MLR for all the surface observations or divide them in clusters.
 
-The first option implies the calculation of a MLR considering all the observations at once and using explanatory variables, such as altitude, distance to coast, latitude and longitude. The second option, uses clusters to classify stations in different groups. This allows to separate stations that may behave differently due to the presence of dissimilar weather conditions. For example, weather stations placed at a similar altitude, ones under the effects of fog and others with clear sky conditions.
+The first option implies the calculation of a MLR considering all the observations at once and using explanatory variables, such as altitude, distance to coast, latitude and longitude. The second option uses clusters to classify stations in different groups. This allows to separate stations that may behave differently due to the presence of dissimilar weather conditions. For example, weather stations placed at a similar altitude, ones under the effects of fog and others with clear sky conditions.
 
 A complete explanation of how it works and the idea behind MICA can be found in [pyMICA documentation](https://pymica.readthedocs.io/en/latest/howitworks.html)
+
+If you use pyMICA, please cite us as:
+
+[Casellas, E., Bech, J., Veciana, R., Miró, J. R., Sairouni, A., & Pineda, N. (2020). A meteorological analysis interpolation scheme for high spatial-temporal resolution in complex terrain. Atmospheric Research, 246, 105103.](https://www.sciencedirect.com/science/article/pii/S0169809520304166?via%3Dihub)
 
 Installation
 ------------
