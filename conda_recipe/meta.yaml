@@ -19,7 +19,7 @@ requirements:
     - numpy >=1.15.2
     - scipy >=1.1.0
     - scikit-learn >=0.20.0
-    - gdal >= 3.0.2
+    - gdal >=3.0.2
 
 about:
   home: https://github.com/meteocat/pymica
