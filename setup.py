@@ -60,7 +60,7 @@ setuptools.setup(
         'Topic :: Scientific/Engineering :: Atmospheric Science',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6'],
+        'Programming Language :: Python :: 3.8'],
     command_options={
         'build_sphinx': {
             'project': ('setup.py', name),
