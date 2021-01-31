@@ -16,7 +16,7 @@ install:
 - conda create -n test-environment -c conda-forge python=$TRAVIS_PYTHON_VERSION cython
   numpy scipy scikit-learn pyproj
 - source activate test-environment
-- conda install -y gdal=3.0.2
+- conda install -y gdal=2.3.3
 - conda list
 script:
 - python setup.py build_ext
