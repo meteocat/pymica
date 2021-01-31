@@ -49,7 +49,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/meteocat/pymica",
     packages=setuptools.find_packages(),
-    install_requires=['cython', 'numpy', 'scipy', 'scikit-learn'],
+    install_requires=['cython', 'numpy', 'scipy', 'scikit-learn', 'gdal'],
     scripts=['bin/pymica_distance_to_sea_calculator',
              'bin/pymica_create_clusters_file',
              'bin/pymica_generate_clusters'],
