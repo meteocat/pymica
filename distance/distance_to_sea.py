@@ -60,8 +60,8 @@ def get_distances(points, dist_file):
 
     out = []
     for point in points:
-        point = ogr.CreateGeometryFromWkt("POINT ({} {})".format(point[1],
-                                                                 point[0]))
+        point = ogr.CreateGeometryFromWkt("POINT ({} {})".format(point[0],
+                                                                 point[1]))
         point.Transform(transform_point)
 
         out.append(point.Distance(geom))
