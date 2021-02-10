@@ -7,7 +7,7 @@ bleach==3.1.4
 certifi==2019.3.9
 cffi==1.11.5
 chardet==3.0.4
-cryptography==3.2
+cryptography==3.3.2
 Cython==0.29
 decorator==4.3.0
 docutils==0.14
