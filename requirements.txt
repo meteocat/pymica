@@ -52,7 +52,7 @@ ptyprocess==0.6.0
 pycodestyle==2.4.0
 pycparser==2.19
 pyflakes==1.6.0
-Pygments==2.2.0
+Pygments==2.7.4
 pylint==2.3.1
 pyMICA==0.0
 pyOpenSSL==18.0.0
