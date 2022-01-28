@@ -3,10 +3,8 @@
 import unittest
 from tempfile import gettempdir
 
-import gdal
 import numpy as np
-import osr
-
+from osgeo import gdal, osr
 from pymica.pymica import PyMica
 
 
