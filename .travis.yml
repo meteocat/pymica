@@ -14,9 +14,8 @@ env:
 - GDAL_DATA=$HOME/miniconda/envs/test-environment/share/gdal
 install:
 - conda create -n test-environment -c conda-forge python=$TRAVIS_PYTHON_VERSION cython
-  numpy scipy scikit-learn pyproj
+  numpy scipy scikit-learn pyproj gdal
 - source activate test-environment
-- conda install -y gdal
 - conda list
 script:
 - python setup.py build_ext
