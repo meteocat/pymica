@@ -1,4 +1,4 @@
-name: pymica
+name: pymica-git
 dependencies:
   - numpy
   - scipy
