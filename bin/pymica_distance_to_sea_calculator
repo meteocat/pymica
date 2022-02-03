@@ -5,10 +5,8 @@ from the shore geometry
 
 import argparse
 
-import gdal
-import osr
-
 from distance.distance_to_sea import get_dist_array
+from osgeo import gdal, osr
 
 
 def write_data(data, geotransform, epsg, size, out_file):

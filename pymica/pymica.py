@@ -3,14 +3,12 @@ clusters multi-linear regressions corrected with residuals.
 '''
 import json
 
-import gdal
-import ogr
-import osr
-from numpy import concatenate, newaxis
-
 from interpolation.idw import idw
 from interpolation.inverse_distance import inverse_distance
 from interpolation.inverse_distance_3d import inverse_distance_3d
+from numpy import concatenate, newaxis
+from osgeo import gdal, ogr, osr
+
 from pymica.apply_regression import (apply_clustered_regression,
                                      apply_regression)
 from pymica.clustered_regression import (ClusteredRegression,
@@ -74,8 +72,8 @@ class PyMica:
 
         for point in data:
             geom = ogr.Geometry(ogr.wkbPoint)
-            geom.AddPoint(point[self.data_format['loc_vars'][0]],
-                          point[self.data_format['loc_vars'][1]])
+            geom.AddPoint(point[self.data_format['loc_vars'][1]],
+                          point[self.data_format['loc_vars'][0]])
             geom.Transform(transf)
 
             if point[self.data_format['id_key']] in residuals:

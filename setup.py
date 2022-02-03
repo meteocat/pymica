@@ -7,7 +7,8 @@ import subprocess
 import numpy
 import setuptools
 
-release = subprocess.check_output(['git', 'describe', '--abbrev=0', '--tags']).decode('utf-8').strip()
+release = subprocess.check_output(
+    ['git', 'describe', '--abbrev=0', '--tags']).decode('utf-8').strip()
 version = ".".join(release.split('.')[0:2])
 name = "pymica"
 
@@ -60,7 +61,7 @@ setuptools.setup(
         'Topic :: Scientific/Engineering :: Atmospheric Science',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6'],
+        'Programming Language :: Python :: 3.9'],
     command_options={
         'build_sphinx': {
             'project': ('setup.py', name),

@@ -4,7 +4,7 @@ and takes the best option for each zone
 import sys
 from copy import deepcopy
 
-import ogr
+from osgeo import ogr
 
 from pymica.multiregression import MultiRegressionSigma
 
@@ -76,7 +76,7 @@ class ClusteredRegression:
                         new_regr_all.original_data = data_in_cluster
                         cluster_file_regressions.append(new_regr_all)
                         file_mse += mse_all * len(data_in_cluster)
-                    
+
                     # Variable to deal with stations present in more than
                     # one cluster
                     data_used = data_used + len(data_in_cluster)
