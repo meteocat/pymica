@@ -10,15 +10,15 @@ from interpolation.inverse_distance import \
 
 
 class TestInverseDistance(unittest.TestCase):
+
+    residues = {'AA': {'value': 0, 'y': 0, 'x': 0},
+                'BB': {'value': 1, 'y': 1, 'x': 1},
+                'CC': {'value': 2, 'y': 2, 'x': 2}}
+    geotransform = [0, 0.5, 0, 2, 0, -0.5]
+    size = [5, 5]
+
     def test_inverse_distance(self):
-
-        residues = {'AA': {'value': 0, 'y': 0, 'x': 0},
-                    'BB': {'value': 1, 'y': 1, 'x': 1},
-                    'CC': {'value': 2, 'y': 2, 'x': 2}}
-        geotransform = [0, 0.5, 0, 2, 0, -0.5]
-        size = [5, 5]
-
-        result = inverse_distance(residues, size, geotransform)
+        result = inverse_distance(self.residues, self.size, self.geotransform)
 
         self.assertIsInstance(result, type(array((0, 0))))
 
@@ -26,11 +26,31 @@ class TestInverseDistance(unittest.TestCase):
         self.assertEqual(result[4][0], 0)
         self.assertEqual(result[2][2], 1)
 
+    def test_inverse_distance_power(self):
+        result = inverse_distance(self.residues, self.size, self.geotransform,
+                                  power=4)
+        self.assertIsInstance(result, type(array((0, 0))))
+
+        self.assertAlmostEqual(result[1][0], 0.8407, 3)
+        self.assertAlmostEqual(result[3][4], 1.1592, 3)
+        self.assertEqual(result[4][0], 0)
+        self.assertEqual(result[2][2], 1)
+
+    def test_inverse_distance_smoothing(self):
+        result = inverse_distance(self.residues, self.size, self.geotransform,
+                                  smoothing=0.5)
+        self.assertIsInstance(result, type(array((0, 0))))
+
+        self.assertAlmostEqual(result[0][4], 1.9169, 3)
+        self.assertAlmostEqual(result[4][0], 0.0830, 3)
+        self.assertAlmostEqual(result[2][2], 1)
+
+    def test_inverse_distance_100(self):
         now = datetime.utcnow()
         geotransform = [0, 0.002002, 0, 2, 0, -0.002002]
         size = [1000, 1000]
 
-        result = inverse_distance(residues, size, geotransform)
+        result = inverse_distance(self.residues, size, geotransform)
 
         spent_time = datetime.utcnow() - now
         print("test_inverse_distance:")

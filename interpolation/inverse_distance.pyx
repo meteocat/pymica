@@ -17,7 +17,8 @@ DTYPE = np.float64
 ctypedef np.float64_t DTYPE_t
 
 def inverse_distance(residues: Dict[str, Dict[str, float]],
-                     size: List[int], geotransform: List[int]):
+                     size: List[int], geotransform: List[int],
+                     power: float=2.5, smoothing: float=0.0):
     """
     inverse_distance(residues, size, geotransform)
 
@@ -71,18 +72,16 @@ def inverse_distance(residues: Dict[str, Dict[str, float]],
         y = cgeotransform[3] + j * cgeotransform[5]
         for i in range(xsize):
             x = cgeotransform[0] + i * cgeotransform[1]
-            cda[i + j * xsize] = point_residue(x, y, cxpos, cypos, cvalues, N)
+            cda[i + j * xsize] = point_residue(x, y, cxpos, cypos, cvalues, N, power, smoothing)
 
     data_array = np.array(cda)
     return data_array.reshape(size)
 
-cdef float point_residue(double x, double y, double[:] xpos, double[:] ypos, double[:] values, int N):
-    cdef float power = 2.5
-    cdef int smoothing = 0
+cdef float point_residue(double x, double y, double[:] xpos, double[:] ypos,
+                         double[:] values, int N, float power, float smoothing):
     cdef double numerator = 0
     cdef int i
-    cdef double denominator
-    denominator = 0
+    cdef double denominator = 0
 
     for i in range(N):
         dist = sqrt((x - xpos[i]) ** 2 + (
