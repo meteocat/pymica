@@ -23,7 +23,7 @@ class PyMica:
 
     def __init__(self, data_file, variables_file,
                  clusters=None, data_format=None, residuals_int='id2d',
-                 z_field='altitude'):
+                 z_field='altitude', config={}):
         '''
         Args:
             data_file (str): The path with the point data
@@ -46,6 +46,7 @@ class PyMica:
             z_field (str): The field used as the z variable when using the id3d
                            value as the residuals_int method.
                            Defaults to 'altitude'
+            config (dict): Configuration dictionary.
         '''
         if data_format is None:
             self.data_format = {'loc_vars': ('lon', 'lat'),
@@ -54,6 +55,16 @@ class PyMica:
                                 'x_vars': ('altitude', 'dist')}
         else:
             self.data_format = data_format
+
+        if 'power' in config.keys():
+            self.power = float(config['power'])
+        else:
+            self.power = 2.5
+
+        if 'smoothing' in config.keys():
+            self.smoothing = float(config['smoothing'])
+        else:
+            self.smoothing = 0
 
         with open(data_file, "r") as f_p:
             data = json.load(f_p)
@@ -88,8 +99,11 @@ class PyMica:
                                ]['z'] = point[z_field]
 
         if residuals_int == 'id2d':
-            residuals_field = inverse_distance(residuals_data, self.size,
-                                               self.geotransform)
+            residuals_field = inverse_distance(residuals_data,
+                                               self.size,
+                                               self.geotransform,
+                                               power=self.power,
+                                               smoothing=self.smoothing)
         elif residuals_int == 'id3d':
             dem = gdal.Open(
                 variables_file[self.data_format['x_vars'].index(z_field)])

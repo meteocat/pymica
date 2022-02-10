@@ -65,7 +65,7 @@ class TestPyMica(unittest.TestCase):
                       self.clusters)
         self.assertEqual(inst.result.shape, (1000, 1000))
 
-        inst.save_file(gettempdir() + "/out.tiff")
+        inst.save_file(gettempdir() + "/out_5.tiff")
 
         # Test passing multiple variable files instead
         # of one with all the layers
