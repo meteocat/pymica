@@ -11,21 +11,22 @@ from interpolation.inverse_distance_3d import inverse_distance_3d
 
 class TestInverseDistance3D(unittest.TestCase):
 
+    residues = {'AA': {'value': 0, 'z': 1, 'y': 0, 'x': 0},
+                'BB': {'value': 1, 'z': 0, 'y': 1, 'x': 1},
+                'CC': {'value': 2, 'z': 0, 'y': 2, 'x': 2}}
+
+    geotransform = [0, 0.5, 0, 2, 0, -0.5]
+    size = [5, 5]
+
+    dem = array([[1, 0, 0, 0, 0],
+                 [1, 0, 0, 0, 0],
+                 [1, 0, 0, 0, 1],
+                 [1, 0, 0, 0, 2],
+                 [1, 0, 0, 0, 3]])
+
     def test_inverse_distance_3d(self):
-
-        residues = {'AA': {'value': 0, 'z': 1, 'y': 0, 'x': 0},
-                    'BB': {'value': 1, 'z': 0, 'y': 1, 'x': 1},
-                    'CC': {'value': 2, 'z': 0, 'y': 2, 'x': 2}}
-        geotransform = [0, 0.5, 0, 2, 0, -0.5]
-        size = [5, 5]
-
-        dem = array([[1, 0, 0, 0, 0],
-                     [1, 0, 0, 0, 0],
-                     [1, 0, 0, 0, 1],
-                     [1, 0, 0, 0, 2],
-                     [1, 0, 0, 0, 3]])
-
-        result = inverse_distance_3d(residues, size, geotransform, dem)
+        result = inverse_distance_3d(self.residues, self.size,
+                                     self.geotransform, self.dem)
 
         self.assertIsInstance(result, type(array((0, 0))))
 
@@ -33,9 +34,56 @@ class TestInverseDistance3D(unittest.TestCase):
         self.assertEqual(result[4][0], 0)
         self.assertEqual(result[2][2], 1)
 
-        self.assertTrue(abs(result[0][0] - 0.013) < 0.001)
-        self.assertTrue(abs(result[4][4] - 0.706) < 0.001)
-        self.assertTrue(abs(result[4][1] - 1.165) < 0.001)
+        self.assertAlmostEqual(result[0][0], 0.013, 2)
+        self.assertAlmostEqual(result[4][4], 0.706, 2)
+        self.assertAlmostEqual(result[4][1], 1.165, 2)
+
+    def test_inverse_distance_3d_power(self):
+        result = inverse_distance_3d(self.residues, self.size,
+                                     self.geotransform, self.dem,
+                                     power=3)
+
+        self.assertIsInstance(result, type(array((0, 0))))
+
+        self.assertEqual(result[0][4], 2)
+        self.assertEqual(result[4][0], 0)
+        self.assertEqual(result[2][2], 1)
+
+        self.assertAlmostEqual(result[0][0], 0.0008, 3)
+        self.assertAlmostEqual(result[4][4], 0.5584, 3)
+        self.assertAlmostEqual(result[4][1], 1.0820, 3)
+
+    def test_inverse_distance_3d_smoothing(self):
+        result = inverse_distance_3d(self.residues, self.size,
+                                     self.geotransform, self.dem,
+                                     smoothing=2)
+
+        self.assertIsInstance(result, type(array((0, 0))))
+
+        self.assertEqual(result[0][4], 2)
+        self.assertEqual(result[4][0], 0)
+        self.assertEqual(result[2][2], 1)
+
+        self.assertAlmostEqual(result[0][0], 0.0259, 3)
+        self.assertAlmostEqual(result[4][4], 0.7063, 3)
+        self.assertAlmostEqual(result[4][1], 1.3335, 3)
+
+    def test_inverse_distance_3d_penalization(self):
+        result = inverse_distance_3d(self.residues, self.size,
+                                     self.geotransform, self.dem,
+                                     smoothing=2, penalization=100)
+
+        self.assertIsInstance(result, type(array((0, 0))))
+
+        self.assertEqual(result[0][4], 2)
+        self.assertEqual(result[4][0], 0)
+        self.assertEqual(result[2][2], 1)
+
+        self.assertAlmostEqual(result[0][0], 0.0023, 3)
+        self.assertAlmostEqual(result[4][4], 0.7063, 3)
+        self.assertAlmostEqual(result[4][1], 1.3382, 3)
+
+    def test_inverse_distance_3d_1000(self):
 
         now = datetime.utcnow()
         geotransform = [0, 0.002002, 0, 2, 0, -0.002002]
@@ -45,16 +93,14 @@ class TestInverseDistance3D(unittest.TestCase):
         dem[750:, :] = 1
         dem[:, 0:250] = 1
 
-        result = inverse_distance_3d(residues, size, geotransform, dem)
+        result = inverse_distance_3d(self.residues, size, geotransform, dem)
         spent_time = datetime.utcnow() - now
         print("test_inverse_distance:")
         print("Time for 1000x1000:", spent_time.total_seconds(), "s")
         self.assertLess(spent_time.total_seconds(), 50.5)
 
-        self.assertAlmostEqual(result[0][size[1]-1], 2, places=5)
-        self.assertAlmostEqual(result[size[0]-1][0], 0, places=5)
-        self.assertAlmostEqual(result[int(size[0]/2)][int(size[1]/2)],
-                               1, places=5)
-        self.assertAlmostEqual(result[0][0], 0.013, places=3)
-        self.assertAlmostEqual(result[size[0]-1][size[1]-1], 0.013,
-                               places=3)
+        self.assertAlmostEqual(result[0][size[1]-1], 2, 5)
+        self.assertAlmostEqual(result[size[0]-1][0], 0, 5)
+        self.assertAlmostEqual(result[int(size[0]/2)][int(size[1]/2)], 1, 5)
+        self.assertAlmostEqual(result[0][0], 0.013, 3)
+        self.assertAlmostEqual(result[size[0]-1][size[1]-1], 0.013, 3)

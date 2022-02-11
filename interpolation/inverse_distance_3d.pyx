@@ -18,7 +18,9 @@ DTYPE = np.float64
 ctypedef np.float64_t DTYPE_t
 
 def inverse_distance_3d(residues: Dict[str, Dict[str, float]],
-                        size: List[int], geotransform: List[int], dem):
+                        size: List[int], geotransform: List[int], dem,
+                        power: float=2, smoothing: float=0,
+                        penalization: float=30):
     """
     inverse_distance_3d(residues, size, geotransform, dem)
 
@@ -78,15 +80,20 @@ def inverse_distance_3d(residues: Dict[str, Dict[str, float]],
         for i in range(xsize):
             x = cgeotransform[0] + i * cgeotransform[1]
             z = dem[j, i]
-            cda[i + j * xsize] = point_residue(x, y, z, cxpos, cypos, czpos, cvalues, N)
+            cda[i + j * xsize] = point_residue(x, y, z, cxpos, cypos, czpos,
+                                               cvalues, N, power, smoothing,
+                                               penalization)
 
     data_array = np.array(cda)
     return data_array.reshape(size)
 
-cdef float point_residue(double x, double y, double z, double[:] xpos, double[:] ypos, double[:] zpos, double[:] values, int N):
-    cdef int power = 2
-    cdef int smoothing = 0
-    cdef int penalization = 30
+cdef float point_residue(double x, double y, double z, double[:] xpos,
+                         double[:] ypos, double[:] zpos, double[:] values,
+                         int N, float power, float smoothing,
+                         float penalization):
+    # cdef int power = 2
+    # cdef int smoothing = 0
+    # cdef int penalization = 30
     cdef double numerator = 0
     cdef int i
     cdef double dist_3d
@@ -100,7 +107,8 @@ cdef float point_residue(double x, double y, double z, double[:] xpos, double[:]
         if dist < 0.00000000001:
             return values[i]
 
-        dist_3d = sqrt(dist ** 2 + (penalization * (z - zpos[i])) ** 2 + smoothing*smoothing)
+        dist_3d = sqrt(dist ** 2 + (penalization * (z - zpos[i])) ** 2 + 
+                       smoothing * smoothing)
 
         numerator = numerator + (values[i] / pow(dist_3d, power))
         denominator = denominator + (1 / pow(dist_3d, power))
