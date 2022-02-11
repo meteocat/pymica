@@ -64,7 +64,12 @@ class PyMica:
         if 'smoothing' in config.keys():
             self.smoothing = float(config['smoothing'])
         else:
-            self.smoothing = 0
+            self.smoothing = 0.0
+
+        if 'penalization' in config.keys():
+            self.penalization = float(config['penalization'])
+        else:
+            self.penalization = 30.0
 
         with open(data_file, "r") as f_p:
             data = json.load(f_p)
@@ -105,11 +110,14 @@ class PyMica:
                                                power=self.power,
                                                smoothing=self.smoothing)
         elif residuals_int == 'id3d':
-            dem = gdal.Open(
-                variables_file[self.data_format['x_vars'].index(z_field)])
-            dem = dem.ReadAsArray()
-            residuals_field = inverse_distance_3d(residuals_data, self.size,
-                                                  self.geotransform, dem)
+            # dem = gdal.Open(
+            #     variables_file[self.data_format['x_vars'].index(z_field)])
+            # dem = dem.ReadAsArray()
+            dem = self.variables[self.data_format['x_vars'].index(z_field)]
+            residuals_field = inverse_distance_3d(
+                residuals_data, self.size,
+                self.geotransform, dem, power=self.power,
+                smoothing=self.smoothing, penalization=self.penalization)
         elif residuals_int == 'idw':
             residuals_field = idw(residuals_data, self.size, self.geotransform)
         else:
