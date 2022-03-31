@@ -101,6 +101,7 @@ class PyMica:
         in_proj = osr.SpatialReference()
         in_proj.ImportFromEPSG(4326)
         self.config = config
+        self.methodology = methodology
 
         self.__check_variables__()
 
@@ -180,6 +181,19 @@ class PyMica:
                 raise ValueError('Variables properties are not the same. '
                                  'Variables fields must have the same '
                                  'GeoTransform, Projection, XSize and YSize.')
+
+    def summary(self):
+        print('pymica interpolator')
+        print('-------------------')
+        if self.methodology in ['mlr+id2d', 'id2d']:
+            print('Methodology                 : ' + self.methodology)
+            print('Inverse distance - power    : ' + str(self.power))
+            print('Inverse distance - smoothing: ' + str(self.smoothing))
+        if self.methodology in ['mlr+id3d', 'id3d']:
+            print('Methodology                    : ' + self.methodology)
+            print('Inverse distance - power       : ' + str(self.power))
+            print('Inverse distance - smoothing   : ' + str(self.smoothing))
+            print('Inverse distance - penalization: ' + str(self.penalization))
 
     def save_file(self, file_name):
         '''Saves the calculate field data into a file

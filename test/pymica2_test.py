@@ -56,7 +56,6 @@ class TestPyMica2(unittest.TestCase):
         d_s = None
 
     def test_init(cls):
-
         mlr_id2d = PyMica(methodology='mlr+id2d', config=cls.config)
         cls.assertEqual(mlr_id2d.smoothing, 0.0)
         cls.assertEqual(mlr_id2d.power, 2.5)
