@@ -3,11 +3,13 @@ clusters multi-linear regressions corrected with residuals.
 '''
 import json
 from multiprocessing.sharedctypes import Value
+from tabnanny import check
 
 from interpolation.idw import idw
 from interpolation.inverse_distance import inverse_distance
 from interpolation.inverse_distance_3d import inverse_distance_3d
-from numpy import concatenate, newaxis
+from numpy import asarray, concatenate, newaxis, array_equal
+import numpy as np
 from osgeo import gdal, ogr, osr
 
 from pymica.apply_regression import (apply_clustered_regression,
@@ -21,9 +23,7 @@ class PyMica:
     them with the interpolated residuals and saves files and gives
     errors.
     '''
-    def __init__(self, methodology, variables_file,
-                 clusters=None, data_format=None,
-                 z_field='altitude', config={}):
+    def __init__(self, methodology, config):
         '''
         Args:
             data_file (str): The path with the point data
@@ -68,9 +68,8 @@ class PyMica:
                 print('id_penalization not in the configuration dictionary. '
                       'id_penalization set to default value of 30.')
             self.smoothing = config.get('id_penalization', 30.0)
-        
-        
 
+        '''
         if data_format is None:
             self.data_format = {'loc_vars': ('lon', 'lat'),
                                 'id_key': 'id',
@@ -78,7 +77,7 @@ class PyMica:
                                 'x_vars': ('altitude', 'dist')}
         else:
             self.data_format = data_format
-
+        '''
         if 'power' in config.keys():
             self.power = float(config['power'])
         else:
@@ -93,19 +92,22 @@ class PyMica:
             self.penalization = float(config['penalization'])
         else:
             self.penalization = 30.0
-
+        '''
         with open(data_file, "r") as f_p:
             data = json.load(f_p)
-
-        self.__read_variables_files__(variables_file)
+        '''
+        # self.__read_variables_files__(variables_file)
 
         in_proj = osr.SpatialReference()
         in_proj.ImportFromEPSG(4326)
+        self.config = config
 
-        transf = osr.CoordinateTransformation(in_proj, self.out_proj)
+        self.__check_variables__()
 
-        cl_reg, out_data = self.__get_regression_results(clusters, data)
+        # transf = osr.CoordinateTransformation(in_proj, self.out_proj)
 
+        # cl_reg, out_data = self.__get_regression_results(clusters, data)
+        '''
         residuals = cl_reg.get_residuals()
         residuals_data = {}
 
@@ -148,8 +150,36 @@ class PyMica:
                              " \"id3d\" or \"idw\"")
 
         self.result = out_data - residuals_field
-    
-    def interpolate(data_file)
+        '''
+
+    def __check_variables__(self):
+        """Checks if the properties of variables are the same with each other.
+
+        Raises:
+            ValueError: If properties of variable fields are not the same with
+                        each other.
+        """
+        if len(self.config['variables_files'].keys()) < 2:
+            pass
+        for i, var in enumerate(list(self.config['variables_files'].keys())):
+            var_ds = gdal.Open(self.config['variables_files'][var])
+            if i == 0:
+                var_md = np.array([var_ds.GetGeoTransform(),
+                                   var_ds.GetProjectionRef(),
+                                   var_ds.RasterXSize,
+                                   var_ds.RasterYSize], dtype='object')
+                check_equal = True
+            else:
+                check_equal = array_equal(np.array([var_ds.GetGeoTransform(),
+                                                    var_ds.GetProjectionRef(),
+                                                    var_ds.RasterXSize,
+                                                    var_ds.RasterYSize],
+                                                   dtype='object'),
+                                          var_md)
+            if check_equal is False:
+                raise ValueError('Variables properties are not the same. '
+                                 'Variables fields must have the same '
+                                 'GeoTransform, Projection, XSize and YSize.')
 
     def save_file(self, file_name):
         '''Saves the calculate field data into a file
