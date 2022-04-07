@@ -1,8 +1,10 @@
 '''Main class. Calculates data fields from points, using
 clusters multi-linear regressions corrected with residuals.
 '''
+import errno
 import json
 from multiprocessing.sharedctypes import Value
+from os import strerror
 from tabnanny import check
 
 from interpolation.idw import idw
@@ -104,6 +106,9 @@ class PyMica:
         self.methodology = methodology
 
         self.__check_variables__()
+
+        if methodology in ['mlr', 'id3d', 'mlr+id2d', 'mlr+id3d']:
+            self.__read_variables_files2__()
 
         # transf = osr.CoordinateTransformation(in_proj, self.out_proj)
 
@@ -234,6 +239,24 @@ class PyMica:
                                         self.data_format['x_vars'])
 
         return cl_reg, out_data
+
+    def __read_variables_files2__(self):
+        for i, var in enumerate(list(self.config['variables_files'].keys())):
+            var_ds = gdal.Open(self.config['variables_files'][var])
+            if var_ds is None:
+                raise FileNotFoundError(errno.ENOENT, strerror(errno.ENOENT),
+                                        self.config['variables_files'][var])
+            if i == 0:
+                self.varibles = var_ds.ReadAsArray()
+            else:
+                self.variables = np.concatenate((self.variables,
+                                                 var_ds.ReadAsArray()), axis=0)
+        var_ds = None
+
+        self.field_geotransform = var_ds.GetGeoTransform()
+        self.field_proj = osr.SpatialReference()
+        self.field_proj.ImportFormWkt(var_ds.GetProjectionRef())
+        self.field_size = (var_ds.RasterYSize, var_ds.RasterXSize)
 
     def __read_variables_files__(self, variables_file):
         if isinstance(variables_file, (list,)):
