@@ -2,6 +2,9 @@
 clusters multi-linear regressions corrected with residuals.
 '''
 import json
+from json import load
+from os.path import exists
+'''
 from multiprocessing.sharedctypes import Value
 
 from interpolation.idw import idw
@@ -14,16 +17,14 @@ from pymica.apply_regression import (apply_clustered_regression,
                                      apply_regression)
 from pymica.clustered_regression import (ClusteredRegression,
                                          MultiRegressionSigma)
-
+'''
 
 class PyMica:
     '''Main project class. Calculates the regressions, corrects
     them with the interpolated residuals and saves files and gives
     errors.
     '''
-    def __init__(self, methodology, variables_file,
-                 clusters=None, data_format=None,
-                 z_field='altitude', config={}):
+    def __init__(self, methodology='id3d', conf='/home/recerca/workspace/pymica/pymica/conf/config_interp.json'):
         '''
         Args:
             data_file (str): The path with the point data
@@ -48,115 +49,92 @@ class PyMica:
                            Defaults to 'altitude'
             config (dict): Configuration dictionary.
         '''
-        if methodology not in ['id2d', 'mlr+id2d', 'id3d', 'mlr+id3d']:
+        if methodology not in ['id2d', 'mlr+id2d', 'id3d', 'mlr+id3d','mlr']:
             raise ValueError('Methodology must be \"id2d\", \"id3d\", '
-                             '\"mlr+id2d\" or \"mlr+id3d\"')
+                             '\"mlr+id2d\", \"mlr+id3d\" or \"mlr\"')
 
-        if methodology in ['id2d', 'mlr+id2d', 'id3d', 'mlr+id3d']:
-            if 'id_power' not in config.keys():
-                print('id_power not in the configuration dictionary. '
-                      'id_power set to default value of 2.5.')
-            self.power = config.get('id_power', 2.5)
-
-            if 'id_smoothing' not in config.keys():
-                print('id_smoothing not in the configuration dictionary. '
-                      'id_smoothing set to default value of 0.0.')
-            self.smoothing = config.get('id_smoothing', 0.0)
-
-        if methodology == 'id3d' or methodology == 'mlr+id3d':
-            if 'id_penalization' not in config.keys():
-                print('id_penalization not in the configuration dictionary. '
-                      'id_penalization set to default value of 30.')
-            self.smoothing = config.get('id_penalization', 30.0)
+        self.config = self.__read_config__(conf)
         
+        self.__check_config__(methodology)
+
+    def __read_config__(self,config_file):
         
+        #if exists(dirname(abspath(__file__)) + "/config.json"):
+        #    config_file = dirname(abspath(__file__)) + "/config.json"
+        #elif exists(getcwd() + "/config.json"):
+        #    config_file = getcwd() + "/config.json"
+        #else:
+        #    raise Exception("No es pot trobar el fitxer de configuració")
 
-        if data_format is None:
-            self.data_format = {'loc_vars': ('lon', 'lat'),
-                                'id_key': 'id',
-                                'y_var': 'temp',
-                                'x_vars': ('altitude', 'dist')}
-        else:
-            self.data_format = data_format
+        try:
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+                f.close()
+        except FileNotFoundError:
+            raise FileNotFoundError('Wrong configuration file path.')
+        except json.decoder.JSONDecodeError as err:
+            raise json.decoder.JSONDecodeError(err.msg, err.doc, err.pos)
 
-        if 'power' in config.keys():
-            self.power = float(config['power'])
-        else:
-            self.power = 2.5
+        return config
 
-        if 'smoothing' in config.keys():
-            self.smoothing = float(config['smoothing'])
-        else:
-            self.smoothing = 0.0
+    def __check_config__(self, method):
 
-        if 'penalization' in config.keys():
-            self.penalization = float(config['penalization'])
-        else:
-            self.penalization = 30.0
+        if 'id_power' not in self.config[method].keys():
+            print('id_power not in the configuration dictionary. ' +
+                    'id_power set to default value of 2.5.')
+        self.power = self.config.get('id_power', 2.5)
 
-        with open(data_file, "r") as f_p:
-            data = json.load(f_p)
+        if 'id_smoothing' not in self.config[method].keys():
+            print('id_smoothing not in the configuration dictionary. ' +
+                    'id_smoothing set to default value of 0.0.')
+        self.smoothing = self.config.get('id_smoothing', 0.0)
 
-        self.__read_variables_files__(variables_file)
+        if 'interpolation_bouds' not in self.config[method].keys():
+            print('interpolations_bounds not in the configuration dictionary. ' +
+                  'interpolations_bounds set to default value of [0, 10000, 0, 10000]')
+        self.interpolation_bounds = self.config.get('interpolation_bounds', [0, 10000, 0, 10000])
 
-        in_proj = osr.SpatialReference()
-        in_proj.ImportFromEPSG(4326)
+        if 'resolution' not in self.config[method].keys():
+            print('resolution (m) not in the configuration dictionary. ' +
+                  'resolution set to default value of 1000 m')
+        self.resolution = self.config.get('resolution', 1000)
 
-        transf = osr.CoordinateTransformation(in_proj, self.out_proj)
+        if 'EPSG' not in self.config[method].keys():
+            print('EPSG not in the configuration dictionary. ' +
+                  'EPSG set to default value of 25381')
+        self.EPGS = self.config.get('EPSG', 25831)
 
-        cl_reg, out_data = self.__get_regression_results(clusters, data)
 
-        residuals = cl_reg.get_residuals()
-        residuals_data = {}
+        if method in ['id3d', 'mlr+id3d']:
+            if 'id_penalization' not in self.config[method].keys():
+                print('id_penalization not in the configuration dictionary. ' +
+                        'id_penalization set to default value of 30.')
+            self.penalization = self.config.get('id_penalization', 30.0)
 
-        for point in data:
-            geom = ogr.Geometry(ogr.wkbPoint)
-            geom.AddPoint(point[self.data_format['loc_vars'][1]],
-                          point[self.data_format['loc_vars'][0]])
-            geom.Transform(transf)
+        if method in ['mlr+id2d', 'mlr+id3d','mlr','id3d']:
+            if 'variables_files' not in self.config[method].keys():
+                raise KeyError('variables_files must be included in the ' +
+                                'configuration file if ' + method + ' is ' +
+                                'selected.')
+            self.variables_files = self.config[method].get('variables_files', None)
+            
+            if len(self.variables_files.keys()) < 1:
+                raise ValueError('variables_files dictionary must have at ' +
+                                    'least one key including a variable file ' +
+                                    'path containing a 2D predictor field.')
+                
 
-            if point[self.data_format['id_key']] in residuals:
-                residuals_data[point[
-                    self.data_format['id_key']]] = {
-                    'value': residuals[point[
-                        self.data_format['id_key']]],
-                    'x': geom.GetX(), 'y': geom.GetY()}
+    '''
+    def interpolate(data_file):
+        pass
 
-            if residuals_int == 'id3d':
-                residuals_data[point[self.data_format['id_key']]
-                               ]['z'] = point[z_field]
 
-        if residuals_int == 'id2d':
-            residuals_field = inverse_distance(residuals_data,
-                                               self.size,
-                                               self.geotransform,
-                                               power=self.power,
-                                               smoothing=self.smoothing)
-        elif residuals_int == 'id3d':
-            # dem = gdal.Open(
-            #     variables_file[self.data_format['x_vars'].index(z_field)])
-            # dem = dem.ReadAsArray()
-            dem = self.variables[self.data_format['x_vars'].index(z_field)]
-            residuals_field = inverse_distance_3d(
-                residuals_data, self.size,
-                self.geotransform, dem, power=self.power,
-                smoothing=self.smoothing, penalization=self.penalization)
-        elif residuals_int == 'idw':
-            residuals_field = idw(residuals_data, self.size, self.geotransform)
-        else:
-            raise ValueError("[Errno 2]residuals_int must be \"id2d\"," +
-                             " \"id3d\" or \"idw\"")
-
-        self.result = out_data - residuals_field
-    
-    def interpolate(data_file)
-
+        
     def save_file(self, file_name):
-        '''Saves the calculate field data into a file
-
-        Args:
-            file_name (str): The output file path
-        '''
+        #Saves the calculate field data into a file
+        #Args:
+        #    file_name (str): The output file path
+        
 
         driver = gdal.GetDriverByName('GTiff')
         d_s = driver.Create(file_name, self.size[1], self.size[0], 1,
@@ -208,11 +186,14 @@ class PyMica:
                         self.variables = concatenate((self.variables,
                                                       layer_data), axis=0)
         else:
-            d_s = gdal.Open(variables_file)
-            self.variables = d_s.ReadAsArray()
-
-        self.out_proj = osr.SpatialReference()
+            d_s = gdal.Oconfig = json.load(f)
+                f.close()osr.SpatialReference()
         self.out_proj.ImportFromWkt(d_s.GetProjection())
         self.size = (d_s.RasterYSize, d_s.RasterXSize)
         self.geotransform = d_s.GetGeoTransform()
         d_s = None
+    '''
+
+
+if __name__ == '__main__':
+    inst=PyMica()

@@ -1,0 +1,30 @@
+{
+    "id2d": {"id_power":2.5,
+             "interpolation_bouds":[0, 10000, 0 ,10000],
+             "resolution":1000,
+             "EPSG":25831},
+    
+    "id3d": {"id_smoothing":0.0,
+             "id_penalization":30.0,
+             "variables_files": {"altitud": "",
+                                "d_coast": ""},
+             "interpolation_bouds":[0, 10000, 0 ,10000],
+             "resolution":1000,
+             "EPSG":25831},
+ 
+    "mlr": {"clusters": "None",
+            "variables_files": {}},
+
+    "mlr+id2d": {"id_power":2.5,
+                 "id_smoothing":0.0,
+                 "clusters":"None"
+                 },
+    "mlr+id3d": {"id_power":2.5,
+                "id_smoothing":0.0,
+                "clusters":"None",
+                "variables_files": {"altitud": "kk",
+                                    "d_coast": "kk"},
+                "interpolation_bouds":[0, 10000, 0 ,10000],
+                "resolution":1000,
+                "EPSG":25831}
+}
