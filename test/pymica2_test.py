@@ -1,29 +1,18 @@
 '''Tests for pymica.pymica.py
 '''
-
-from operator import methodcaller
+import io
+import json
 import unittest
 import unittest.mock
-from tempfile import gettempdir
 
 import numpy as np
 from osgeo import gdal, osr
 from pymica.pymica2 import PyMica
-import io
-import json
 
 
 class TestPyMica(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.variables_file = gettempdir() + '/variables.tiff'
-        cls.config = {'variables_files':
-                      {'altitude': gettempdir() + '/altitude.tif',
-                       'd_coast': gettempdir() + '/d_coast.tif'}}
-        cls.config_wrong = {'variables_files':
-                            {'altitude': gettempdir() + '/altitude.tif',
-                             'd_coast': gettempdir() + '/d_coast_2.tif'}}
-
         size = [1000, 1000]
         alt_data = np.ones(size)
         alt_data[2][2] = 12
@@ -36,7 +25,7 @@ class TestPyMica(unittest.TestCase):
         driver = gdal.GetDriverByName('GTiff')
 
         # Create fake altitude field
-        d_s = driver.Create(cls.config['variables_files']['altitude'],
+        d_s = driver.Create('test/data/tifs/altitude.tif',
                             size[1], size[0], 1, gdal.GDT_Float32)
         d_s.GetRasterBand(1).WriteArray(alt_data)
         d_s.SetGeoTransform((260000, 270, 0, 4750000, 0, -270))
@@ -44,7 +33,7 @@ class TestPyMica(unittest.TestCase):
         d_s = None
 
         # Create fake distance to coast field
-        d_s = driver.Create(cls.config['variables_files']['d_coast'],
+        d_s = driver.Create('test/data/tifs/d_coast.tif',
                             size[1], size[0], 1, gdal.GDT_Float32)
         d_s.GetRasterBand(1).WriteArray(dist_data)
         d_s.SetGeoTransform((260000, 270, 0, 4750000, 0, -270))
@@ -52,7 +41,7 @@ class TestPyMica(unittest.TestCase):
         d_s = None
 
         # Create wrong fake distance to coast field
-        d_s = driver.Create(cls.config_wrong['variables_files']['d_coast'],
+        d_s = driver.Create('test/data/tifs/d_coast_2.tif',
                             3, 3, 1, gdal.GDT_Float32)
         d_s.GetRasterBand(1).WriteArray(dist_data[:3, :3])
         d_s.SetGeoTransform((260000, 270, 0, 4750000, 0, -270))
@@ -60,144 +49,213 @@ class TestPyMica(unittest.TestCase):
         d_s = None
 
     def test_init(cls):
-        mlr_id2d = PyMica(methodology='mlr+id2d', config=cls.config)
+        mlr_id2d = PyMica('mlr+id2d', './test/data/config_init.json')
         cls.assertEqual(mlr_id2d.smoothing, 0.0)
         cls.assertEqual(mlr_id2d.power, 2.5)
 
-        mlr_id3d = PyMica(methodology='mlr+id3d', config=cls.config)
+        mlr_id3d = PyMica('mlr+id3d', './test/data/config_init.json')
         cls.assertEqual(mlr_id3d.smoothing, 0.0)
         cls.assertEqual(mlr_id3d.power, 2.5)
         cls.assertEqual(mlr_id3d.penalization, 30)
 
     def test_init_wrong_variables_files(cls):
         with cls.assertRaises(ValueError) as cm:
-            PyMica(methodology='mlr+id2d', config=cls.config_wrong)
+            PyMica('mlr', './test/data/config_init.json')
         cls.assertEqual('Variables properties are not the same. '
                         'Variables fields must have the same '
                         'GeoTransform, Projection, XSize and YSize.',
                         str(cm.exception))
-        
+
     def test_init_config_not_found(self):
         with self.assertRaises(FileNotFoundError) as cm:
-            PyMica(methodology='id3d', conf='aaaa.json')
+            PyMica('id3d', 'aaaa.json')
         self.assertEqual('Wrong configuration file path.', str(cm.exception))
 
     def test_init_config_json_error(self):
         with self.assertRaises(json.decoder.JSONDecodeError) as cm:
-            PyMica(methodology='id3d', conf='./test/data/config_error.json')
+            PyMica('id3d', './test/data/config_error.json')
         self.assertEqual('Expecting property name enclosed in double quotes: '
                          'line 2 column 5 (char 6)',
                          str(cm.exception))
 
     def test_config_return(self):
-        ins=PyMica(methodology='id3d', conf='./test/data/config_init.json')
-        self.assertEqual(len(ins.config.keys()), 5) 
+        inst = PyMica('id3d', './test/data/config_init.json')
+        self.assertEqual(len(inst.config.keys()), 5)
 
-    
-    def test_init_methodology(self):
+    def test_init_wrong_methodology(self):
         with self.assertRaises(ValueError) as cm:
-            PyMica(methodology='id3', conf='./test/data/config_init.json')
+            PyMica('id3', './test/data/config_init.json')
         self.assertEqual('Methodology must be \"id2d\", \"id3d\", '
-                             '\"mlr+id2d\", \"mlr+id3d\" or \"mlr\"', str(cm.exception))
+                         '\"mlr+id2d\", \"mlr+id3d\" or \"mlr\"',
+                         str(cm.exception))
 
+    def test_init_default_values_config(self):
 
-    def test_values_config(self):
-        ins=PyMica(methodology='id3d', conf='./test/data/config_init.json')
-        self.assertEqual(ins.power,2.5)
-        self.assertEqual(ins.penalization,30)
-        self.assertEqual(ins.smoothing,0)
+        with unittest.mock.patch('sys.stdout',
+                                 new_callable=io.StringIO) as mock_stdout:
+            inst = PyMica('id3d',
+                          './test/data/config_init_error_parameters.json')
+        self.assertEqual(mock_stdout.getvalue().strip(),
+                         'id_power not in the configuration dictionary.'
+                         ' id_power set to default value of 2.5.\n'
+                         'id_smoothing not in the configuration dictionary.'
+                         ' id_smoothing set to default value of 0.0.\n'
+                         'id_penalization not in the configuration dictionary.'
+                         ' id_penalization set to default value of 30.')
+        self.assertEqual(inst.power, 2.5)
+        self.assertEqual(inst.penalization, 30)
+        self.assertEqual(inst.smoothing, 0)
 
-        with unittest.mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            PyMica(methodology='id3d', conf='./test/data/config_init_error_parameters.json')
-        self.assertEqual(mock_stdout.getvalue().strip(), 'id_power not in the configuration dictionary. ' +
-                                                 'id_power set to default value of 2.5.')
+    def test_init_missing_interpolation_bounds(self):
 
-        with unittest.mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            PyMica(methodology='id2d', conf='./test/data/config_init_error_parameters.json')
-        self.assertEqual(mock_stdout.getvalue().strip(), 'id_smoothing not in the configuration dictionary. ' +
-                      'id_smoothing set to default value of 0.0.')
+        config = {'id2d': {'id_power': 2.5,
+                           'id_smoothing': 0.0,
+                           'resolution': 1000,
+                           'EPSG': 25831}}
 
-        with unittest.mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            PyMica(methodology='mlr+id3d', conf='./test/data/config_init_error_parameters.json')
-        self.assertEqual(mock_stdout.getvalue().strip(), 'id_penalization not in the configuration dictionary. ' +
-                          'id_penalization set to default value of 30.')
-        
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
         with self.assertRaises(KeyError) as cm:
-            method='mlr+id2d'
-            PyMica(methodology=method, conf='./test/data/config_init_error_parameters.json')
-        self.assertEqual('\'variables_files must be included in the configuration file if ' + method + ' is selected.\'', str(cm.exception))
+            PyMica('id2d', './test/data/config_test.json')
+        self.assertEqual('interpolation_bounds must be defined in the '
+                         'configuration dictionary.', cm.exception.args[0])
+
+    def test_init_wrong_type_interpolation_bounds(self):
+
+        config = {'id2d': {'id_power': 2.5,
+                           'id_smoothing': 0.0,
+                           'interpolation_bounds': 0,
+                           'resolution': 1000,
+                           'EPSG': 25831}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
+        with self.assertRaises(TypeError) as cm:
+            PyMica('id2d', './test/data/config_test.json')
+        self.assertEqual('interpolation_bounds must be a List as '
+                         '[x_min, y_min, x_max, y_max]', cm.exception.args[0])
+
+    def test_init_wrong_length_interpolation_bounds(self):
+
+        config = {'id2d': {'id_power': 2.5,
+                           'id_smoothing': 0.0,
+                           'interpolation_bounds': [0, 100],
+                           'resolution': 1000,
+                           'EPSG': 25831}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
 
         with self.assertRaises(ValueError) as cm:
-            method='mlr'
-            PyMica(methodology=method, conf='./test/data/config_init_error_parameters.json')
+            PyMica('id2d', './test/data/config_test.json')
+        self.assertEqual('interpolation_bounds must be a List as '
+                         '[x_min, y_min, x_max, y_max]', cm.exception.args[0])
+
+    def test_init_missing_resolution(self):
+
+        config = {'id2d': {'id_power': 2.5,
+                           'id_smoothing': 0.0,
+                           'interpolation_bounds': [0, 0, 1000, 1000],
+                           'EPSG': 25831}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
+        with self.assertRaises(KeyError) as cm:
+            PyMica('id2d', './test/data/config_test.json')
+        self.assertEqual('resolution must be defined in the configuration '
+                         'dictionary.', cm.exception.args[0])
+
+    def test_init_wrong_type_resolution(self):
+
+        config = {'id2d': {'id_power': 2.5,
+                           'id_smoothing': 0.0,
+                           'interpolation_bounds': [0, 0, 1000, 1000],
+                           'resolution': "1000",
+                           'EPSG': 25831}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
+        with self.assertRaises(TypeError) as cm:
+            PyMica('id2d', './test/data/config_test.json')
+        self.assertEqual('resolution must have a valid value in meters.',
+                         cm.exception.args[0])
+
+    def test_init_missing_epsg(self):
+
+        config = {'id2d': {'id_power': 2.5,
+                           'id_smoothing': 0.0,
+                           'interpolation_bounds': [0, 0, 1000, 1000],
+                           'resolution': 1000}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
+        with self.assertRaises(KeyError) as cm:
+            PyMica('id2d', './test/data/config_test.json')
+        self.assertEqual('EPSG must be defined in the configuration '
+                         'dictionary.', cm.exception.args[0])
+
+    def test_init_wrong_type_epsg(self):
+
+        config = {'id2d': {'id_power': 2.5,
+                           'id_smoothing': 0.0,
+                           'interpolation_bounds': [0, 0, 1000, 1000],
+                           'resolution': 1000,
+                           'EPSG': "25831"}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
+        with self.assertRaises(TypeError) as cm:
+            PyMica('id2d', './test/data/config_test.json')
+        self.assertEqual('EPSG must have a valid int value.',
+                         cm.exception.args[0])
+
+    def test_init_missing_variables_files(self):
+
+        config = {'mlr+id2d': {'id_power': 2.5,
+                               'id_smoothing': 0.0,
+                               'interpolation_bounds': [0, 0, 1000, 1000],
+                               'resolution': 1000,
+                               'EPSG': 25831}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
+        with self.assertRaises(KeyError) as cm:
+            PyMica('mlr+id2d', './test/data/config_test.json')
+        self.assertEqual('variables_files must be included in the ' +
+                         'configuration file if mlr+id2d is selected.',
+                         cm.exception.args[0])
+
+    def test_init_empty_variables_files(self):
+
+        config = {'mlr+id2d': {'id_power': 2.5,
+                               'id_smoothing': 0.0,
+                               'interpolation_bounds': [0, 0, 1000, 1000],
+                               'resolution': 1000,
+                               'EPSG': 25831,
+                               'variables_files': {}}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
+        with self.assertRaises(ValueError) as cm:
+            PyMica('mlr+id2d', './test/data/config_test.json')
         self.assertEqual('variables_files dictionary must have at ' +
-                        'least one key including a variable file ' +
-                        'path containing a 2D predictor field.', str(cm.exception))
-
-    '''
-    def test_init(self):
-        inst = PyMica("./test/data/sample_data.json", self.variables_file,
-                      self.clusters)
-        self.assertEqual(inst.result.shape, (1000, 1000))
-
-        inst.save_file(gettempdir() + "/out.tiff")
-
-        # Test passing multiple variable files instead
-        # of one with all the layers
-        PyMica("./test/data/sample_data.json", [self.variables_file],
-               self.clusters)
-
-        # No clusters
-        PyMica("./test/data/sample_data.json", [self.variables_file])
-
-        # Multiple clusters
-        clusters2 = {'clusters_files': ["./test/data/clusters.json",
-                                        "./test/data/clusters5.json"],
-                     'mask_files': [self.mask_file, self.mask5_file]}
-        PyMica("./test/data/sample_data.json", [self.variables_file],
-               clusters2)
-
-
-    def test_init_different_vars(self):
-        with open("./test/data/sample_data.json") as d_s:
-            data = d_s.read()
-        with open(gettempdir() + "/sample_data.json", "w") as d_s:
-            d_s.write(data.replace('id', 'other_id')
-                          .replace('temp', 'other_var')
-                          .replace('dist', 'other_x_var'))
-
-        data_format = {'loc_vars': ('lon', 'lat'),
-                       'id_key': 'other_id',
-                       'y_var': 'other_var',
-                       'x_vars': ('altitude', 'other_x_var')}
-        inst = PyMica(gettempdir() + "/sample_data.json", self.variables_file,
-                      self.clusters, data_format)
-        self.assertEqual(inst.result.shape, (1000, 1000))
-
-    @unittest.skip
-    def test_errors(self):
-
-        with self.assertRaises(FileNotFoundError) as cm:
-            PyMica("BadFile", self.variables_file,
-                   self.clusters)
-        self.assertEqual(
-            "[Errno 2] No such file or directory: 'BadFile'",
-            str(cm.exception))
-
-        with self.assertRaises(FileNotFoundError) as cm:
-            PyMica("./test/data/sample_data.json", ["BadFile"])
-        self.assertEqual(
-            "[Errno 2] No such file or directory: 'BadFile'",
-            str(cm.exception))
-
-        with self.assertRaises(ValueError) as cm:
-            PyMica("./test/data/sample_data.json", self.variables_file,
-                   residuals_int='BadMethdology')
-        self.assertEqual(
-            "[Errno 2]residuals_int must be \"id2d\"," +
-            " \"id3d\" or \"idw\"",
-            str(cm.exception)
-            )
-        # TODO : mask doesn't exist or clusters bad formatted
-        # TODO : Bad variable names passed
-    '''
+                         'least one key including a variable file ' +
+                         'path containing a 2D predictor field.',
+                         cm.exception.args[0])

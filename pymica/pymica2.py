@@ -3,8 +3,11 @@ clusters multi-linear regressions corrected with residuals.
 '''
 import errno
 import json
-from json import load
-from os.path import exists
+from os import strerror
+
+import numpy as np
+from osgeo import gdal, osr
+
 '''
 from multiprocessing.sharedctypes import Value
 from os import strerror
@@ -23,12 +26,13 @@ from pymica.clustered_regression import (ClusteredRegression,
                                          MultiRegressionSigma)
 '''
 
+
 class PyMica:
     '''Main project class. Calculates the regressions, corrects
     them with the interpolated residuals and saves files and gives
     errors.
     '''
-    def __init__(self, methodology='id3d', conf='/home/recerca/workspace/pymica/pymica/conf/config_interp.json'):
+    def __init__(self, methodology, config):
         '''
         Args:
             data_file (str): The path with the point data
@@ -57,27 +61,16 @@ class PyMica:
             raise ValueError('Methodology must be \"id2d\", \"id3d\", '
                              '\"mlr+id2d\", \"mlr+id3d\" or \"mlr\"')
 
-        self.config = self.__read_config__(conf)
+        self.methodology = methodology
+        self.config = self.__read_config__(config)
 
         self.__check_config__(methodology)
 
-        self.config = config
-        self.methodology = methodology
-
-        self.__check_variables__()
-
         if methodology in ['mlr', 'id3d', 'mlr+id2d', 'mlr+id3d']:
+            self.__check_variables__()
             self.__read_variables_files2__()
 
-    def __read_config__(self,config_file):
-        
-        #if exists(dirname(abspath(__file__)) + "/config.json"):
-        #    config_file = dirname(abspath(__file__)) + "/config.json"
-        #elif exists(getcwd() + "/config.json"):
-        #    config_file = getcwd() + "/config.json"
-        #else:
-        #    raise Exception("No es pot trobar el fitxer de configuració")
-
+    def __read_config__(self, config_file):
         try:
             with open(config_file, 'r') as f:
                 config = json.load(f)
@@ -90,50 +83,62 @@ class PyMica:
         return config
 
     def __check_config__(self, method):
+        if method in ['id2d', 'id3d', 'mlr+id2d', 'mlr+id3d']:
+            if 'id_power' not in self.config[method].keys():
+                print('id_power not in the configuration dictionary. ' +
+                      'id_power set to default value of 2.5.')
+            self.power = self.config[method].get('id_power', 2.5)
 
-        if 'id_power' not in self.config[method].keys():
-            print('id_power not in the configuration dictionary. ' +
-                    'id_power set to default value of 2.5.')
-        self.power = self.config.get('id_power', 2.5)
-
-        if 'id_smoothing' not in self.config[method].keys():
-            print('id_smoothing not in the configuration dictionary. ' +
-                    'id_smoothing set to default value of 0.0.')
-        self.smoothing = self.config.get('id_smoothing', 0.0)
-
-        if 'interpolation_bouds' not in self.config[method].keys():
-            print('interpolations_bounds not in the configuration dictionary. ' +
-                  'interpolations_bounds set to default value of [0, 10000, 0, 10000]')
-        self.interpolation_bounds = self.config.get('interpolation_bounds', [0, 10000, 0, 10000])
-
-        if 'resolution' not in self.config[method].keys():
-            print('resolution (m) not in the configuration dictionary. ' +
-                  'resolution set to default value of 1000 m')
-        self.resolution = self.config.get('resolution', 1000)
-
-        if 'EPSG' not in self.config[method].keys():
-            print('EPSG not in the configuration dictionary. ' +
-                  'EPSG set to default value of 25381')
-        self.EPGS = self.config.get('EPSG', 25831)
-
+            if 'id_smoothing' not in self.config[method].keys():
+                print('id_smoothing not in the configuration dictionary. ' +
+                      'id_smoothing set to default value of 0.0.')
+            self.smoothing = self.config[method].get('id_smoothing', 0.0)
 
         if method in ['id3d', 'mlr+id3d']:
             if 'id_penalization' not in self.config[method].keys():
                 print('id_penalization not in the configuration dictionary. ' +
-                        'id_penalization set to default value of 30.')
-            self.penalization = self.config.get('id_penalization', 30.0)
+                      'id_penalization set to default value of 30.')
+            self.penalization = self.config[method].get('id_penalization',
+                                                        30.0)
 
-        if method in ['mlr+id2d', 'mlr+id3d','mlr','id3d']:
+        self.interpolation_bounds = self.config[method].get(
+            'interpolation_bounds', None)
+        if self.interpolation_bounds is None:
+            raise KeyError('interpolation_bounds must be defined in the '
+                           'configuration dictionary.')
+        if type(self.interpolation_bounds) is not list:
+            raise TypeError('interpolation_bounds must be a List as '
+                            '[x_min, y_min, x_max, y_max]')
+        if len(self.interpolation_bounds) != 4:
+            raise ValueError('interpolation_bounds must be a List as '
+                             '[x_min, y_min, x_max, y_max]')
+
+        self.resolution = self.config[method].get('resolution', None)
+        if self.resolution is None:
+            raise KeyError('resolution must be defined in the configuration '
+                           'dictionary.')
+        if type(self.resolution) is str:
+            raise TypeError('resolution must have a valid value in meters.')
+
+        self.EPSG = self.config[method].get('EPSG', None)
+        if self.EPSG is None:
+            raise KeyError('EPSG must be defined in the configuration '
+                           'dictionary.')
+        if type(self.EPSG) is not int:
+            raise TypeError('EPSG must have a valid int value.')
+
+        if method in ['mlr+id2d', 'mlr+id3d', 'mlr', 'id3d']:
             if 'variables_files' not in self.config[method].keys():
                 raise KeyError('variables_files must be included in the ' +
-                                'configuration file if ' + method + ' is ' +
-                                'selected.')
-            self.variables_files = self.config[method].get('variables_files', None)
-            
+                               'configuration file if ' + method + ' is ' +
+                               'selected.')
+            self.variables_files = self.config[method].get('variables_files',
+                                                           None)
+
             if len(self.variables_files.keys()) < 1:
-                raise ValueError('variables_files dictionary must have at ' +
-                                    'least one key including a variable file ' +
-                                    'path containing a 2D predictor field.')
+                raise ValueError('variables_files dictionary must have at '
+                                 'least one key including a variable file '
+                                 'path containing a 2D predictor field.')
 
     def __check_variables__(self):
         """Checks if the properties of variables are the same with each other.
@@ -142,10 +147,12 @@ class PyMica:
             ValueError: If properties of variable fields are not the same with
                         each other.
         """
-        if len(self.config['variables_files'].keys()) < 2:
+        if len(self.config[self.methodology]['variables_files'].keys()) < 2:
             pass
-        for i, var in enumerate(list(self.config['variables_files'].keys())):
-            var_ds = gdal.Open(self.config['variables_files'][var])
+        for i, var in enumerate(list(self.config[self.methodology]
+                                                ['variables_files'].keys())):
+            var_ds = gdal.Open(self.config[self.methodology]
+                                          ['variables_files'][var])
             if i == 0:
                 var_md = np.array([var_ds.GetGeoTransform(),
                                    var_ds.GetProjectionRef(),
@@ -153,12 +160,11 @@ class PyMica:
                                    var_ds.RasterYSize], dtype='object')
                 check_equal = True
             else:
-                check_equal = array_equal(np.array([var_ds.GetGeoTransform(),
-                                                    var_ds.GetProjectionRef(),
-                                                    var_ds.RasterXSize,
-                                                    var_ds.RasterYSize],
-                                                   dtype='object'),
-                                          var_md)
+                check_equal = np.array_equal(
+                    np.array([var_ds.GetGeoTransform(),
+                              var_ds.GetProjectionRef(),
+                              var_ds.RasterXSize,
+                              var_ds.RasterYSize], dtype='object'), var_md)
             if check_equal is False:
                 raise ValueError('Variables properties are not the same. '
                                  'Variables fields must have the same '
@@ -177,6 +183,26 @@ class PyMica:
             print('Inverse distance - smoothing   : ' + str(self.smoothing))
             print('Inverse distance - penalization: ' + str(self.penalization))
 
+    def __read_variables_files2__(self):
+        for i, var in enumerate(list(self.config[self.methodology]
+                                                ['variables_files'].keys())):
+            var_ds = gdal.Open(self.config[self.methodology]
+                                          ['variables_files'][var])
+            if var_ds is None:
+                raise FileNotFoundError(errno.ENOENT, strerror(errno.ENOENT),
+                                        self.config['variables_files'][var])
+            if i == 0:
+                self.variables = np.array([var_ds.ReadAsArray()])
+            else:
+                self.variables = np.concatenate(
+                    (self.variables, np.array([var_ds.ReadAsArray()])), axis=0)
+
+        self.field_geotransform = var_ds.GetGeoTransform()
+        self.field_proj = osr.SpatialReference()
+        self.field_proj.ImportFromWkt(var_ds.GetProjectionRef())
+        self.field_size = (var_ds.RasterYSize, var_ds.RasterXSize)
+
+        var_ds = None
     '''
     def interpolate(data_file):
         pass
@@ -221,24 +247,6 @@ class PyMica:
 
         return cl_reg, out_data
 
-    def __read_variables_files2__(self):
-        for i, var in enumerate(list(self.config['variables_files'].keys())):
-            var_ds = gdal.Open(self.config['variables_files'][var])
-            if var_ds is None:
-                raise FileNotFoundError(errno.ENOENT, strerror(errno.ENOENT),
-                                        self.config['variables_files'][var])
-            if i == 0:
-                self.varibles = var_ds.ReadAsArray()
-            else:
-                self.variables = np.concatenate((self.variables,
-                                                 var_ds.ReadAsArray()), axis=0)
-        var_ds = None
-
-        self.field_geotransform = var_ds.GetGeoTransform()
-        self.field_proj = osr.SpatialReference()
-        self.field_proj.ImportFormWkt(var_ds.GetProjectionRef())
-        self.field_size = (var_ds.RasterYSize, var_ds.RasterXSize)
-
     def __read_variables_files__(self, variables_file):
         if isinstance(variables_file, (list,)):
             self.variables = None
@@ -263,7 +271,3 @@ class PyMica:
         self.geotransform = d_s.GetGeoTransform()
         d_s = None
     '''
-
-
-if __name__ == '__main__':
-    inst=PyMica()
