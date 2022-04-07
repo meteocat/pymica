@@ -1,16 +1,20 @@
 '''Main class. Calculates data fields from points, using
 clusters multi-linear regressions corrected with residuals.
 '''
+import errno
 import json
 from json import load
 from os.path import exists
 '''
 from multiprocessing.sharedctypes import Value
+from os import strerror
+from tabnanny import check
 
 from interpolation.idw import idw
 from interpolation.inverse_distance import inverse_distance
 from interpolation.inverse_distance_3d import inverse_distance_3d
-from numpy import concatenate, newaxis
+from numpy import asarray, concatenate, newaxis, array_equal
+import numpy as np
 from osgeo import gdal, ogr, osr
 
 from pymica.apply_regression import (apply_clustered_regression,
@@ -54,8 +58,16 @@ class PyMica:
                              '\"mlr+id2d\", \"mlr+id3d\" or \"mlr\"')
 
         self.config = self.__read_config__(conf)
-        
+
         self.__check_config__(methodology)
+
+        self.config = config
+        self.methodology = methodology
+
+        self.__check_variables__()
+
+        if methodology in ['mlr', 'id3d', 'mlr+id2d', 'mlr+id3d']:
+            self.__read_variables_files2__()
 
     def __read_config__(self,config_file):
         
@@ -122,12 +134,52 @@ class PyMica:
                 raise ValueError('variables_files dictionary must have at ' +
                                     'least one key including a variable file ' +
                                     'path containing a 2D predictor field.')
-                
+
+    def __check_variables__(self):
+        """Checks if the properties of variables are the same with each other.
+
+        Raises:
+            ValueError: If properties of variable fields are not the same with
+                        each other.
+        """
+        if len(self.config['variables_files'].keys()) < 2:
+            pass
+        for i, var in enumerate(list(self.config['variables_files'].keys())):
+            var_ds = gdal.Open(self.config['variables_files'][var])
+            if i == 0:
+                var_md = np.array([var_ds.GetGeoTransform(),
+                                   var_ds.GetProjectionRef(),
+                                   var_ds.RasterXSize,
+                                   var_ds.RasterYSize], dtype='object')
+                check_equal = True
+            else:
+                check_equal = array_equal(np.array([var_ds.GetGeoTransform(),
+                                                    var_ds.GetProjectionRef(),
+                                                    var_ds.RasterXSize,
+                                                    var_ds.RasterYSize],
+                                                   dtype='object'),
+                                          var_md)
+            if check_equal is False:
+                raise ValueError('Variables properties are not the same. '
+                                 'Variables fields must have the same '
+                                 'GeoTransform, Projection, XSize and YSize.')
+
+    def summary(self):
+        print('pymica interpolator')
+        print('-------------------')
+        if self.methodology in ['mlr+id2d', 'id2d']:
+            print('Methodology                 : ' + self.methodology)
+            print('Inverse distance - power    : ' + str(self.power))
+            print('Inverse distance - smoothing: ' + str(self.smoothing))
+        if self.methodology in ['mlr+id3d', 'id3d']:
+            print('Methodology                    : ' + self.methodology)
+            print('Inverse distance - power       : ' + str(self.power))
+            print('Inverse distance - smoothing   : ' + str(self.smoothing))
+            print('Inverse distance - penalization: ' + str(self.penalization))
 
     '''
     def interpolate(data_file):
         pass
-
 
         
     def save_file(self, file_name):
@@ -168,6 +220,24 @@ class PyMica:
                                         self.data_format['x_vars'])
 
         return cl_reg, out_data
+
+    def __read_variables_files2__(self):
+        for i, var in enumerate(list(self.config['variables_files'].keys())):
+            var_ds = gdal.Open(self.config['variables_files'][var])
+            if var_ds is None:
+                raise FileNotFoundError(errno.ENOENT, strerror(errno.ENOENT),
+                                        self.config['variables_files'][var])
+            if i == 0:
+                self.varibles = var_ds.ReadAsArray()
+            else:
+                self.variables = np.concatenate((self.variables,
+                                                 var_ds.ReadAsArray()), axis=0)
+        var_ds = None
+
+        self.field_geotransform = var_ds.GetGeoTransform()
+        self.field_proj = osr.SpatialReference()
+        self.field_proj.ImportFormWkt(var_ds.GetProjectionRef())
+        self.field_size = (var_ds.RasterYSize, var_ds.RasterXSize)
 
     def __read_variables_files__(self, variables_file):
         if isinstance(variables_file, (list,)):

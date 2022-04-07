@@ -1,5 +1,7 @@
 '''Tests for pymica.pymica.py
 '''
+
+from operator import methodcaller
 import unittest
 import unittest.mock
 from tempfile import gettempdir
@@ -8,32 +10,73 @@ import numpy as np
 from osgeo import gdal, osr
 from pymica.pymica2 import PyMica
 import io
-
 import json
 
 
 class TestPyMica(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.config = {"id2d": {"id_power": 2.5,
-                               "id_smoothing": 0.0},
-                      
-                      "id3d": {"id_power":2.5,
-                              "id_smoothing":0.0,
-                              "id_penalization":30.0},
-                  
-                      "mlr": {"clusters": "None",
-                              "variables_files": {"altitude": "",
-                                              "d_coast": ""}},
-  
-                      "mlr+id2d": {"id_power":2.5,
-                                  "id_smoothing":0.0,
-                                  "clusters":"None",
-                                  "variables_files": {"altitud": "",
-                                                      "d_coast": ""}},
-                      "mlr+id3d": {"variables_files": {"altitud": "",
-                                                      "d_coast": ""}}}
+        cls.variables_file = gettempdir() + '/variables.tiff'
+        cls.config = {'variables_files':
+                      {'altitude': gettempdir() + '/altitude.tif',
+                       'd_coast': gettempdir() + '/d_coast.tif'}}
+        cls.config_wrong = {'variables_files':
+                            {'altitude': gettempdir() + '/altitude.tif',
+                             'd_coast': gettempdir() + '/d_coast_2.tif'}}
 
+        size = [1000, 1000]
+        alt_data = np.ones(size)
+        alt_data[2][2] = 12
+
+        dist_data = np.ones(size)
+
+        proj = osr.SpatialReference()
+        proj.ImportFromEPSG(25831)
+
+        driver = gdal.GetDriverByName('GTiff')
+
+        # Create fake altitude field
+        d_s = driver.Create(cls.config['variables_files']['altitude'],
+                            size[1], size[0], 1, gdal.GDT_Float32)
+        d_s.GetRasterBand(1).WriteArray(alt_data)
+        d_s.SetGeoTransform((260000, 270, 0, 4750000, 0, -270))
+        d_s.SetProjection(proj.ExportToWkt())
+        d_s = None
+
+        # Create fake distance to coast field
+        d_s = driver.Create(cls.config['variables_files']['d_coast'],
+                            size[1], size[0], 1, gdal.GDT_Float32)
+        d_s.GetRasterBand(1).WriteArray(dist_data)
+        d_s.SetGeoTransform((260000, 270, 0, 4750000, 0, -270))
+        d_s.SetProjection(proj.ExportToWkt())
+        d_s = None
+
+        # Create wrong fake distance to coast field
+        d_s = driver.Create(cls.config_wrong['variables_files']['d_coast'],
+                            3, 3, 1, gdal.GDT_Float32)
+        d_s.GetRasterBand(1).WriteArray(dist_data[:3, :3])
+        d_s.SetGeoTransform((260000, 270, 0, 4750000, 0, -270))
+        d_s.SetProjection(proj.ExportToWkt())
+        d_s = None
+
+    def test_init(cls):
+        mlr_id2d = PyMica(methodology='mlr+id2d', config=cls.config)
+        cls.assertEqual(mlr_id2d.smoothing, 0.0)
+        cls.assertEqual(mlr_id2d.power, 2.5)
+
+        mlr_id3d = PyMica(methodology='mlr+id3d', config=cls.config)
+        cls.assertEqual(mlr_id3d.smoothing, 0.0)
+        cls.assertEqual(mlr_id3d.power, 2.5)
+        cls.assertEqual(mlr_id3d.penalization, 30)
+
+    def test_init_wrong_variables_files(cls):
+        with cls.assertRaises(ValueError) as cm:
+            PyMica(methodology='mlr+id2d', config=cls.config_wrong)
+        cls.assertEqual('Variables properties are not the same. '
+                        'Variables fields must have the same '
+                        'GeoTransform, Projection, XSize and YSize.',
+                        str(cm.exception))
+        
     def test_init_config_not_found(self):
         with self.assertRaises(FileNotFoundError) as cm:
             PyMica(methodology='id3d', conf='aaaa.json')
@@ -90,8 +133,6 @@ class TestPyMica(unittest.TestCase):
         self.assertEqual('variables_files dictionary must have at ' +
                         'least one key including a variable file ' +
                         'path containing a 2D predictor field.', str(cm.exception))
-        
-
 
     '''
     def test_init(self):
@@ -115,6 +156,7 @@ class TestPyMica(unittest.TestCase):
                      'mask_files': [self.mask_file, self.mask5_file]}
         PyMica("./test/data/sample_data.json", [self.variables_file],
                clusters2)
+
 
     def test_init_different_vars(self):
         with open("./test/data/sample_data.json") as d_s:
