@@ -1,11 +1,10 @@
 '''Main class. Calculates data fields from points, using
 clusters multi-linear regressions corrected with residuals.
 '''
-import errno
 import json
-from os import strerror
 
 import numpy as np
+from genericpath import exists
 from osgeo import gdal, osr
 
 '''
@@ -57,7 +56,7 @@ class PyMica:
                            Defaults to 'altitude'
             config (dict): Configuration dictionary.
         '''
-        if methodology not in ['id2d', 'mlr+id2d', 'id3d', 'mlr+id3d','mlr']:
+        if methodology not in ['id2d', 'mlr+id2d', 'id3d', 'mlr+id3d', 'mlr']:
             raise ValueError('Methodology must be \"id2d\", \"id3d\", '
                              '\"mlr+id2d\", \"mlr+id3d\" or \"mlr\"')
 
@@ -65,6 +64,8 @@ class PyMica:
         self.config = self.__read_config__(config)
 
         self.__check_config__(methodology)
+
+        self.__get_geographical_parameters__()
 
         if methodology in ['mlr', 'id3d', 'mlr+id2d', 'mlr+id3d']:
             self.__check_variables__()
@@ -147,24 +148,27 @@ class PyMica:
             ValueError: If properties of variable fields are not the same with
                         each other.
         """
-        if len(self.config[self.methodology]['variables_files'].keys()) < 2:
-            pass
+
+        geo_param = np.array([self.field_geotransform,
+                              self.field_proj.ExportToWkt(),
+                              self.field_size[0], self.field_size[1]],
+                             dtype='object')
+
         for i, var in enumerate(list(self.config[self.methodology]
                                                 ['variables_files'].keys())):
+            if not exists(self.config[self.methodology]
+                                     ['variables_files'][var]):
+                raise FileNotFoundError('No such file or directory: ' +
+                                        self.config[self.methodology]
+                                                   ['variables_files'][var])
             var_ds = gdal.Open(self.config[self.methodology]
                                           ['variables_files'][var])
-            if i == 0:
-                var_md = np.array([var_ds.GetGeoTransform(),
-                                   var_ds.GetProjectionRef(),
-                                   var_ds.RasterXSize,
-                                   var_ds.RasterYSize], dtype='object')
-                check_equal = True
-            else:
-                check_equal = np.array_equal(
-                    np.array([var_ds.GetGeoTransform(),
-                              var_ds.GetProjectionRef(),
-                              var_ds.RasterXSize,
-                              var_ds.RasterYSize], dtype='object'), var_md)
+
+            check_equal = np.array_equal(np.array(
+                [var_ds.GetGeoTransform(), var_ds.GetProjectionRef(),
+                 var_ds.RasterXSize, var_ds.RasterYSize], dtype='object'),
+                geo_param)
+
             if check_equal is False:
                 raise ValueError('Variables properties are not the same. '
                                  'Variables fields must have the same '
@@ -188,9 +192,6 @@ class PyMica:
                                                 ['variables_files'].keys())):
             var_ds = gdal.Open(self.config[self.methodology]
                                           ['variables_files'][var])
-            if var_ds is None:
-                raise FileNotFoundError(errno.ENOENT, strerror(errno.ENOENT),
-                                        self.config['variables_files'][var])
             if i == 0:
                 self.variables = np.array([var_ds.ReadAsArray()])
             else:
@@ -203,11 +204,24 @@ class PyMica:
         self.field_size = (var_ds.RasterYSize, var_ds.RasterXSize)
 
         var_ds = None
+
+    def __get_geographical_parameters__(self):
+        int_bounds = self.config[self.methodology]['interpolation_bounds']
+        res = self.config[self.methodology]['resolution']
+
+        self.field_geotransform = (float(int_bounds[0]), float(res), float(0),
+                                   float(int_bounds[3]), float(0), float(-res))
+
+        self.field_proj = osr.SpatialReference()
+        self.field_proj.ImportFromEPSG(self.config[self.methodology]['EPSG'])
+        self.field_size = [(int_bounds[3] - int_bounds[1]) / res,
+                           (int_bounds[2] - int_bounds[0]) / res]
+
     '''
     def interpolate(data_file):
         pass
 
-        
+
     def save_file(self, file_name):
         #Saves the calculate field data into a file
         #Args:

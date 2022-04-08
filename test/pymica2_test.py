@@ -48,16 +48,6 @@ class TestPyMica(unittest.TestCase):
         d_s.SetProjection(proj.ExportToWkt())
         d_s = None
 
-    def test_init(cls):
-        mlr_id2d = PyMica('mlr+id2d', './test/data/config_init.json')
-        cls.assertEqual(mlr_id2d.smoothing, 0.0)
-        cls.assertEqual(mlr_id2d.power, 2.5)
-
-        mlr_id3d = PyMica('mlr+id3d', './test/data/config_init.json')
-        cls.assertEqual(mlr_id3d.smoothing, 0.0)
-        cls.assertEqual(mlr_id3d.power, 2.5)
-        cls.assertEqual(mlr_id3d.penalization, 30)
-
     def test_init_wrong_variables_files(cls):
         with cls.assertRaises(ValueError) as cm:
             PyMica('mlr', './test/data/config_init.json')
@@ -78,10 +68,6 @@ class TestPyMica(unittest.TestCase):
                          'line 2 column 5 (char 6)',
                          str(cm.exception))
 
-    def test_config_return(self):
-        inst = PyMica('id3d', './test/data/config_init.json')
-        self.assertEqual(len(inst.config.keys()), 5)
-
     def test_init_wrong_methodology(self):
         with self.assertRaises(ValueError) as cm:
             PyMica('id3', './test/data/config_init.json')
@@ -91,10 +77,21 @@ class TestPyMica(unittest.TestCase):
 
     def test_init_default_values_config(self):
 
+        config = {'id3d': {'resolution': 270,
+                           'interpolation_bounds': [260000, 4480000,
+                                                    530000, 4750000],
+                           'EPSG': 25831,
+                           'variables_files': {'altitude':
+                                               'test/data/tifs/altitude.tif'}}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
         with unittest.mock.patch('sys.stdout',
                                  new_callable=io.StringIO) as mock_stdout:
             inst = PyMica('id3d',
-                          './test/data/config_init_error_parameters.json')
+                          './test/data/config_test.json')
         self.assertEqual(mock_stdout.getvalue().strip(),
                          'id_power not in the configuration dictionary.'
                          ' id_power set to default value of 2.5.\n'
@@ -259,3 +256,42 @@ class TestPyMica(unittest.TestCase):
                          'least one key including a variable file ' +
                          'path containing a 2D predictor field.',
                          cm.exception.args[0])
+
+    def test_init_not_found_variables_files(self):
+
+        config = {'mlr+id2d': {'id_power': 2.5,
+                               'id_smoothing': 0.0,
+                               'interpolation_bounds': [0, 0, 1000, 1000],
+                               'resolution': 1000,
+                               'EPSG': 25831,
+                               'variables_files': {'altitude':
+                                                   'notfound.tif'}}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
+        with self.assertRaises(FileNotFoundError) as cm:
+            PyMica('mlr+id2d', './test/data/config_test.json')
+        self.assertEqual('No such file or directory: notfound.tif',
+                         str(cm.exception))
+
+    def test_init_two_variables_files(self):
+
+        config = {'mlr+id2d': {'id_power': 2.5,
+                               'id_smoothing': 0.0,
+                               'interpolation_bounds': [260000, 4480000,
+                                                        530000, 4750000],
+                               'resolution': 270,
+                               'EPSG': 25831,
+                               'variables_files': {
+                                   'altitude': 'test/data/tifs/altitude.tif',
+                                   'd_coast': 'test/data/tifs/d_coast.tif'}}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
+        mlr_id2d = PyMica('mlr+id2d', './test/data/config_test.json')
+
+        self.assertEqual(mlr_id2d.variables.shape, (2, 1000, 1000))
