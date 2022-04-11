@@ -6,6 +6,12 @@ import json
 import numpy as np
 from genericpath import exists
 from osgeo import gdal, osr
+from interpolation.inverse_distance import inverse_distance
+from interpolation.inverse_distance_3d import inverse_distance_3d
+from pymica.apply_regression import (apply_clustered_regression,
+                                     apply_regression)
+from pymica.clustered_regression import (ClusteredRegression,
+                                         MultiRegressionSigma)
 
 '''
 from multiprocessing.sharedctypes import Value
@@ -214,29 +220,31 @@ class PyMica:
 
         self.field_proj = osr.SpatialReference()
         self.field_proj.ImportFromEPSG(self.config[self.methodology]['EPSG'])
-        self.field_size = [(int_bounds[3] - int_bounds[1]) / res,
-                           (int_bounds[2] - int_bounds[0]) / res]
+        self.field_size = [int((int_bounds[3] - int_bounds[1]) / res),
+                           int((int_bounds[2] - int_bounds[0]) / res)]
 
-    '''
-    def interpolate(data_file):
-        pass
+    def interpolate(self, data):
 
+        if self.methodology == 'id2d':
+            field = inverse_distance(data, self.field_size,
+                                     list(self.field_geotransform),
+                                     self.power, self.smoothing)
+        elif self.methodology == 'id3d':
+            field = inverse_distance_3d(
+                data,
+                self.field_size,
+                self.field_geotransform,
+                self.variables[
+                    list(self.variables_files.keys()).index('altitude')],
+                self.power,
+                self.smoothing,
+                self.penalization)
+        elif self.methodology == 'mlr':
+            regression, field = self.__get_regression_results__(False, data)
 
-    def save_file(self, file_name):
-        #Saves the calculate field data into a file
-        #Args:
-        #    file_name (str): The output file path
-        
+        return field
 
-        driver = gdal.GetDriverByName('GTiff')
-        d_s = driver.Create(file_name, self.size[1], self.size[0], 1,
-                            gdal.GDT_Float32)
-        d_s.SetGeoTransform(self.geotransform)
-        d_s.SetProjection(self.out_proj.ExportToWkt())
-
-        d_s.GetRasterBand(1).WriteArray(self.result)
-
-    def __get_regression_results(self, clusters, data):
+    def __get_regression_results__(self, clusters, data):
         if clusters:
             cl_reg = ClusteredRegression(data, clusters['clusters_files'],
                                          data_format=self.data_format)
@@ -252,14 +260,28 @@ class PyMica:
                                 self.data_format['x_vars'],
                                 mask)
         else:
-            cl_reg = MultiRegressionSigma(data,
-                                          id_key=self.data_format['id_key'],
-                                          y_var=self.data_format['y_var'],
-                                          x_vars=self.data_format['x_vars'])
+            cl_reg = MultiRegressionSigma(
+                data, id_key='id', y_var='value',
+                x_vars=list(self.variables_files.keys()))
             out_data = apply_regression(cl_reg, self.variables,
-                                        self.data_format['x_vars'])
+                                        list(self.variables_files.keys()))
 
         return cl_reg, out_data
+
+    '''
+    def save_file(self, file_name):
+        #Saves the calculate field data into a file
+        #Args:
+        #    file_name (str): The output file path
+
+
+        driver = gdal.GetDriverByName('GTiff')
+        d_s = driver.Create(file_name, self.size[1], self.size[0], 1,
+                            gdal.GDT_Float32)
+        d_s.SetGeoTransform(self.geotransform)
+        d_s.SetProjection(self.out_proj.ExportToWkt())
+
+        d_s.GetRasterBand(1).WriteArray(self.result)
 
     def __read_variables_files__(self, variables_file):
         if isinstance(variables_file, (list,)):
