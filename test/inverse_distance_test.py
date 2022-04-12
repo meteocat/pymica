@@ -11,9 +11,9 @@ from interpolation.inverse_distance import \
 
 class TestInverseDistance(unittest.TestCase):
 
-    residues = {'AA': {'value': 0, 'y': 0, 'x': 0},
-                'BB': {'value': 1, 'y': 1, 'x': 1},
-                'CC': {'value': 2, 'y': 2, 'x': 2}}
+    residues = [{'id': 'AA', 'value': 0, 'y': 0, 'x': 0},
+                {'id': 'BB', 'value': 1, 'y': 1, 'x': 1},
+                {'id': 'CC', 'value': 2, 'y': 2, 'x': 2}]
     geotransform = [0, 0.5, 0, 2, 0, -0.5]
     size = [5, 5]
 

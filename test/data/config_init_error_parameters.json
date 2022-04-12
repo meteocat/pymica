@@ -1,30 +1,33 @@
 {
     "id2d": {"id_power":2.5,
-             "interpolation_bouds":[0, 10000, 0 ,10000],
              "resolution":1000,
              "EPSG":25831},
     
-    "id3d": {"id_smoothing":0.0,
-             "id_penalization":30.0,
-             "variables_files": {"altitud": "",
-                                "d_coast": ""},
-             "interpolation_bouds":[0, 10000, 0 ,10000],
+    "id3d": {"variables_files": {"altitude": "test/data/tifs/altitude.tif",
+                                "d_coast": "test/data/tifs/d_coast.tif"},
+             "interpolation_bounds":[0, 10000, 0, 10000],
              "resolution":1000,
              "EPSG":25831},
  
     "mlr": {"clusters": "None",
+            "interpolation_bounds": [0, 10000, 0, 10000],
+            "resolution": 1000,
+            "EPSG": 25831,    
             "variables_files": {}},
 
     "mlr+id2d": {"id_power":2.5,
                  "id_smoothing":0.0,
-                 "clusters":"None"
+                 "clusters":"None",
+                 "interpolation_bounds": [0, 10000, 0, 10000],
+                 "resolution": 1000,
+                 "EPSG": 25831
                  },
     "mlr+id3d": {"id_power":2.5,
                 "id_smoothing":0.0,
                 "clusters":"None",
-                "variables_files": {"altitud": "kk",
-                                    "d_coast": "kk"},
-                "interpolation_bouds":[0, 10000, 0 ,10000],
+                "variables_files": {"altitude": "test/data/tifs/altitude.tif",
+                                    "d_coast": "test/data/tifs/d_coast.tif"},
+                "interpolation_bounds":[0, 10000, 0, 10000],
                 "resolution":1000,
                 "EPSG":25831}
 }

@@ -16,24 +16,23 @@ from typing import Dict, List
 DTYPE = np.float64
 ctypedef np.float64_t DTYPE_t
 
-def inverse_distance(residues: Dict[str, Dict[str, float]],
+def inverse_distance(data: List[Dict[str, float]],
                      size: List[int], geotransform: List[int],
                      power: float=2.5, smoothing: float=0.0):
     """
-    inverse_distance(residues, size, geotransform)
+    inverse_distance(data, size, geotransform)
 
-    Interpolates the residues field using the inverse of the distance method
+    Interpolates the data field using the inverse of the distance method
     
     Args:
-        residues (dict): The residues dict
+        data (dict): The data dict
         size (list): x X y
-        geotransform (list): The geotransform to apply to relate the residues coordinates
+        geotransform (list): The geotransform to apply to relate the data coordinates
                              and the position in the matrix.
                              See https://www.gdal.org/gdal_datamodel.html for more information
 
-    
     Returns:
-        list: The interpolated residues
+        list: The interpolated data
     """
 
     cdef array.array da = array.array('d', [])
@@ -44,10 +43,10 @@ def inverse_distance(residues: Dict[str, Dict[str, float]],
     ypos0 = []
     values0 = []
 
-    for key in residues.keys():
-        xpos0.append(residues[key]['x'])
-        ypos0.append(residues[key]['y'])
-        values0.append(residues[key]['value'])
+    for d in data:
+        xpos0.append(d['x'])
+        ypos0.append(d['y'])
+        values0.append(d['value'])
 
     cdef int N
     N = len(xpos0)
