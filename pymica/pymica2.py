@@ -239,8 +239,35 @@ class PyMica:
                 self.power,
                 self.smoothing,
                 self.penalization)
-        elif self.methodology == 'mlr':
+        elif self.methodology in ['mlr', 'mlr+id2d', 'mlr+id3d']:
             regression, field = self.__get_regression_results__(False, data)
+
+        if self.methodology in ['mlr+id2d', 'mlr+id3d']:
+            residues = regression.get_residuals()
+
+            res_interp = []
+            for stat in data:
+                if stat['id'] in residues.keys():
+                    res = {'id': stat['id'], 'x': stat['x'],
+                           'y': stat['y'], 'value': residues[stat['id']]}
+                    if self.methodology == 'mlr+id3d':
+                        res['altitude'] = stat['altitude']
+                    res_interp.append(res)
+
+            if self.methodology == 'mlr+id2d':
+                res_field = inverse_distance(res_interp, self.field_size,
+                                             list(self.field_geotransform),
+                                             self.power, self.smoothing)
+            elif self.methodology == 'mlr+id3d':
+                res_field = inverse_distance_3d(
+                    res_interp, self.field_size, self.field_geotransform,
+                    self.variables[
+                        list(self.variables_files.keys()).index('altitude')],
+                    self.power,
+                    self.smoothing,
+                    self.penalization)
+
+            field = field - res_field
 
         return field
 

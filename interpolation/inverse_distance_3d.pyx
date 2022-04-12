@@ -17,7 +17,7 @@ from typing import Dict, List, Union
 DTYPE = np.float64
 ctypedef np.float64_t DTYPE_t
 
-def inverse_distance_3d(residues: Dict[str, Dict[str, float]],
+def inverse_distance_3d(data: List[Dict[str, float]],
                         size: List[int], geotransform: List[int], dem,
                         power: float=2, smoothing: float=0,
                         penalization: float=30):
@@ -47,11 +47,11 @@ def inverse_distance_3d(residues: Dict[str, Dict[str, float]],
     zpos0 = []
     values0 = []
 
-    for key in residues.keys():
-        xpos0.append(residues[key]['x'])
-        ypos0.append(residues[key]['y'])
-        zpos0.append(residues[key]['z'])
-        values0.append(residues[key]['value'])
+    for d in data:
+        xpos0.append(d['x'])
+        ypos0.append(d['y'])
+        zpos0.append(d['altitude'])
+        values0.append(d['value'])
 
     cdef int N
     N = len(xpos0)

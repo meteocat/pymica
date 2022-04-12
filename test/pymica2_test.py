@@ -346,9 +346,12 @@ class TestPyMica(unittest.TestCase):
 
         id3d = PyMica('id3d', './test/data/config_test.json')
 
-        data = {'A': {'x': 280000.0, 'y': 4500000.0, 'z': 10, 'value': 50.0},
-                'B': {'x': 380000.0, 'y': 4600000.0, 'z': 100,  'value': 20.0},
-                'C': {'x': 480000.0, 'y': 4700000.0, 'z': 1000, 'value': 10.0}}
+        data = [{'id': 'A', 'x': 280000.0, 'y': 4500000.0, 'altitude': 10,
+                 'value': 50.0},
+                {'id': 'B', 'x': 380000.0, 'y': 4600000.0, 'altitude': 100,
+                 'value': 20.0},
+                {'id': 'C', 'x': 480000.0, 'y': 4700000.0, 'altitude': 1000,
+                 'value': 10.0}]
 
         field = id3d.interpolate(data)
 
@@ -404,6 +407,37 @@ class TestPyMica(unittest.TestCase):
             f.close()
 
         mlr_id2d = PyMica('mlr+id2d', './test/data/config_test.json')
+
+        data = [{'id': 'A', 'x': 280000.0, 'y': 4500000.0,
+                 'altitude': 10, 'value': 50.0},
+                {'id': 'B', 'x': 380000.0, 'y': 4600000.0,
+                 'altitude': 100,  'value': 20.0},
+                {'id': 'C', 'x': 480000.0, 'y': 4700000.0,
+                 'altitude': 1000, 'value': 10.0}]
+
+        field = mlr_id2d.interpolate(data)
+
+        self.assertEqual(field.shape, (1000, 1000))
+        self.assertAlmostEqual(field[925, 74], 50.000, 2)
+        self.assertAlmostEqual(field[555, 444], 20.000, 2)
+        self.assertAlmostEqual(field[185, 814], 9.999, 2)
+
+    def test_init_interpolate_mlr_id3d(self):
+
+        config = {'mlr+id3d': {'id_power': 2.5,
+                               'id_smoothing': 0.0,
+                               'interpolation_bounds': [260000, 4480000,
+                                                        530000, 4750000],
+                               'resolution': 270,
+                               'EPSG': 25831,
+                               'variables_files': {
+                                   'altitude': 'test/data/tifs/altitude.tif'}}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
+        mlr_id2d = PyMica('mlr+id3d', './test/data/config_test.json')
 
         data = [{'id': 'A', 'x': 280000.0, 'y': 4500000.0,
                  'altitude': 10, 'value': 50.0},

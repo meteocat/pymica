@@ -11,9 +11,9 @@ from interpolation.inverse_distance_3d import inverse_distance_3d
 
 class TestInverseDistance3D(unittest.TestCase):
 
-    residues = {'AA': {'value': 0, 'z': 1, 'y': 0, 'x': 0},
-                'BB': {'value': 1, 'z': 0, 'y': 1, 'x': 1},
-                'CC': {'value': 2, 'z': 0, 'y': 2, 'x': 2}}
+    residues = [{'id': 'AA', 'value': 0, 'altitude': 1, 'y': 0, 'x': 0},
+                {'id': 'BB', 'value': 1, 'altitude': 0, 'y': 1, 'x': 1},
+                {'id': 'CC', 'value': 2, 'altitude': 0, 'y': 2, 'x': 2}]
 
     geotransform = [0, 0.5, 0, 2, 0, -0.5]
     size = [5, 5]
