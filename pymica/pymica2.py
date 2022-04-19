@@ -6,6 +6,7 @@ import json
 import numpy as np
 from genericpath import exists
 from osgeo import gdal, osr
+from interpolation.inverse_distance_3d import inverse_distance_3d
 
 '''
 from multiprocessing.sharedctypes import Value
@@ -84,6 +85,9 @@ class PyMica:
         return config
 
     def __check_config__(self, method):
+        if method not in self.config.keys():
+            raise KeyError(method + ' not defined in the configuration file.')
+
         if method in ['id2d', 'id3d', 'mlr+id2d', 'mlr+id3d']:
             if 'id_power' not in self.config[method].keys():
                 print('id_power not in the configuration dictionary. ' +
@@ -174,6 +178,52 @@ class PyMica:
                                  'Variables fields must have the same '
                                  'GeoTransform, Projection, XSize and YSize.')
 
+    
+    def __check_data__(self,data_file):
+
+
+        # Check if the data file exists
+        # Check if json is well structured
+        try:
+            with open(data_file, 'r') as f:
+                data = json.load(f)
+                f.close()
+        except FileNotFoundError:
+            raise FileNotFoundError('Wrong data file path.')
+        except json.decoder.JSONDecodeError as err:
+            raise json.decoder.JSONDecodeError(err.msg, err.doc, err.pos)
+        for elements in data:
+            if 'id' not in elements.keys():
+                raise KeyError('id must be included in the data file')
+            if 'lat' not in elements.keys():
+                raise KeyError('lat must be included in the data file')
+            if 'lon' not in elements.keys():
+                raise KeyError('lon must be included in the data file')
+            if 'value' not in elements.keys():
+                raise KeyError('value must be included in the data file')
+        
+        if self.methodology in ['id3d','mlr+id3d']:
+            for elements in data:
+                if 'altitude' not in elements.keys():
+                    raise KeyError('altitude must be included in the data file')
+ 
+        if self.methodology in ['mlr','mlr+id2d','mlr+id3d']:
+            for elements in data:
+                if not set(list(self.config[self.methodology]['variables_files'].keys())).issubset(set(list(elements.keys()))):
+                    raise KeyError('Some variables missing in '+elements['id'])
+
+
+        
+
+        
+
+    
+
+
+
+    
+    
+    
     def summary(self):
         print('pymica interpolator')
         print('-------------------')
@@ -217,11 +267,15 @@ class PyMica:
         self.field_size = [(int_bounds[3] - int_bounds[1]) / res,
                            (int_bounds[2] - int_bounds[0]) / res]
 
+    
+    def interpolate(self,data_file):
+        self.__check_data__(data_file)
+        if self.methodology=='id3d':
+            pass
+
+        
+
     '''
-    def interpolate(data_file):
-        pass
-
-
     def save_file(self, file_name):
         #Saves the calculate field data into a file
         #Args:
