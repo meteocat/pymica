@@ -52,8 +52,22 @@ class TestPyMica(unittest.TestCase):
         d_s = None
 
     def test_init_wrong_variables_files(cls):
+        config = {'mlr': {'resolution': 270,
+                          'interpolation_bounds': [260000, 4480000,
+                                                   530000, 4750000],
+                          'clusters': 'None',
+                          'variables_files': {'altitude': 'test/data/tifs/'
+                                                          'altitude.tif',
+                                              'd_coast': 'test/data/tifs/'
+                                                         'd_coast_2.tif'},
+                          'EPSG': 25831}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
         with cls.assertRaises(ValueError) as cm:
-            PyMica('mlr', './test/data/config_init.json')
+            PyMica('mlr', 'test/data/config_test.json')
         cls.assertEqual('Variables properties are not the same. '
                         'Variables fields must have the same '
                         'GeoTransform, Projection, XSize and YSize.',
@@ -77,6 +91,24 @@ class TestPyMica(unittest.TestCase):
         self.assertEqual('Methodology must be \"id2d\", \"id3d\", '
                          '\"mlr+id2d\", \"mlr+id3d\" or \"mlr\"',
                          str(cm.exception))
+
+    def test_init_methodology_not_in_config(self):
+
+        config = {'id3d': {'resolution': 270,
+                           'interpolation_bounds': [260000, 4480000,
+                                                    530000, 4750000],
+                           'EPSG': 25831,
+                           'variables_files': {'altitude':
+                                               'test/data/tifs/altitude.tif'}}}
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
+        with self.assertRaises(KeyError) as cm:
+            PyMica('id2d', './test/data/config_test.json')
+        self.assertEqual('id2d not defined in the configuration file.',
+                         cm.exception.args[0])
 
     def test_init_default_values_config(self):
 
@@ -177,7 +209,7 @@ class TestPyMica(unittest.TestCase):
         config = {'id2d': {'id_power': 2.5,
                            'id_smoothing': 0.0,
                            'interpolation_bounds': [0, 0, 1000, 1000],
-                           'resolution': "1000",
+                           'resolution': '1000',
                            'EPSG': 25831}}
 
         with open('test/data/config_test.json', 'w') as f:
@@ -211,7 +243,7 @@ class TestPyMica(unittest.TestCase):
                            'id_smoothing': 0.0,
                            'interpolation_bounds': [0, 0, 1000, 1000],
                            'resolution': 1000,
-                           'EPSG': "25831"}}
+                           'EPSG': '25831'}}
 
         with open('test/data/config_test.json', 'w') as f:
             json.dump(config, f)
@@ -452,3 +484,148 @@ class TestPyMica(unittest.TestCase):
         self.assertAlmostEqual(field[925, 74], 50.000, 2)
         self.assertAlmostEqual(field[555, 444], 20.000, 2)
         self.assertAlmostEqual(field[185, 814], 9.999, 2)
+
+    def test_interpolate_check_data(self):
+        config = {'id3d': {'id_smoothing': 0.0,
+                           'id_penalization': 30,
+                           'resolution': 270,
+                           'id_power': 2.5,
+                           'interpolation_bounds': [260000, 4480000,
+                                                    530000, 4750000],
+                           'EPSG': 25831,
+                           'variables_files': {'altitude':
+                                               'test/data/tifs/altitude.tif'}},
+                  'mlr': {'clusters': None,
+                          'resolution': 270,
+                          'interpolation_bounds': [260000, 4480000,
+                                                   530000, 4750000],
+                          'EPSG': 25831,
+                          'variables_files': {'d_coast':
+                                              'test/data/tifs/d_coast.tif'}}
+                  }
+
+        with open('test/data/config_test.json', 'w') as f:
+            json.dump(config, f)
+            f.close()
+
+        # Test que el fitxer no existeix
+        with self.assertRaises(FileNotFoundError) as cm:
+            inst = PyMica('id3d', 'test/data/config_test.json')
+            inst.interpolate(data_file='aaaa')
+        self.assertEqual('Wrong data file path.', str(cm.exception))
+
+        with self.assertRaises(json.decoder.JSONDecodeError) as cm:
+            inst = PyMica('id3d', 'test/data/config_test.json')
+            inst.interpolate(data_file='test/data/sample_data_err.json')
+        self.assertEqual("Expecting ',' delimiter: line 1 column 3474 "
+                         "(char 3473)", str(cm.exception))
+
+        # Fem test per les lat
+        data_dict = [{'id': 'C6', 'value': 6.4, 'altitude': 264,
+                      'lon': 0.95172, 'lati': 41.6566,
+                      'dist': 0.8583929293407604},
+                     {'id': 'C7', 'value': 5.6, 'altitude': 427,
+                      'lon': 1.16234, 'lat': 41.66695,
+                      'dist': 0.8387222708681318}]
+
+        with open('test/data/sample_data_test_keys.json', 'w') as f:
+            json.dump(data_dict, f)
+            f.close()
+
+        with self.assertRaises(KeyError) as cm:
+            inst = PyMica('id3d', 'test/data/config_test.json')
+            inst.interpolate(data_file='test/data/sample_data_test_keys.json')
+        self.assertEqual('lat must be included in the data file',
+                         cm.exception.args[0])
+
+        # Fem test per les lon
+        data_dict = [{'id': 'C6', 'value': 6.4, 'altitude': 264,
+                      'loni': 0.95172, 'lat': 41.6566,
+                      'dist': 0.8583929293407604},
+                     {'id': 'C7', 'value': 5.6, 'altitude': 427,
+                      'lon': 1.16234, 'lat': 41.66695,
+                      'dist': 0.8387222708681318}]
+
+        with open('test/data/sample_data_test_keys.json', 'w') as f:
+            json.dump(data_dict, f)
+            f.close()
+
+        with self.assertRaises(KeyError) as cm:
+            inst = PyMica('id3d', 'test/data/config_test.json')
+            inst.interpolate(data_file='test/data/sample_data_test_keys.json')
+        self.assertEqual('lon must be included in the data file',
+                         cm.exception.args[0])
+
+        # Fem test per les altures
+        data_dict = [{'id': 'C6', 'value': 6.4, 'alti': 264, 'lon': 0.95172,
+                      'lat': 41.6566, 'dist': 0.8583929293407604},
+                     {'id': 'C7', 'value': 5.6, 'altitude': 427,
+                      'lon': 1.16234, 'lat': 41.66695,
+                      'dist': 0.8387222708681318}]
+
+        with open('test/data/sample_data_test_keys.json', 'w') as f:
+            json.dump(data_dict, f)
+            f.close()
+
+        with self.assertRaises(KeyError) as cm:
+            inst = PyMica('id3d', 'test/data/config_test.json')
+            inst.interpolate(data_file='test/data/sample_data_test_keys.json')
+        self.assertEqual('altitude must be included in the data file',
+                         cm.exception.args[0])
+
+        # Fem test per "id"
+        data_dict = [{'ide': 'C6', 'value': 6.4, 'altitude': 264,
+                      'lon': 0.95172, 'lat': 41.6566,
+                      'dist': 0.8583929293407604},
+                     {'id': 'C7', 'value': 5.6, 'altitude': 427,
+                      'lon': 1.16234, 'lat': 41.66695,
+                      'dist': 0.8387222708681318}]
+
+        with open('test/data/sample_data_test_keys.json', 'w') as f:
+            json.dump(data_dict, f)
+            f.close()
+
+        with self.assertRaises(KeyError) as cm:
+            inst = PyMica('id3d', 'test/data/config_test.json')
+            inst.interpolate(data_file='test/data/sample_data_test_keys.json')
+        self.assertEqual('id must be included in the data file',
+                         cm.exception.args[0])
+
+        # Fem test per "value"
+        data_dict = [{'id': 'C6', 'temp': 6.4, 'altitude': 264,
+                      'lon': 0.95172, 'lat': 41.6566,
+                      'dist': 0.8583929293407604},
+                     {'id': 'C7', 'valor': 5.6, 'altitude': 427,
+                      'lon': 1.16234, 'lat': 41.66695,
+                      'dist': 0.8387222708681318}]
+
+        with open('test/data/sample_data_test_keys.json', 'w') as f:
+            json.dump(data_dict, f)
+            f.close()
+
+        with self.assertRaises(KeyError) as cm:
+            inst = PyMica('id3d', 'test/data/config_test.json')
+            inst.interpolate(data_file='test/data/sample_data_test_keys.json')
+        self.assertEqual('value must be included in the data file',
+                         cm.exception.args[0])
+
+        # Fem test variables_file (parametres a config ha de tenir variables
+        #  a data)
+
+        # Fem test per 'value'
+        data_dict = [{'id': 'C6', 'value': 6.4, 'altitude': 264,
+                      'lon': 0.95172, 'lat': 41.6566,
+                      'dist': 0.8583929293407604},
+                     {'id': 'C7', 'value': 5.6, 'altitude': 427,
+                      'lon': 1.16234, 'lat': 41.66695,
+                      'dist': 0.8387222708681318}]
+
+        with open('test/data/sample_data_test_keys.json', 'w') as f:
+            json.dump(data_dict, f)
+            f.close()
+
+        with self.assertRaises(KeyError) as cm:
+            inst = PyMica('mlr', 'test/data/config_test.json')
+            inst.interpolate(data_file='test/data/sample_data_test_keys.json')
+        self.assertEqual('Some variables missing in C6',
+                         cm.exception.args[0])
