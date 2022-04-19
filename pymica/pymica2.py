@@ -191,7 +191,7 @@ class PyMica:
                 data = json.load(f)
                 f.close()
         except FileNotFoundError:
-            raise FileNotFoundError('Wrong data file path.')
+            raise FileNotFoundError('No such file or directory: ' + data_file)
         except json.decoder.JSONDecodeError as err:
             raise json.decoder.JSONDecodeError(err.msg, err.doc, err.pos)
         for elements in data:
@@ -216,7 +216,9 @@ class PyMica:
                     self.config[self.methodology]
                     ['variables_files'].keys())).issubset(
                         set(list(elements.keys()))):
-                    raise KeyError('Some variables missing in '+elements['id'])
+                    raise KeyError('Some of the variables provided in the '
+                                   'variables_files dictionary missing in '
+                                   + elements['id'] + '.')
 
         in_proj = osr.SpatialReference()
         in_proj.ImportFromEPSG(4326)
