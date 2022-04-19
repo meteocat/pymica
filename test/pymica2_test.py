@@ -51,6 +51,17 @@ class TestPyMica(unittest.TestCase):
         d_s.SetProjection(proj.ExportToWkt())
         d_s = None
 
+        data = [{'id': 'A', 'lon': 0.3990722, 'lat': 40.6215578,
+                 'altitude': 10, 'value': 50.0},
+                {'id': 'B', 'lon': 1.5613071, 'lat': 41.5426639,
+                 'altitude': 100, 'value': 20.0},
+                {'id': 'C', 'lon': 2.7567764, 'lat': 42.4520729,
+                 'altitude': 1000, 'value': 10.0}]
+
+        with open('test/data/init_data.json', 'w') as f:
+            json.dump(data, f)
+            f.close()
+
     def test_init_wrong_variables_files(cls):
         config = {'mlr': {'resolution': 270,
                           'interpolation_bounds': [260000, 4480000,
@@ -348,12 +359,7 @@ class TestPyMica(unittest.TestCase):
             f.close()
 
         id2d = PyMica('id2d', './test/data/config_test.json')
-
-        data = [{'id': 'A', 'x': 280000.0, 'y': 4500000.0, 'value': 50.0},
-                {'id': 'B', 'x': 380000.0, 'y': 4600000.0, 'value': 20.0},
-                {'id': 'C', 'x': 480000.0, 'y': 4700000.0, 'value': 10.0}]
-
-        field = id2d.interpolate(data)
+        field = id2d.interpolate('test/data/init_data.json')
 
         self.assertEqual(field.shape, (1000, 1000))
         self.assertAlmostEqual(field[0, 0], 23.992, 2)
@@ -377,15 +383,7 @@ class TestPyMica(unittest.TestCase):
             f.close()
 
         id3d = PyMica('id3d', './test/data/config_test.json')
-
-        data = [{'id': 'A', 'x': 280000.0, 'y': 4500000.0, 'altitude': 10,
-                 'value': 50.0},
-                {'id': 'B', 'x': 380000.0, 'y': 4600000.0, 'altitude': 100,
-                 'value': 20.0},
-                {'id': 'C', 'x': 480000.0, 'y': 4700000.0, 'altitude': 1000,
-                 'value': 10.0}]
-
-        field = id3d.interpolate(data)
+        field = id3d.interpolate('test/data/init_data.json')
 
         self.assertEqual(field.shape, (1000, 1000))
         self.assertAlmostEqual(field[0, 0], 24.086, 2)
@@ -408,15 +406,7 @@ class TestPyMica(unittest.TestCase):
             f.close()
 
         mlr = PyMica('mlr', './test/data/config_test.json')
-
-        data = [{'id': 'A', 'x': 280000.0, 'y': 4500000.0,
-                 'altitude': 10, 'value': 50.0},
-                {'id': 'B', 'x': 380000.0, 'y': 4600000.0,
-                 'altitude': 100,  'value': 20.0},
-                {'id': 'C', 'x': 480000.0, 'y': 4700000.0,
-                 'altitude': 1000, 'value': 10.0}]
-
-        field = mlr.interpolate(data)
+        field = mlr.interpolate('test/data/init_data.json')
 
         self.assertEqual(field.shape, (1000, 1000))
         self.assertAlmostEqual(field[0, 0], 37.193, 2)
@@ -439,15 +429,7 @@ class TestPyMica(unittest.TestCase):
             f.close()
 
         mlr_id2d = PyMica('mlr+id2d', './test/data/config_test.json')
-
-        data = [{'id': 'A', 'x': 280000.0, 'y': 4500000.0,
-                 'altitude': 10, 'value': 50.0},
-                {'id': 'B', 'x': 380000.0, 'y': 4600000.0,
-                 'altitude': 100,  'value': 20.0},
-                {'id': 'C', 'x': 480000.0, 'y': 4700000.0,
-                 'altitude': 1000, 'value': 10.0}]
-
-        field = mlr_id2d.interpolate(data)
+        field = mlr_id2d.interpolate('test/data/init_data.json')
 
         self.assertEqual(field.shape, (1000, 1000))
         self.assertAlmostEqual(field[925, 74], 50.000, 2)
@@ -470,15 +452,7 @@ class TestPyMica(unittest.TestCase):
             f.close()
 
         mlr_id2d = PyMica('mlr+id3d', './test/data/config_test.json')
-
-        data = [{'id': 'A', 'x': 280000.0, 'y': 4500000.0,
-                 'altitude': 10, 'value': 50.0},
-                {'id': 'B', 'x': 380000.0, 'y': 4600000.0,
-                 'altitude': 100,  'value': 20.0},
-                {'id': 'C', 'x': 480000.0, 'y': 4700000.0,
-                 'altitude': 1000, 'value': 10.0}]
-
-        field = mlr_id2d.interpolate(data)
+        field = mlr_id2d.interpolate('test/data/init_data.json')
 
         self.assertEqual(field.shape, (1000, 1000))
         self.assertAlmostEqual(field[925, 74], 50.000, 2)

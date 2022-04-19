@@ -5,7 +5,7 @@ import json
 
 import numpy as np
 from genericpath import exists
-from osgeo import gdal, osr
+from osgeo import gdal, osr, ogr
 from interpolation.inverse_distance import inverse_distance
 from interpolation.inverse_distance_3d import inverse_distance_3d
 from pymica.apply_regression import (apply_clustered_regression,
@@ -183,7 +183,7 @@ class PyMica:
                                  'Variables fields must have the same '
                                  'GeoTransform, Projection, XSize and YSize.')
 
-    def __check_data__(self, data_file):
+    def __input_data__(self, data_file):
         # Check if the data file exists
         # Check if json is well structured
         try:
@@ -218,18 +218,20 @@ class PyMica:
                         set(list(elements.keys()))):
                     raise KeyError('Some variables missing in '+elements['id'])
 
-    def summary(self):
-        print('pymica interpolator')
-        print('-------------------')
-        if self.methodology in ['mlr+id2d', 'id2d']:
-            print('Methodology                 : ' + self.methodology)
-            print('Inverse distance - power    : ' + str(self.power))
-            print('Inverse distance - smoothing: ' + str(self.smoothing))
-        if self.methodology in ['mlr+id3d', 'id3d']:
-            print('Methodology                    : ' + self.methodology)
-            print('Inverse distance - power       : ' + str(self.power))
-            print('Inverse distance - smoothing   : ' + str(self.smoothing))
-            print('Inverse distance - penalization: ' + str(self.penalization))
+        in_proj = osr.SpatialReference()
+        in_proj.ImportFromEPSG(4326)
+        transf = osr.CoordinateTransformation(in_proj, self.field_proj)
+
+        for point in data:
+            geom = ogr.Geometry(ogr.wkbPoint)
+            geom.AddPoint(point['lat'],
+                          point['lon'])
+            geom.Transform(transf)
+
+            point['x'] = geom.GetX()
+            point['y'] = geom.GetY()
+
+        return data
 
     def __read_variables_files2__(self):
         for i, var in enumerate(list(self.config[self.methodology]
@@ -261,7 +263,9 @@ class PyMica:
         self.field_size = [int((int_bounds[3] - int_bounds[1]) / res),
                            int((int_bounds[2] - int_bounds[0]) / res)]
 
-    def interpolate(self, data):
+    def interpolate(self, data_file):
+
+        data = self.__input_data__(data_file)
 
         if self.methodology == 'id2d':
             field = inverse_distance(data, self.field_size,
