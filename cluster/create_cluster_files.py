@@ -27,6 +27,7 @@ def create_reprojected_geoms(file_name, epsg):
 
     in_proj = osr.SpatialReference()
     in_proj.ImportFromEPSG(4326)
+    in_proj.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
     transf = osr.CoordinateTransformation(in_proj, out_proj)
 
