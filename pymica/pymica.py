@@ -3,15 +3,15 @@ clusters multi-linear regressions corrected with residuals.
 '''
 import json
 
-from interpolation.idw import idw
-from interpolation.inverse_distance import inverse_distance
-from interpolation.inverse_distance_3d import inverse_distance_3d
+from pymica.methods.idw import idw
+from pymica.methods.inverse_distance import inverse_distance
+from pymica.methods.inverse_distance_3d import inverse_distance_3d
 from numpy import concatenate, newaxis
 from osgeo import gdal, ogr, osr
 
-from pymica.apply_regression import (apply_clustered_regression,
+from pymica.methods.apply_regression import (apply_clustered_regression,
                                      apply_regression)
-from pymica.clustered_regression import (ClusteredRegression,
+from pymica.methods.clustered_regression import (ClusteredRegression,
                                          MultiRegressionSigma)
 
 

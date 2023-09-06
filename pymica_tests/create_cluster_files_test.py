@@ -7,13 +7,13 @@ from tempfile import gettempdir
 
 from osgeo import gdal, ogr
 
-from cluster.create_cluster_files import (create_reprojected_geoms,
+from pymica.utils.create_cluster_files import (create_reprojected_geoms,
                                           rasterize_clusters)
 
 
 class TestCreateClustersFiles(unittest.TestCase):
     def test_create_reprojected_geoms(self):
-        d_s = create_reprojected_geoms("./test/data/clusters.json", 25831)
+        d_s = create_reprojected_geoms("./pymica_tests/data/clusters.json", 25831)
 
         self.assertIsInstance(d_s, ogr.DataSource)
         layer = d_s.GetLayer()
@@ -28,7 +28,7 @@ class TestCreateClustersFiles(unittest.TestCase):
             str(c_m.exception))
 
         with self.assertRaises(ValueError) as c_m:
-            create_reprojected_geoms("./test/data/clusters.json", -999)
+            create_reprojected_geoms("./pymica_tests/data/clusters.json", -999)
         self.assertEqual(
             "Wrong EPSG code: -999",
             str(c_m.exception))
@@ -39,7 +39,7 @@ class TestCreateClustersFiles(unittest.TestCase):
         if exists(out_file):
             remove(out_file)
 
-        layer = create_reprojected_geoms("./test/data/clusters.json", 25831)
+        layer = create_reprojected_geoms("./pymica_tests/data/clusters.json", 25831)
         rasterize_clusters(layer,
                            {'size': [1000, 1000],
                             'geotransform': geotransform,

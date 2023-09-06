@@ -2,7 +2,7 @@
 '''
 import unittest
 
-from cluster.create_clusters import calculate_utm_def
+from pymica.utils.create_clusters import calculate_utm_def
 from pyproj import Proj
 
 

@@ -2,7 +2,7 @@
 '''
 import unittest
 
-from pymica.multiregression import MultiRegression, MultiRegressionSigma
+from pymica.methods.multiregression import MultiRegression, MultiRegressionSigma
 
 
 class TestMultiRegressionSigma(unittest.TestCase):

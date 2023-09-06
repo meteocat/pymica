@@ -5,7 +5,7 @@ from datetime import datetime
 
 from numpy import array
 
-from interpolation.idw import idw
+from pymica.methods.idw import idw
 
 
 class TestInverseDistanceWeighting(unittest.TestCase):
