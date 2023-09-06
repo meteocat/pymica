@@ -30,7 +30,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        python /home/runner/work/pymica/setup.py build_ext --inplace
+        python /home/runner/work/pymica/pymica/setup.py build_ext --inplace
         conda install pytest
         export PYTHONPATH=$PYTHONPATH:/home/runner/work/pymica/pymica/
         pytest
