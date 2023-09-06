@@ -2,14 +2,12 @@
 Run python setup.py --help for options
 '''
 import datetime
-import subprocess
 
 import numpy
 import setuptools
 
-release = subprocess.check_output(
-    ['git', 'describe', '--abbrev=0', '--tags']).decode('utf-8').strip()
-version = ".".join(release.split('.')[0:2])
+release = "0.1.0"
+version = "0.1.0"
 name = "pymica"
 
 now = datetime.datetime.now()
