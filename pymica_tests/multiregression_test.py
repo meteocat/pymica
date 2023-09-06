@@ -2,7 +2,7 @@
 '''
 import unittest
 
-from pymica.multiregression import MultiRegression
+from pymica.methods.multiregression import MultiRegression
 
 
 class TestMultiRegression(unittest.TestCase):

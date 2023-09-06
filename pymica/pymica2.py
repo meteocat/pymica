@@ -6,11 +6,11 @@ import json
 import numpy as np
 from genericpath import exists
 from osgeo import gdal, osr, ogr
-from interpolation.inverse_distance import inverse_distance
-from interpolation.inverse_distance_3d import inverse_distance_3d
-from pymica.apply_regression import (apply_clustered_regression,
+from pymica.methods.inverse_distance import inverse_distance
+from pymica.methods.inverse_distance_3d import inverse_distance_3d
+from pymica.methods.apply_regression import (apply_clustered_regression,
                                      apply_regression)
-from pymica.clustered_regression import (ClusteredRegression,
+from pymica.methods.clustered_regression import (ClusteredRegression,
                                          MultiRegressionSigma)
 
 '''
@@ -276,8 +276,8 @@ class PyMica:
         elif self.methodology == 'id3d':
             field = inverse_distance_3d(
                 data,
-                self.field_size,
-                self.field_geotransform,
+                list(self.field_size),
+                list(self.field_geotransform),
                 self.variables[
                     list(self.variables_files.keys()).index('altitude')],
                 self.power,
@@ -299,12 +299,12 @@ class PyMica:
                     res_interp.append(res)
 
             if self.methodology == 'mlr+id2d':
-                res_field = inverse_distance(res_interp, self.field_size,
+                res_field = inverse_distance(res_interp, list(self.field_size),
                                              list(self.field_geotransform),
                                              self.power, self.smoothing)
             elif self.methodology == 'mlr+id3d':
                 res_field = inverse_distance_3d(
-                    res_interp, self.field_size, self.field_geotransform,
+                    res_interp, list(self.field_size), list(self.field_geotransform),
                     self.variables[
                         list(self.variables_files.keys()).index('altitude')],
                     self.power,
@@ -312,6 +312,8 @@ class PyMica:
                     self.penalization)
 
             field = field - res_field
+
+        self.field = field
 
         return field
 
@@ -339,21 +341,18 @@ class PyMica:
 
         return cl_reg, out_data
 
-    '''
     def save_file(self, file_name):
         #Saves the calculate field data into a file
         #Args:
         #    file_name (str): The output file path
-
-
         driver = gdal.GetDriverByName('GTiff')
         d_s = driver.Create(file_name, self.size[1], self.size[0], 1,
                             gdal.GDT_Float32)
         d_s.SetGeoTransform(self.geotransform)
         d_s.SetProjection(self.out_proj.ExportToWkt())
 
-        d_s.GetRasterBand(1).WriteArray(self.result)
-
+        d_s.GetRasterBand(1).WriteArray(self.field)
+    '''
     def __read_variables_files__(self, variables_file):
         if isinstance(variables_file, (list,)):
             self.variables = None

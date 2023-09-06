@@ -5,7 +5,7 @@ from datetime import datetime
 
 from numpy import array
 
-from interpolation.inverse_distance import \
+from pymica.methods.inverse_distance import \
     inverse_distance  # pylint: disable=E0611
 
 

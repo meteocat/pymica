@@ -6,10 +6,10 @@ from datetime import datetime
 
 import numpy as np
 
-from pymica.apply_regression import (apply_clustered_regression,
-                                     apply_regression)
-from pymica.clustered_regression import ClusteredRegression
-from pymica.multiregression import MultiRegressionSigma
+from pymica.methods.apply_regression import (apply_clustered_regression,
+                                             apply_regression)
+from pymica.methods.clustered_regression import ClusteredRegression
+from pymica.methods.multiregression import MultiRegressionSigma
 
 
 class ApplyRegressionTest(unittest.TestCase):
@@ -93,11 +93,11 @@ class ApplyRegressionTest(unittest.TestCase):
             str(cm.exception))
 
     def test_apply_clustered_regression(self):
-        f_p = open("./test/data/sample_data.json")
+        f_p = open("./pymica_tests/data/sample_data.json")
         data = json.load(f_p)
         f_p.close()
         inst = ClusteredRegression(data,
-                                   ["./test/data/clusters.json"])
+                                   ["./pymica_tests/data/clusters.json"])
 
         size = [1000, 1000]
         alt_data = np.ones(size)

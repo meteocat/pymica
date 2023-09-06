@@ -14,7 +14,7 @@ class TestPyMica(unittest.TestCase):
         cls.variables_file = gettempdir() + '/variables.tiff'
         cls.mask_file = gettempdir() + '/mask.tiff'
         cls.mask5_file = gettempdir() + '/mask5.tiff'
-        cls.clusters = {'clusters_files': ["./test/data/clusters.json"],
+        cls.clusters = {'clusters_files': ["./pymica_tests/data/clusters.json"],
                         'mask_files': [cls.mask_file]}
         size = [1000, 1000]
         alt_data = np.ones(size)
@@ -61,7 +61,7 @@ class TestPyMica(unittest.TestCase):
         d_s = None
 
     def test_init(self):
-        inst = PyMica("./test/data/sample_data.json", self.variables_file,
+        inst = PyMica("./pymica_tests/data/sample_data.json", self.variables_file,
                       self.clusters)
         self.assertEqual(inst.result.shape, (1000, 1000))
 
@@ -69,21 +69,21 @@ class TestPyMica(unittest.TestCase):
 
         # Test passing multiple variable files instead
         # of one with all the layers
-        PyMica("./test/data/sample_data.json", [self.variables_file],
+        PyMica("./pymica_tests/data/sample_data.json", [self.variables_file],
                self.clusters)
 
         # No clusters
-        PyMica("./test/data/sample_data.json", [self.variables_file])
+        PyMica("./pymica_tests/data/sample_data.json", [self.variables_file])
 
         # Multiple clusters
-        clusters2 = {'clusters_files': ["./test/data/clusters.json",
-                                        "./test/data/clusters5.json"],
+        clusters2 = {'clusters_files': ["./pymica_tests/data/clusters.json",
+                                        "./pymica_tests/data/clusters5.json"],
                      'mask_files': [self.mask_file, self.mask5_file]}
-        PyMica("./test/data/sample_data.json", [self.variables_file],
+        PyMica("./pymica_tests/data/sample_data.json", [self.variables_file],
                clusters2)
 
     def test_init_different_vars(self):
-        with open("./test/data/sample_data.json") as d_s:
+        with open("./pymica_tests/data/sample_data.json") as d_s:
             data = d_s.read()
         with open(gettempdir() + "/sample_data.json", "w") as d_s:
             d_s.write(data.replace('id', 'other_id')
@@ -109,13 +109,13 @@ class TestPyMica(unittest.TestCase):
             str(cm.exception))
 
         with self.assertRaises(FileNotFoundError) as cm:
-            PyMica("./test/data/sample_data.json", ["BadFile"])
+            PyMica("./pymica_tests/data/sample_data.json", ["BadFile"])
         self.assertEqual(
             "[Errno 2] No such file or directory: 'BadFile'",
             str(cm.exception))
 
         with self.assertRaises(ValueError) as cm:
-            PyMica("./test/data/sample_data.json", self.variables_file,
+            PyMica("./pymica_tests/data/sample_data.json", self.variables_file,
                    residuals_int='BadMethdology')
         self.assertEqual(
             "[Errno 2]residuals_int must be \"id2d\"," +

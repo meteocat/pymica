@@ -6,7 +6,7 @@ from datetime import datetime
 from numpy import array, zeros
 
 # pylint: disable=E0611
-from interpolation.inverse_distance_3d import inverse_distance_3d
+from pymica.methods.inverse_distance_3d import inverse_distance_3d
 
 
 class TestInverseDistance3D(unittest.TestCase):

@@ -6,7 +6,7 @@ from copy import deepcopy
 
 from osgeo import ogr
 
-from pymica.multiregression import MultiRegressionSigma
+from pymica.methods.multiregression import MultiRegressionSigma
 
 
 class ClusteredRegression:
