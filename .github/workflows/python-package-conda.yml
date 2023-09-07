@@ -22,8 +22,7 @@ jobs:
       run: |
         # conda env update --file environment_dev.yml --name base
         conda env create --file environment_dev.yml --name pymica-dev
-        source ~/miniconda3/etc/profile.d/conda.sh
-        conda activate pymica-dev
+        $CONDA/bin/activate pymica-dev
     - name: Lint with flake8
       run: |
         conda install flake8
