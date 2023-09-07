@@ -3,7 +3,7 @@
 from genericpath import exists
 import io
 import json
-from os import remove
+from os import remove, makedirs, rmdir
 import unittest
 import unittest.mock
 
@@ -26,6 +26,8 @@ class TestPyMica(unittest.TestCase):
 
         proj = osr.SpatialReference()
         proj.ImportFromEPSG(25831)
+
+        makedirs('pymica_tests/data/tifs/')
 
         driver = gdal.GetDriverByName('GTiff')
 
@@ -623,3 +625,5 @@ class TestPyMica(unittest.TestCase):
             remove('pymica_tests/data/init_data.json')
         if exists('pymica_tests/data/sample_data_test_keys.json'):
             remove('pymica_tests/data/sample_data_test_keys.json')
+        if exists('pymica_tests/data/tifs'):
+            rmdir('pymica_tests/data/tifs')
