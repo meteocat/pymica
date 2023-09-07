@@ -8,11 +8,11 @@ from pymica.methods.clustered_regression import ClusteredRegression
 
 class TestClusteredRegression(unittest.TestCase):
     def test_regression_ideal_data(self):
-        f_p = open("./pymica_tests/data/sample_data.json")
+        f_p = open("pymica_tests/data/sample_data.json")
         data = json.load(f_p)
         f_p.close()
         inst = ClusteredRegression(data,
-                                   ["./pymica_tests/data/clusters.json"])
+                                   ["pymica_tests/data/clusters.json"])
         self.assertEqual(len(inst.final_data), 3)
         self.assertAlmostEqual(inst.mse, 2.1828, 3)
 
@@ -29,22 +29,22 @@ class TestClusteredRegression(unittest.TestCase):
             str(cm.exception))
 
     def test_get_residuals(self):
-        f_p = open("./pymica_tests/data/sample_data.json")
+        f_p = open("pymica_tests/data/sample_data.json")
         data = json.load(f_p)
         f_p.close()
         inst = ClusteredRegression(data,
-                                   ["./pymica_tests/data/clusters.json"])
+                                   ["pymica_tests/data/clusters.json"])
         result = inst.get_residuals()
         self.assertEqual(len(data), len(result))
         for point in data:
             self.assertTrue(point['id'] in result)
 
     def test_predict_points(self):
-        f_p = open("./pymica_tests/data/sample_data.json")
+        f_p = open("pymica_tests/data/sample_data.json")
         data = json.load(f_p)
         f_p.close()
         inst = ClusteredRegression(data,
-                                   ["./pymica_tests/data/clusters.json"])
+                                   ["pymica_tests/data/clusters.json"])
         sample_data = [{"id": "C6", "temp": 6.4, "altitude": 264,
                         "lon": 0.95172, "lat": 41.6566,
                         "dist": 0.8583929293407604},

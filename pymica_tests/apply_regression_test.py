@@ -93,11 +93,11 @@ class ApplyRegressionTest(unittest.TestCase):
             str(cm.exception))
 
     def test_apply_clustered_regression(self):
-        f_p = open("./pymica_tests/data/sample_data.json")
+        f_p = open("pymica_tests/data/sample_data.json")
         data = json.load(f_p)
         f_p.close()
         inst = ClusteredRegression(data,
-                                   ["./pymica_tests/data/clusters.json"])
+                                   ["pymica_tests/data/clusters.json"])
 
         size = [1000, 1000]
         alt_data = np.ones(size)
