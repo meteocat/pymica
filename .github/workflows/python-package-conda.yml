@@ -23,11 +23,11 @@ jobs:
         # conda env update --file environment_dev.yml --name base
         conda env create --file environment_dev.yml --name pymica-dev 
         # $CONDA/bin/activate pymica-dev
-    - name: Activate environment
+    - name: Activate conda environment
       uses: conda-incubator/setup-miniconda@v2
       with:
-       auto-activate-base: true
-       activate-environment: "pymica-dev"
+        auto-activate-base: true
+        activate-environment: "pymica-dev"
     - name: Lint with flake8
       run: |
         conda install flake8
