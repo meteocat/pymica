@@ -1,21 +1,44 @@
+"""Module with geographic tools.
+"""
 import math
+
 import pyproj
 
 
-def calculate_utm_def(point):
-    """Returns the proj4 definition, calculating the utm zone from
-    a point definition
+def get_utm_epsg_from_lonlat(longitude: float, latitude: float) -> str:
+    """Get UTM EPSG from longitude and latitude coordinates.
 
     Args:
-        point (list): A two element list with the lon and lat values
-                      from a point
+        longitude (float): Longitude of a location.
+        latitude (float): Latitude of a location.
 
     Returns:
-        object: The pyproj.Proj object to use to convert
+        str: UTM EPSG coordinates reference system.
     """
+    zone = (math.floor((longitude + 180) / 6) % 60) + 1
+    south = " +south " if latitude < 0 else " "
+    desc = (
+        "+proj=utm +zone={}{}+ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+    ).format(zone, south)
 
-    zone = (math.floor((point[0] + 180)/6) % 60) + 1
-    south = " +south " if point[1] < 0 else " "
-    desc = ("+proj=utm +zone={}{}+ellps=WGS84 +datum=WGS84 " +
-            "+units=m +no_defs").format(zone, south)
-    return pyproj.Proj(desc)
+    utm_epsg = pyproj.CRS.from_proj4(desc).to_epsg()
+
+    return utm_epsg
+
+
+def reproject_point(point: tuple, in_proj: int | str, out_proj: int | str) -> tuple:
+    """Reproject a location from `in_proj` to `out_proj`.
+
+    Args:
+        point (tuple): Coordinates of a location.
+        in_proj (int | str): Input projection as EPSG code or proj4.
+        out_proj (int | str): Output projection as EPSG code or proj4.
+
+    Returns:
+        tuple: Reprojected point coordinates.
+    """
+    reproject = pyproj.Transformer.from_crs(in_proj, out_proj, always_xy=True)
+
+    point_x, point_y = reproject.transform(point[0], point[1])
+
+    return (point_x, point_y)
