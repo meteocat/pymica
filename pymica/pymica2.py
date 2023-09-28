@@ -183,18 +183,9 @@ class PyMica:
                                  'Variables fields must have the same '
                                  'GeoTransform, Projection, XSize and YSize.')
 
-    def __input_data__(self, data_file):
-        # Check if the data file exists
-        # Check if json is well structured
-        try:
-            with open(data_file, 'r') as f:
-                data = json.load(f)
-                f.close()
-        except FileNotFoundError:
-            raise FileNotFoundError('No such file or directory: ' + data_file)
-        except json.decoder.JSONDecodeError as err:
-            raise json.decoder.JSONDecodeError(err.msg, err.doc, err.pos)
-        for elements in data:
+    def __input_data__(self, data_dict):
+        # Check the data
+        for elements in data_dict:
             if 'id' not in elements.keys():
                 raise KeyError('id must be included in the data file')
             if 'lat' not in elements.keys():
@@ -205,13 +196,13 @@ class PyMica:
                 raise KeyError('value must be included in the data file')
 
         if self.methodology in ['id3d', 'mlr+id3d']:
-            for elements in data:
+            for elements in data_dict:
                 if 'altitude' not in elements.keys():
                     raise KeyError('altitude must be included in the '
                                    'data file')
 
         if self.methodology in ['mlr', 'mlr+id2d', 'mlr+id3d']:
-            for elements in data:
+            for elements in data_dict:
                 if not set(list(
                     self.config[self.methodology]
                     ['variables_files'].keys())).issubset(
@@ -224,7 +215,7 @@ class PyMica:
         in_proj.ImportFromEPSG(4326)
         transf = osr.CoordinateTransformation(in_proj, self.field_proj)
 
-        for point in data:
+        for point in data_dict:
             geom = ogr.Geometry(ogr.wkbPoint)
             geom.AddPoint(point['lat'],
                           point['lon'])
@@ -233,7 +224,7 @@ class PyMica:
             point['x'] = geom.GetX()
             point['y'] = geom.GetY()
 
-        return data
+        return data_dict
 
     def __read_variables_files2__(self):
         for i, var in enumerate(list(self.config[self.methodology]
@@ -265,9 +256,9 @@ class PyMica:
         self.field_size = [int((int_bounds[3] - int_bounds[1]) / res),
                            int((int_bounds[2] - int_bounds[0]) / res)]
 
-    def interpolate(self, data_file):
+    def interpolate(self, data_dict):
 
-        data = self.__input_data__(data_file)
+        data = self.__input_data__(data_dict)
 
         if self.methodology == 'id2d':
             field = inverse_distance(data, self.field_size,
