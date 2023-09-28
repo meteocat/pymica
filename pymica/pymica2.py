@@ -255,6 +255,30 @@ class PyMica:
         self.field_proj.ImportFromEPSG(self.config[self.methodology]['EPSG'])
         self.field_size = [int((int_bounds[3] - int_bounds[1]) / res),
                            int((int_bounds[2] - int_bounds[0]) / res)]
+        
+    def __get_regression_results__(self, clusters, data):
+        if clusters:
+            cl_reg = ClusteredRegression(data, clusters['clusters_files'],
+                                         data_format=self.data_format)
+            cluster_file_index = clusters['clusters_files'].index(
+                    cl_reg.final_cluster_file)
+
+            d_s = gdal.Open(clusters['mask_files'][cluster_file_index])
+            mask = d_s.ReadAsArray()
+            d_s = None
+
+            out_data = apply_clustered_regression(
+                                cl_reg, self.variables,
+                                self.data_format['x_vars'],
+                                mask)
+        else:
+            cl_reg = MultiRegressionSigma(
+                data, id_key='id', y_var='value',
+                x_vars=list(self.variables_files.keys()))
+            out_data = apply_regression(cl_reg, self.variables,
+                                        list(self.variables_files.keys()))
+
+        return cl_reg, out_data
 
     def interpolate(self, data_dict):
 
@@ -308,29 +332,6 @@ class PyMica:
 
         return field
 
-    def __get_regression_results__(self, clusters, data):
-        if clusters:
-            cl_reg = ClusteredRegression(data, clusters['clusters_files'],
-                                         data_format=self.data_format)
-            cluster_file_index = clusters['clusters_files'].index(
-                    cl_reg.final_cluster_file)
-
-            d_s = gdal.Open(clusters['mask_files'][cluster_file_index])
-            mask = d_s.ReadAsArray()
-            d_s = None
-
-            out_data = apply_clustered_regression(
-                                cl_reg, self.variables,
-                                self.data_format['x_vars'],
-                                mask)
-        else:
-            cl_reg = MultiRegressionSigma(
-                data, id_key='id', y_var='value',
-                x_vars=list(self.variables_files.keys()))
-            out_data = apply_regression(cl_reg, self.variables,
-                                        list(self.variables_files.keys()))
-
-        return cl_reg, out_data
 
     def save_file(self, file_name):
         #Saves the calculate field data into a file
