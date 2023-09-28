@@ -75,7 +75,7 @@ class PyMica:
 
         if methodology in ['mlr', 'id3d', 'mlr+id2d', 'mlr+id3d']:
             self.__check_variables__()
-            self.__read_variables_files2__()
+            self.__read_variables_files__()
 
     def __read_config__(self, config_file):
         try:
@@ -226,7 +226,7 @@ class PyMica:
 
         return data_dict
 
-    def __read_variables_files2__(self):
+    def __read_variables_files__(self):
         for i, var in enumerate(list(self.config[self.methodology]
                                                 ['variables_files'].keys())):
             var_ds = gdal.Open(self.config[self.methodology]
@@ -343,28 +343,4 @@ class PyMica:
         d_s.SetProjection(self.out_proj.ExportToWkt())
 
         d_s.GetRasterBand(1).WriteArray(self.field)
-    '''
-    def __read_variables_files__(self, variables_file):
-        if isinstance(variables_file, (list,)):
-            self.variables = None
-            for layer_file in variables_file:
-                d_s = gdal.Open(layer_file)
-                if d_s is None:
-                    raise FileNotFoundError("[Errno 2] No such file or " +
-                                            "directory: 'BadFile'")
-                for i in range(d_s.RasterCount):
-                    layer_data = d_s.GetRasterBand(i + 1)\
-                        .ReadAsArray()[newaxis, :, :]
-                    if self.variables is None:
-                        self.variables = layer_data
-                    else:
-                        self.variables = concatenate((self.variables,
-                                                      layer_data), axis=0)
-        else:
-            d_s = gdal.Oconfig = json.load(f)
-                f.close()osr.SpatialReference()
-        self.out_proj.ImportFromWkt(d_s.GetProjection())
-        self.size = (d_s.RasterYSize, d_s.RasterXSize)
-        self.geotransform = d_s.GetGeoTransform()
-        d_s = None
-    '''
+
