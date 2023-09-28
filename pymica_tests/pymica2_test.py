@@ -13,6 +13,14 @@ from pymica.pymica2 import PyMica
 
 
 class TestPyMica(unittest.TestCase):
+
+    data = [{'id': 'A', 'lon': 0.3990722, 'lat': 40.6215578,
+                 'altitude': 10, 'value': 50.0},
+                {'id': 'B', 'lon': 1.5613071, 'lat': 41.5426639,
+                 'altitude': 100, 'value': 20.0},
+                {'id': 'C', 'lon': 2.7567764, 'lat': 42.4520729,
+                 'altitude': 1000, 'value': 10.0}]
+
     @classmethod
     def setUpClass(cls):
         size = [1000, 1000]
@@ -54,17 +62,6 @@ class TestPyMica(unittest.TestCase):
         d_s.SetGeoTransform((260000, 270, 0, 4750000, 0, -270))
         d_s.SetProjection(proj.ExportToWkt())
         d_s = None
-
-        data = [{'id': 'A', 'lon': 0.3990722, 'lat': 40.6215578,
-                 'altitude': 10, 'value': 50.0},
-                {'id': 'B', 'lon': 1.5613071, 'lat': 41.5426639,
-                 'altitude': 100, 'value': 20.0},
-                {'id': 'C', 'lon': 2.7567764, 'lat': 42.4520729,
-                 'altitude': 1000, 'value': 10.0}]
-
-        with open('pymica_tests/data/init_data.json', 'w') as f:
-            json.dump(data, f)
-            f.close()
 
         config = {'id3d': {'id_smoothing': 0.0,
                            'id_penalization': 30,
@@ -383,25 +380,15 @@ class TestPyMica(unittest.TestCase):
         
         with open('pymica_tests/data/config_test.json', 'w') as f:
             json.dump(config, f)
-            f.close()
-
+            f.close()          
         
-        data_dict = [{'id': 'C6', 'value': 6.4, 'altitude': 264,
-                      'lon': 0.95172, 'lat': 41.6566,
-                      'dist': 0.8583929293407604},
-                     {'id': 'C7', 'value': 5.6, 'altitude': 427,
-                      'lon': 1.16234, 'lat': 41.66695,
-                      'dist': 0.8387222708681318}]
-        
-        
-
         id2d = PyMica('id2d', 'pymica_tests/data/config_test.json')
-        field = id2d.interpolate(data_dict)
+        field = id2d.interpolate(self.data)
 
         self.assertEqual(field.shape, (1000, 1000))
-        self.assertAlmostEqual(field[0, 0], 6.025, 2)
-        self.assertAlmostEqual(field[500, 500], 5.851, 2)
-        self.assertAlmostEqual(field[750, 750], 5.946, 2)
+        self.assertAlmostEqual(field[0, 0], 23.992, 2)
+        self.assertAlmostEqual(field[500, 500], 20.052, 2)
+        self.assertAlmostEqual(field[750, 750], 21.693, 2)
 
     def test_init_interpolate_id3d(self):
 
@@ -419,22 +406,13 @@ class TestPyMica(unittest.TestCase):
             json.dump(config, f)
             f.close()
 
-        
-        data_dict = [{'id': 'C6', 'value': 6.4, 'altitude': 264,
-                      'lon': 0.95172, 'lat': 41.6566,
-                      'dist': 0.8583929293407604},
-                     {'id': 'C7', 'value': 5.6, 'altitude': 427,
-                      'lon': 1.16234, 'lat': 41.66695,
-                      'dist': 0.8387222708681318}]
-        
-        
         id3d = PyMica('id3d', 'pymica_tests/data/config_test.json')
-        field = id3d.interpolate(data_dict)
+        field = id3d.interpolate(self.data)
 
         self.assertEqual(field.shape, (1000, 1000))
-        self.assertAlmostEqual(field[0, 0], 6.026, 2)
-        self.assertAlmostEqual(field[500, 500], 5.863, 2)
-        self.assertAlmostEqual(field[750, 750], 5.948, 2)
+        self.assertAlmostEqual(field[0, 0], 24.086, 2)
+        self.assertAlmostEqual(field[500, 500], 20.063, 2)
+        self.assertAlmostEqual(field[750, 750], 21.809, 2)
 
     def test_init_interpolate_mlr(self):
 
@@ -451,20 +429,14 @@ class TestPyMica(unittest.TestCase):
             json.dump(config, f)
             f.close()
 
-        data_dict = [{'id': 'C6', 'value': 6.4, 'altitude': 264,
-                      'lon': 0.95172, 'lat': 41.6566,
-                      'dist': 0.8583929293407604},
-                     {'id': 'C7', 'value': 5.6, 'altitude': 427,
-                      'lon': 1.16234, 'lat': 41.66695,
-                      'dist': 0.8387222708681318}]
-
         mlr = PyMica('mlr', 'pymica_tests/data/config_test.json')
-        field = mlr.interpolate(data_dict)
+        field = mlr.interpolate(self.data)
 
         self.assertEqual(field.shape, (1000, 1000))
-        self.assertAlmostEqual(field[0, 0],7.690, 2)
-        self.assertAlmostEqual(field[2, 2], 7.636, 2)
-        self.assertAlmostEqual(field[3, 3], 7.690, 2)
+        self.assertAlmostEqual(field[0, 0], 37.193, 2)
+        self.assertAlmostEqual(field[2, 2], 36.879, 2)
+        self.assertAlmostEqual(field[3, 3], 37.193, 2)
+        
 
     def test_init_interpolate_mlr_id2d(self):
 
@@ -481,21 +453,14 @@ class TestPyMica(unittest.TestCase):
             json.dump(config, f)
             f.close()
 
-        data_dict = [{'id': 'C6', 'value': 6.4, 'altitude': 264,
-                      'lon': 0.95172, 'lat': 41.6566,
-                      'dist': 0.8583929293407604},
-                     {'id': 'C7', 'value': 5.6, 'altitude': 427,
-                      'lon': 1.16234, 'lat': 41.66695,
-                      'dist': 0.8387222708681318}]
-        
 
         mlr_id2d = PyMica('mlr+id2d', 'pymica_tests/data/config_test.json')
-        field = mlr_id2d.interpolate(data_dict)
+        field = mlr_id2d.interpolate(self.data)
 
         self.assertEqual(field.shape, (1000, 1000))
-        self.assertAlmostEqual(field[925, 74], 7.646, 2)
-        self.assertAlmostEqual(field[555, 444], 7.204, 2)
-        self.assertAlmostEqual(field[185, 814], 2.787, 2)
+        self.assertAlmostEqual(field[925, 74], 50.000, 2)
+        self.assertAlmostEqual(field[555, 444], 20.000, 2)
+        self.assertAlmostEqual(field[185, 814], 9.999, 2)
 
     def test_init_interpolate_mlr_id3d(self):
 
@@ -511,21 +476,14 @@ class TestPyMica(unittest.TestCase):
         with open('pymica_tests/data/config_test.json', 'w') as f:
             json.dump(config, f)
             f.close()
-        
-        data_dict = [{'id': 'C6', 'value': 6.4, 'altitude': 264,
-                      'lon': 0.95172, 'lat': 41.6566,
-                      'dist': 0.8583929293407604},
-                     {'id': 'C7', 'value': 5.6, 'altitude': 427,
-                      'lon': 1.16234, 'lat': 41.66695,
-                      'dist': 0.8387222708681318}]
 
         mlr_id2d = PyMica('mlr+id3d', 'pymica_tests/data/config_test.json')
-        field = mlr_id2d.interpolate(data_dict)
+        field = mlr_id2d.interpolate(self.data)
 
         self.assertEqual(field.shape, (1000, 1000))
-        self.assertAlmostEqual(field[925, 74], 7.646, 2)
-        self.assertAlmostEqual(field[555, 444], 7.204, 2)
-        self.assertAlmostEqual(field[185, 814], 2.787, 2)
+        self.assertAlmostEqual(field[925, 74], 50.000, 2)
+        self.assertAlmostEqual(field[555, 444], 20.000, 2)
+        self.assertAlmostEqual(field[185, 814], 9.999, 2)
 
 
     def test_interpolate_input_bad_lat(self):
