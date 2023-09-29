@@ -8,28 +8,10 @@ from genericpath import exists
 from osgeo import gdal, osr, ogr
 from pymica.methods.inverse_distance import inverse_distance
 from pymica.methods.inverse_distance_3d import inverse_distance_3d
-from pymica.methods.apply_regression import (apply_clustered_regression,
-                                     apply_regression)
+
 from pymica.methods.clustered_regression import (ClusteredRegression,
                                          MultiRegressionSigma)
 
-'''
-from multiprocessing.sharedctypes import Value
-from os import strerror
-from tabnanny import check
-
-from interpolation.idw import idw
-from interpolation.inverse_distance import inverse_distance
-from interpolation.inverse_distance_3d import inverse_distance_3d
-from numpy import asarray, concatenate, newaxis, array_equal
-import numpy as np
-from osgeo import gdal, ogr, osr
-
-from pymica.apply_regression import (apply_clustered_regression,
-                                     apply_regression)
-from pymica.clustered_regression import (ClusteredRegression,
-                                         MultiRegressionSigma)
-'''
 
 
 class PyMica:
@@ -267,15 +249,15 @@ class PyMica:
             mask = d_s.ReadAsArray()
             d_s = None
 
-            out_data = apply_clustered_regression(
-                                cl_reg, self.variables,
+            out_data = cl_reg.apply_clustered_regression(
+                                self.variables,
                                 self.data_format['x_vars'],
                                 mask)
         else:
             cl_reg = MultiRegressionSigma(
                 data, id_key='id', y_var='value',
                 x_vars=list(self.variables_files.keys()))
-            out_data = apply_regression(cl_reg, self.variables,
+            out_data = cl_reg.apply_regression(self.variables,
                                         list(self.variables_files.keys()))
 
         return cl_reg, out_data
