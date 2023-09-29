@@ -9,7 +9,7 @@ import unittest.mock
 
 import numpy as np
 from osgeo import gdal, osr
-from pymica.pymica2 import PyMica
+from pymica.pymica import PyMica
 
 
 class TestPyMica(unittest.TestCase):
@@ -580,7 +580,7 @@ class TestPyMica(unittest.TestCase):
         if exists('pymica_tests/data/tifs/altitude.tif'):
             remove('pymica_tests/data/tifs/altitude.tif')
         if exists('pymica_tests/data/tifs/d_coast.tif'):
-            remove('pymica_tests/data/tifs/d_coast.tif')
+            remove('pymica_tests/dºata/tifs/d_coast.tif')
         if exists('pymica_tests/data/tifs/d_coast_2.tif'):
             remove('pymica_tests/data/tifs/d_coast_2.tif')
         if exists('pymica_tests/data/init_data.json'):
