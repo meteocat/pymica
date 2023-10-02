@@ -168,6 +168,10 @@ class PyMica:
     def __input_data__(self, data_dict):
         # Check the data
         for elements in data_dict:
+
+            if not {'id','lat','lon','value'} < set(elements.keys()):
+                raise KeyError('id, lat, lon, value keys must be included in the imput data')
+
             if 'id' not in elements.keys():
                 raise KeyError('id must be included in the data file')
             if 'lat' not in elements.keys():
