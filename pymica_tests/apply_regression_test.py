@@ -6,8 +6,7 @@ from datetime import datetime
 
 import numpy as np
 
-from pymica.methods.apply_regression import (apply_clustered_regression,
-                                             apply_regression)
+
 from pymica.methods.clustered_regression import ClusteredRegression
 from pymica.methods.multiregression import MultiRegressionSigma
 
@@ -31,7 +30,7 @@ class ApplyRegressionTest(unittest.TestCase):
 
         in_data = alt_data.reshape([1, 5, 5])
 
-        result = apply_regression(inst, in_data, ['altitude', 'dist'])
+        result = inst.apply_regression(in_data, ['altitude', 'dist'])
 
         self.assertEqual(result.shape[0], size[1])
         self.assertEqual(result.shape[1], size[0])
@@ -49,7 +48,7 @@ class ApplyRegressionTest(unittest.TestCase):
                                     x_vars=['altitude', 'dist'])
         in_data = np.array([alt_data, dist_data])
 
-        result = apply_regression(inst, in_data, ['altitude', 'dist'])
+        result = inst.apply_regression(in_data, ['altitude', 'dist'])
 
         self.assertEqual(result.shape[0], size[1])
         self.assertEqual(result.shape[1], size[0])
@@ -62,7 +61,7 @@ class ApplyRegressionTest(unittest.TestCase):
         dist_data = np.ones(size)
         in_data = np.array([alt_data, dist_data])
         now = datetime.utcnow()
-        result = apply_regression(inst, in_data, ['altitude', 'dist'])
+        result = inst.apply_regression(in_data, ['altitude', 'dist'])
 
         spent_time = datetime.utcnow() - now
         print("Time for 1000x1000:", spent_time.total_seconds(), "s")
@@ -79,7 +78,7 @@ class ApplyRegressionTest(unittest.TestCase):
         in_data = np.ones([5, 5])
 
         with self.assertRaises(ValueError) as cm:
-            apply_regression(inst, in_data, ['altitude', 'dist'])
+            inst.apply_regression(in_data, ['altitude', 'dist'])
         self.assertEqual(
             "raster_data must be a 3 dimensional array",
             str(cm.exception))
@@ -87,7 +86,7 @@ class ApplyRegressionTest(unittest.TestCase):
         in_data = [5, 5]
 
         with self.assertRaises(ValueError) as cm:
-            apply_regression(inst, in_data, ['altitude', 'dist'])
+            inst.apply_regression(in_data, ['altitude', 'dist'])
         self.assertEqual(
             "raster_data must be a 3 dimensional array",
             str(cm.exception))
@@ -113,6 +112,6 @@ class ApplyRegressionTest(unittest.TestCase):
             for j in range(500):
                 mask[i][i*250 + j][:] = 1 - j/550
 
-        result = apply_clustered_regression(
-            inst, in_data, ['altitude', 'dist'], mask)
+        result = inst.apply_clustered_regression(
+                      in_data, ['altitude', 'dist'], mask)
         self.assertEqual(list(result.shape), size)
