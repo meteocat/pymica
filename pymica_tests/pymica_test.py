@@ -486,7 +486,7 @@ class TestPyMica(unittest.TestCase):
         self.assertAlmostEqual(field[185, 814], 9.999, 2)
 
 
-    def test_interpolate_input_bad_lat(self):
+    def test_interpolate_input_bad_keys(self):
         # Fem test per les lat
         data_dict = [{'id': 'C6', 'value': 6.4, 'altitude': 264,
                       'lon': 0.95172, 'lati': 41.6566,
@@ -498,22 +498,9 @@ class TestPyMica(unittest.TestCase):
         with self.assertRaises(KeyError) as cm:
             inst = PyMica('id3d', 'pymica_tests/data/config_interpolate.json')
             inst.interpolate(data_dict)
-        self.assertEqual('lat must be included in the data file',
+        self.assertEqual('id, lat, lon, value keys must be included in the imput data',
                          cm.exception.args[0])
 
-    def test_interpolate_input_bad_lon(self):
-        data_dict = [{'id': 'C6', 'value': 6.4, 'altitude': 264,
-                      'loni': 0.95172, 'lat': 41.6566,
-                      'dist': 0.8583929293407604},
-                     {'id': 'C7', 'value': 5.6, 'altitude': 427,
-                      'lon': 1.16234, 'lat': 41.66695,
-                      'dist': 0.8387222708681318}]
-
-        with self.assertRaises(KeyError) as cm:
-            inst = PyMica('id3d', 'pymica_tests/data/config_interpolate.json')
-            inst.interpolate(data_dict)
-        self.assertEqual('lon must be included in the data file',
-                         cm.exception.args[0])
 
     def test_interpolate_input_altitude_missing(self):
         data_dict = [{'id': 'C6', 'value': 6.4, 'alti': 264, 'lon': 0.95172,
@@ -528,33 +515,6 @@ class TestPyMica(unittest.TestCase):
         self.assertEqual('altitude must be included in the data file',
                          cm.exception.args[0])
 
-    def test_interpolate_input_bad_id(self):
-        data_dict = [{'ide': 'C6', 'value': 6.4, 'altitude': 264,
-                      'lon': 0.95172, 'lat': 41.6566,
-                      'dist': 0.8583929293407604},
-                     {'id': 'C7', 'value': 5.6, 'altitude': 427,
-                      'lon': 1.16234, 'lat': 41.66695,
-                      'dist': 0.8387222708681318}]
-
-        with self.assertRaises(KeyError) as cm:
-            inst = PyMica('id3d', 'pymica_tests/data/config_interpolate.json')
-            inst.interpolate(data_dict)
-        self.assertEqual('id must be included in the data file',
-                         cm.exception.args[0])
-
-    def test_interpolate_input_value_missing(self):
-        data_dict = [{'id': 'C6', 'temp': 6.4, 'altitude': 264,
-                      'lon': 0.95172, 'lat': 41.6566,
-                      'dist': 0.8583929293407604},
-                     {'id': 'C7', 'valor': 5.6, 'altitude': 427,
-                      'lon': 1.16234, 'lat': 41.66695,
-                      'dist': 0.8387222708681318}]
-
-        with self.assertRaises(KeyError) as cm:
-            inst = PyMica('id3d', 'pymica_tests/data/config_interpolate.json')
-            inst.interpolate(data_dict)
-        self.assertEqual('value must be included in the data file',
-                         cm.exception.args[0])
 
     def test_interpolate_input_data_variable_missing(self):
         data_dict = [{'id': 'C6', 'value': 6.4, 'altitude': 264,
