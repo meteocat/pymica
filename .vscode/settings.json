@@ -79,16 +79,7 @@
         "xema"
     ],
     "python.pythonPath": "~/anaconda3/envs/pymica/bin/python",
-    "python.testing.unittestArgs": [
-        "-v",
-        "-s",
-        "./test",
-        "-p",
-        "*_test.py"
-    ],
-    "python.testing.pytestEnabled": false,
-    "python.testing.nosetestsEnabled": false,
-    "python.testing.unittestEnabled": true,
+    
     "python.linting.flake8Enabled": true,
     "python.linting.pycodestyleEnabled": false,
     "python.linting.pylintPath": "~/anaconda3/envs/pymica_test/bin/python",
