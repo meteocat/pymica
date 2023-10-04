@@ -13,26 +13,15 @@ from pymica.methods.multiregression import MultiRegressionSigma
 class ClusteredRegression:
     '''Calculates multiple linear regressions looking which cluster is better
     '''
-    def __init__(self, data, clusters_files,
-                 data_format=None,
+    def __init__(self, data, clusters_files, x_vars,
                  regression_params=None):
-        if data_format is None:
-            self.data_format = {'id_key': 'id',
-                                'y_var': 'temp',
-                                'x_vars': ('altitude', 'dist')}
-        else:
-            self.data_format = data_format
-
         if regression_params is None:
             self.regression_params = {'sigma_limit': 1.5,
                                       'score_threshold': 0.05}
         else:
             self.regression_params = regression_params
 
-        regr_all = MultiRegressionSigma(data,
-                                        id_key=self.data_format['id_key'],
-                                        y_var=self.data_format['y_var'],
-                                        x_vars=self.data_format['x_vars'])
+        regr_all = MultiRegressionSigma(data, x_vars)
         residuals_all = regr_all.get_residuals()
 
         # Workaround for cases when different clusters share the same
@@ -45,6 +34,7 @@ class ClusteredRegression:
         self.final_regr = [regr_all]
         self.final_data = [data]
         self.final_cluster_file = None
+        self.x_vars = x_vars
 
         try:
             for cluster_file in clusters_files:
@@ -55,15 +45,12 @@ class ClusteredRegression:
                                                             cluster_file)
                 for data_in_cluster in clustered_data:
                     mse_all = __get_cluster_mse__(residuals_all,
-                                                  data_in_cluster,
-                                                  self.data_format['id_key'])
+                                                  data_in_cluster)
 
                     try:
                         cluster_regression = MultiRegressionSigma(
                             data_in_cluster,
-                            id_key=self.data_format['id_key'],
-                            y_var=self.data_format['y_var'],
-                            x_vars=self.data_format['x_vars'])
+                            x_vars=x_vars)
                         mse_cluster = __get_residuals_mse__(cluster_regression
                                                             .get_residuals())
                     except ValueError:
@@ -130,7 +117,7 @@ class ClusteredRegression:
                 for data in zip(cluster_data, result):
                     out[x_data_idx[data[0]['id']]] = data[1]
         return out
-    
+
     def apply_clustered_regression(self, raster_data, raster_fields, mask):
         '''The same as apply_regression, but using a "clustered regresion".
         The result is weighed by a mask array.
@@ -189,40 +176,40 @@ def __get_residuals_mse__(residuals):
     return mse/len(residuals)
 
 
-def __get_cluster_mse__(residuals_all, data_in_cluster, id_key):
+def __get_cluster_mse__(residuals_all, data_in_cluster):
     residuals_sum = 0
     for element in data_in_cluster:
-        residuals_sum += residuals_all[element[id_key]]**2
+        residuals_sum += residuals_all[element["id"]]**2
     return residuals_sum/len(data_in_cluster)
 
 
 def __apply_regression__(regr, raster_data, raster_fields):
-        '''Applies the regression formula to an array, to
-        get all the values for each point
+    '''Applies the regression formula to an array, to
+    get all the values for each point
 
-        Args:
-            regr (MultiRegression): A MultiRegression or MultiRegressionSigma
-                                    instance
-            raster_data (nd.array): A three dimension array with the values to
-                                    apply
-            raster_fields (list): The variable names as passed into MultiRegression
-                                and in the order they appear in raster_data.
-                                Used to apply the fields in the correct order.
+    Args:
+        regr (MultiRegression): A MultiRegression or MultiRegressionSigma
+                                instance
+        raster_data (nd.array): A three dimension array with the values to
+                                apply
+        raster_fields (list): The variable names as passed into MultiRegression
+                            and in the order they appear in raster_data.
+                            Used to apply the fields in the correct order.
 
-        Raises:
-            ValueError: The array has wrong dimensions
+    Raises:
+        ValueError: The array has wrong dimensions
 
-        Returns:
-            nd.array: A 2-D array with all the calculated values
-        '''
-        if not type(raster_data) == np.ndarray or len(raster_data.shape) != 3:
-            raise ValueError("raster_data must be a 3 dimensional array")
-        coefs = regr.get_coefs()
-        out_data = coefs[1] * np.ones((raster_data[0].shape[0],
-                                       raster_data[0].shape[1]))
+    Returns:
+        nd.array: A 2-D array with all the calculated values
+    '''
+    if not type(raster_data) == np.ndarray or len(raster_data.shape) != 3:
+        raise ValueError("raster_data must be a 3 dimensional array")
+    coefs = regr.get_coefs()
+    out_data = coefs[1] * np.ones((raster_data[0].shape[0],
+                                   raster_data[0].shape[1]))
 
-        for i, coef in enumerate(coefs[0]):
-            field_pos = raster_fields.index(regr.used_vars[i])
-            out_data += coef * raster_data[field_pos]
+    for i, coef in enumerate(coefs[0]):
+        field_pos = raster_fields.index(regr.used_vars[i])
+        out_data += coef * raster_data[field_pos]
 
-        return out_data
+    return out_data
