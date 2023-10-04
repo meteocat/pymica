@@ -10,7 +10,7 @@ from datetime import timedelta, datetime
 
 def import_api_smc(variable: str, url_meta: str, 
                    date: datetime, url: str, station_list: list) -> list:
-    """_summary_
+    """
 
     Args:
         variables (str): String containing the name of the variables.
@@ -30,7 +30,7 @@ def import_api_smc(variable: str, url_meta: str,
     str_variables = {'2t':'32', '2r':'33', 'ws':'30', 'wdir':'31', 'ws':'46',
                      'wdir':'47', 'ws':'48', 'wdir':'49'}
 
-    # Mirem que la variable estigui dins les possible
+    # Check if the varible is in the possibles
     if not set(map(str, [variable])) <= set(str_variables.keys()):
             raise ValueError('Les variables disponibles són ' +
                             str(list(str_variables.keys())))
