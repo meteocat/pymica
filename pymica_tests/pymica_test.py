@@ -111,7 +111,7 @@ class TestPyMica(unittest.TestCase):
     def test_init_config_not_found(self):
         with self.assertRaises(FileNotFoundError) as cm:
             PyMica('id3d', 'aaaa.json')
-        self.assertEqual('Wrong configuration file path.', str(cm.exception))
+        self.assertEqual('aaaa.json not found.', str(cm.exception))
 
     def test_init_config_json_error(self):
         with self.assertRaises(json.decoder.JSONDecodeError) as cm:
@@ -203,7 +203,7 @@ class TestPyMica(unittest.TestCase):
 
         with self.assertRaises(TypeError) as cm:
             PyMica('id2d', 'pymica_tests/data/config_test.json')
-        self.assertEqual('interpolation_bounds must be a List as '
+        self.assertEqual('interpolation_bounds must be a list as '
                          '[x_min, y_min, x_max, y_max]', cm.exception.args[0])
 
     def test_init_wrong_length_interpolation_bounds(self):
@@ -220,7 +220,7 @@ class TestPyMica(unittest.TestCase):
 
         with self.assertRaises(ValueError) as cm:
             PyMica('id2d', 'pymica_tests/data/config_test.json')
-        self.assertEqual('interpolation_bounds must be a List as '
+        self.assertEqual('interpolation_bounds must be a list as '
                          '[x_min, y_min, x_max, y_max]', cm.exception.args[0])
 
     def test_init_missing_resolution(self):

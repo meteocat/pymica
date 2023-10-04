@@ -1,5 +1,5 @@
-"""Main class. Calculates data fields from points, using
-clusters multi-linear regressions corrected with residuals.
+"""Main class. Calculates data fields from points, using clusters multi-linear
+regressions corrected with residuals.
 """
 import json
 
@@ -16,39 +16,25 @@ from pymica.methods.clustered_regression import (
 
 
 class PyMica:
-    """Main project class. Calculates the regressions, corrects
-    them with the interpolated residuals and saves files and gives
-    errors.
+    """Main project class. Calculates regressions, corrects them with interpolated
+    residuals, saves the results into raster files and calculates errors.
     """
 
-    def __init__(self, methodology, config):
-        """
+    def __init__(self, methodology: str, config: dict) -> None:
+        """Implements different checks to config depending on the chosen methodology.
+
         Args:
-            data_file (str): The path with the point data
-            variables_file (str, list): The file(s) path(s) containing the
-                                        fields used in the regression
-            clusters (dict, optional): Defaults to None. Two keys,
-                                        clusters_files and mask_files,
-                                        with the paths for the
-                                        cluster definitions and merging data
-            data_format (dict, optional): Defaults to None. The name of the
-                                          variables in the data files.
-                                          Defaults to:
-                                          {'loc_vars': ('lon', 'lat'),
-                                          'id_key': 'id',
-                                          'y_var': 'temp',
-                                          'x_vars': ('altitude', 'dist')}
-            residuals_int (str): The indicator of the residuals interpolation
-                                  methodology. Defaults to 'id2d'.
-                                  Methodologies available: id2d, id3d and idw.
-            z_field (str): The field used as the z variable when using the id3d
-                           value as the residuals_int method.
-                           Defaults to 'altitude'
+            methodology (str): Interpolation method among 'id2d', 'id3d', 'mlr',
+                'mlr+id2d' and 'mlr+id3d'.
             config (dict): Configuration dictionary.
+
+        Raises:
+            ValueError: If `methodology` not in 'id2d', 'id3d', 'mlr', 'mlr+id2d'
+                and 'mlr+id3d'.
         """
         if methodology not in ["id2d", "mlr+id2d", "id3d", "mlr+id3d", "mlr"]:
             raise ValueError(
-                'Methodology must be "id2d", "id3d", ' '"mlr+id2d", "mlr+id3d" or "mlr"'
+                'Methodology must be "id2d", "id3d", "mlr+id2d", "mlr+id3d" or "mlr"'
             )
 
         self.methodology = methodology
@@ -62,102 +48,110 @@ class PyMica:
             self.__check_variables__()
             self.__read_variables_files__()
 
-    def __read_config__(self, config_file):
+    def __read_config__(self, config_file: str) -> dict:
+        """Read configuration file and return it as a dictionary.
+
+        Args:
+            config_file (str): Path to a configuration file.
+
+        Raises:
+            FileNotFoundError: If `config_file` not found.
+            json.decoder.JSONDecodeError: If `config_file` is bad formatted.
+
+        Returns:
+            dict: Configuration dictionary.
+        """
         try:
             with open(config_file, "r") as f:
                 config = json.load(f)
                 f.close()
         except FileNotFoundError:
-            raise FileNotFoundError("Wrong configuration file path.")
+            raise FileNotFoundError(config_file + " not found.")
         except json.decoder.JSONDecodeError as err:
             raise json.decoder.JSONDecodeError(err.msg, err.doc, err.pos)
 
         return config
 
-    def __check_config__(self, method):
-        if method not in self.config.keys():
-            raise KeyError(method + " not defined in the configuration file.")
+    def __check_config__(self, methodology: str) -> None:
+        """Check configuration keys and parameters based on the methodology selected"""
+        if methodology not in self.config.keys():
+            raise KeyError(methodology + " not defined in the configuration file.")
 
-        if method in ["id2d", "id3d", "mlr+id2d", "mlr+id3d"]:
-            if "id_power" not in self.config[method].keys():
+        if methodology in ["id2d", "id3d", "mlr+id2d", "mlr+id3d"]:
+            if "id_power" not in self.config[methodology].keys():
                 print(
                     "id_power not in the configuration dictionary. "
                     + "id_power set to default value of 2.5."
                 )
-            self.power = self.config[method].get("id_power", 2.5)
+            self.power = self.config[methodology].get("id_power", 2.5)
 
-            if "id_smoothing" not in self.config[method].keys():
+            if "id_smoothing" not in self.config[methodology].keys():
                 print(
                     "id_smoothing not in the configuration dictionary. "
                     + "id_smoothing set to default value of 0.0."
                 )
-            self.smoothing = self.config[method].get("id_smoothing", 0.0)
+            self.smoothing = self.config[methodology].get("id_smoothing", 0.0)
 
-        if method in ["id3d", "mlr+id3d"]:
-            if "id_penalization" not in self.config[method].keys():
+        if methodology in ["id3d", "mlr+id3d"]:
+            if "id_penalization" not in self.config[methodology].keys():
                 print(
                     "id_penalization not in the configuration dictionary. "
                     + "id_penalization set to default value of 30."
                 )
-            self.penalization = self.config[method].get("id_penalization", 30.0)
+            self.penalization = self.config[methodology].get("id_penalization", 30.0)
 
-        self.interpolation_bounds = self.config[method].get(
+        self.interpolation_bounds = self.config[methodology].get(
             "interpolation_bounds", None
         )
         if self.interpolation_bounds is None:
             raise KeyError(
-                "interpolation_bounds must be defined in the "
-                "configuration dictionary."
+                "interpolation_bounds must be defined in the configuration dictionary."
             )
         if type(self.interpolation_bounds) is not list:
             raise TypeError(
-                "interpolation_bounds must be a List as " "[x_min, y_min, x_max, y_max]"
+                "interpolation_bounds must be a list as [x_min, y_min, x_max, y_max]"
             )
         if len(self.interpolation_bounds) != 4:
             raise ValueError(
-                "interpolation_bounds must be a List as " "[x_min, y_min, x_max, y_max]"
+                "interpolation_bounds must be a list as [x_min, y_min, x_max, y_max]"
             )
 
-        self.resolution = self.config[method].get("resolution", None)
+        self.resolution = self.config[methodology].get("resolution", None)
         if self.resolution is None:
             raise KeyError(
-                "resolution must be defined in the configuration " "dictionary."
+                "resolution must be defined in the configuration dictionary."
             )
         if type(self.resolution) is str:
             raise TypeError("resolution must have a valid value in meters.")
 
-        self.EPSG = self.config[method].get("EPSG", None)
+        self.EPSG = self.config[methodology].get("EPSG", None)
         if self.EPSG is None:
-            raise KeyError("EPSG must be defined in the configuration " "dictionary.")
+            raise KeyError("EPSG must be defined in the configuration dictionary.")
         if type(self.EPSG) is not int:
             raise TypeError("EPSG must have a valid int value.")
 
-        if method in ["mlr+id2d", "mlr+id3d", "mlr", "id3d"]:
-            if "variables_files" not in self.config[method].keys():
+        if methodology in ["mlr+id2d", "mlr+id3d", "mlr", "id3d"]:
+            if "variables_files" not in self.config[methodology].keys():
                 raise KeyError(
-                    "variables_files must be included in the "
-                    + "configuration file if "
-                    + method
-                    + " is "
-                    + "selected."
+                    "variables_files must be included in the configuration file if "
+                    + methodology
+                    + " is selected."
                 )
-            self.variables_files = self.config[method].get("variables_files", None)
+            self.variables_files = self.config[methodology].get("variables_files", None)
 
             if len(self.variables_files.keys()) < 1:
                 raise ValueError(
-                    "variables_files dictionary must have at "
-                    "least one key including a variable file "
-                    "path containing a 2D predictor field."
+                    "variables_files dictionary must have at least one key including "
+                    "a variable file path containing a 2D predictor field."
                 )
 
-    def __check_variables__(self):
-        """Checks if the properties of variables are the same with each other.
+    def __check_variables__(self) -> None:
+        """Check if the properties of variable fields are the same to each other.
 
         Raises:
             ValueError: If properties of variable fields are not the same with
                         each other.
         """
-
         geo_param = np.array(
             [
                 self.field_geotransform,
@@ -168,9 +162,7 @@ class PyMica:
             dtype="object",
         )
 
-        for i, var in enumerate(
-            list(self.config[self.methodology]["variables_files"].keys())
-        ):
+        for var in list(self.config[self.methodology]["variables_files"].keys()):
             if not exists(self.config[self.methodology]["variables_files"][var]):
                 raise FileNotFoundError(
                     "No such file or directory: "
@@ -193,35 +185,41 @@ class PyMica:
 
             if check_equal is False:
                 raise ValueError(
-                    "Variables properties are not the same. "
-                    "Variables fields must have the same "
-                    "GeoTransform, Projection, XSize and YSize."
+                    "Variables properties are not the same. Variables fields must have"
+                    " the same GeoTransform, Projection, XSize and YSize."
                 )
 
-    def __input_data__(self, data_dict):
-        # Check the data
-        for elements in data_dict:
+    def __input_data__(self, input_data: list) -> None:
+        """Check and transform input data depending on the selected interpolation
+        methodology.
+
+        Args:
+            input_data (list): Input data as list of dictionaries with keys including
+                at least {'id', 'lat', 'lon', 'value'}.
+
+        Raises:
+            KeyError: If id, lat, lon, value keys not included in the input data.
+            KeyError: If methodology is 'id3d' or 'mlr+id3d' and 'altitude' variable is
+                not included in the data dictionary.
+            KeyError: If any variable provided in `variables_files` dictionary missing
+                in any of the data dictionaries.
+
+        Returns:
+            dict: Formatted input data.
+        """
+        for elements in input_data:
             if not {"id", "lat", "lon", "value"} < set(elements.keys()):
                 raise KeyError(
                     "id, lat, lon, value keys must be included in the imput data"
                 )
 
-            if "id" not in elements.keys():
-                raise KeyError("id must be included in the data file")
-            if "lat" not in elements.keys():
-                raise KeyError("lat must be included in the data file")
-            if "lon" not in elements.keys():
-                raise KeyError("lon must be included in the data file")
-            if "value" not in elements.keys():
-                raise KeyError("value must be included in the data file")
-
         if self.methodology in ["id3d", "mlr+id3d"]:
-            for elements in data_dict:
+            for elements in input_data:
                 if "altitude" not in elements.keys():
                     raise KeyError("altitude must be included in the " "data file")
 
         if self.methodology in ["mlr", "mlr+id2d", "mlr+id3d"]:
-            for elements in data_dict:
+            for elements in input_data:
                 if not set(
                     list(self.config[self.methodology]["variables_files"].keys())
                 ).issubset(set(list(elements.keys()))):
@@ -234,7 +232,7 @@ class PyMica:
         in_proj.ImportFromEPSG(4326)
         transf = osr.CoordinateTransformation(in_proj, self.field_proj)
 
-        for point in data_dict:
+        for point in input_data:
             geom = ogr.Geometry(ogr.wkbPoint)
             geom.AddPoint(point["lat"], point["lon"])
             geom.Transform(transf)
@@ -242,7 +240,7 @@ class PyMica:
             point["x"] = geom.GetX()
             point["y"] = geom.GetY()
 
-        return data_dict
+        return input_data
 
     def __read_variables_files__(self):
         for i, var in enumerate(
@@ -255,11 +253,6 @@ class PyMica:
                 self.variables = np.concatenate(
                     (self.variables, np.array([var_ds.ReadAsArray()])), axis=0
                 )
-
-        self.field_geotransform = var_ds.GetGeoTransform()
-        self.field_proj = osr.SpatialReference()
-        self.field_proj.ImportFromWkt(var_ds.GetProjectionRef())
-        self.field_size = (var_ds.RasterYSize, var_ds.RasterXSize)
 
         var_ds = None
 
@@ -311,8 +304,17 @@ class PyMica:
 
         return cl_reg, out_data
 
-    def interpolate(self, data_dict):
-        data = self.__input_data__(data_dict)
+    def interpolate(self, input_data: list) -> np.array:
+        """Apply the interpolation methodology to input data.
+
+        Args:
+            input_dict (list): Input data as list of dictionaries with keys including
+                at least {'id', 'lat', 'lon', 'value'}.
+
+        Returns:
+            np.array: Interpolated field.
+        """
+        data = self.__input_data__(input_data)
 
         if self.methodology == "id2d":
             field = inverse_distance(
@@ -376,13 +378,17 @@ class PyMica:
 
         return field
 
-    def save_file(self, file_name):
-        # Saves the calculate field data into a file
-        # Args:
-        #    file_name (str): The output file path
+    def save_file(self, file_name: str) -> None:
+        """Save the interpolated field into a raster file.
+
+        Args:
+            file_name (str): Output file path.
+        """
         driver = gdal.GetDriverByName("GTiff")
         d_s = driver.Create(file_name, self.size[1], self.size[0], 1, gdal.GDT_Float32)
         d_s.SetGeoTransform(self.geotransform)
         d_s.SetProjection(self.out_proj.ExportToWkt())
 
         d_s.GetRasterBand(1).WriteArray(self.field)
+
+        d_s = None
