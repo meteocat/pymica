@@ -1,18 +1,16 @@
-Examples and tutorials
-======================
+How to use it?
+==============
 
-MICA step by step
+pymica step by step
 ~~~~~~~~~~~~~~~~~
-In these tutorials we’ll show step by step how to obtain an air
+In the following tutorials we’ll show step by step how to obtain an air
 temperature interpolated field using a Multiple Linear Regression with
 altitude and distance to coast as explanatory variables.
-
-There are three step by step tutorials that will guide you through PyMica 
-functions to obtain an air temperature interpolated field.
 
 .. toctree::
    :maxdepth: 1
 
+   ht_01_data
    tutorial_01
    tutorial_02
    tutorial_03

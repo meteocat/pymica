@@ -1,7 +1,7 @@
 Installation
 ============
 
-There are several ways to install this package
+There are several ways to install this package.
 
 Anaconda
 --------
@@ -18,6 +18,6 @@ pip
 setup.py
 --------
 
-:code:`python3 setup.py build`
+:code:`python setup.py build`
 
-:code:`python3 setup.py install`
+:code:`python setup.py install`

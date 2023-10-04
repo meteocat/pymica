@@ -3,38 +3,29 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. image:: _static/logo.svg
+pymica
+======
 
-Welcome to pyMICA's documentation!
-==================================
+Pymica is a Python library that performs meteorological observation interpolation
+using various available methodologies: inverse distance weighting, linear regression,
+multiple linear regression (MLR), and residuals correction. Additionally, the MLR
+method offers the capability to classify observations into different clusters and
+compute a specific MLR model for each cluster. This is particularly effective for
+high spatial and temporal resolution observations, especially when some of them are
+concurrently influenced by fog, while others experience clear sky conditions. This
+approach is also useful in regions affected by or prone to thermal inversions.
 
-MICA, the acronym of Meteorological field Interpolation based on Clustered 
-data Analysis is a Python library which interpolates meteorological surface 
-observations through multiple linear regressions (MLR) and residual corrections.
-Two options are available: using a simple MLR for all the surface observations
-or divide them in clusters.
-
-The first option implies the calculation of a MLR considering all the observations
-at once and using explanatory variables, such as altitude, distance to coast,
-latitude and longitude. The second option, uses clusters to classify stations
-in different groups. This allows to separate stations that may behave differently
-due to the presence of dissimilar weather conditions. 
-For example, weather stations placed at a similar altitude, ones under the effects
-of fog and others with clear sky conditions.
-
-Try it yourself! `Jupyter Notebooks <https://github.com/meteocat/pymica-examples>`__
+More information can be found in `A meteorological analysis interpolation scheme for high spatial-temporal resolution in complex terrain <https://doi.org/10.1016/j.atmosres.2020.105103>`_.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
    
    installation
-   howitworks
-   theory
-   scripts
-   api
+   methodologies
    tutorials
-
+   ht_explanatory
+   api
 
 Indices and tables
 ==================

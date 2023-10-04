@@ -1,19 +1,6 @@
 API
 ===
 
-* :ref:`The PyMICA module`
-* :ref:`Multiregression`
-* :ref:`Clustered regression`
-* :ref:`Interpolation`
-    * :ref:`Inverse of the distance (2D)`
-    * :ref:`Inverse of the distance (3D)`
-    * :ref:`IDW`
-* :ref:`Distance to sea`
-* :ref:`Cluster creation`
-    * :ref:`Create clusters`
-    * :ref:`Create cluster files`
-
-
 The pyMICA module
 -----------------
 
@@ -22,71 +9,43 @@ This is the main module, that bundles all the others to take the input data and 
 .. automodule:: pymica.pymica
     :members:
 
-Multiregression
----------------
-
-.. automodule:: pymica.multiregression
-    :members:
-
-.. automodule:: pymica.apply_regression
-    :members:
-
-Clustered regression
---------------------
-
-.. automodule:: pymica.clustered_regression
-    :members:
-
-Interpolation
+Methodologies
 -------------
-The MICA software obtains an interpolated field through applying the
-regression coefficients to a raster and an anomaly correction. This
-correction is obtained interpolation the regression residuals before
-adding the field to the interpolation result, which can be done using 
-several methods:
 
-Inverse of the distance (2D)
-############################
-
-.. automodule:: interpolation.inverse_distance
+.. automodule:: pymica.methods.inverse_distance
     :members:
 
-Inverse of the distance (3D)
-############################
-
-.. automodule:: interpolation.inverse_distance_3d
+.. automodule:: pymica.methods.inverse_distance_3d
     :members:
 
-IDW
-###
-
-.. automodule:: interpolation.idw
+.. automodule:: pymica.methods.multiregression
     :members:
 
-Distance to sea
----------------
-
-.. automodule:: distance.distance_to_sea
+.. automodule:: pymica.methods.clustered_regression
     :members:
 
-Cluster creation
-----------------
+
+Clusters
+--------
 
 There are some functions used to create the clusters and the rasterized clusters file.
 
-Create clusters
-###############
-
-Creates the geoJSON with the cluster definitions
-
-.. automodule:: cluster.create_clusters
+.. automodule:: pymica.utils.clusters
     :members:
 
-Create cluster files
-####################
 
-Creates the GeoTIFFs with the clusters influence areas to blend the final interpolation
+Distance to coastline
+---------------------
 
-.. automodule:: cluster.create_cluster_files
+Function to calculate one explanatory variable.
+
+.. automodule:: pymica.utils.distance_to_coastline
     :members:
 
+Geotools
+--------
+
+Reprojection and geographic tools.
+
+.. automodule:: pymica.utils.geotools
+    :members:
