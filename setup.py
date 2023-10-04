@@ -1,6 +1,11 @@
+from setuptools import setup
+
+if __name__ == '__main__':
+    setup()
+
 '''Standard setup.py file to install the library.
 Run python setup.py --help for options
-'''
+
 import datetime
 
 import numpy
@@ -71,3 +76,4 @@ setuptools.setup(
         },
     ext_modules=ext_modules
 )
+'''
