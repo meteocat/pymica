@@ -1,23 +1,27 @@
 package:
   name: 'pymica'
-  version: "{{ environ.get('GIT_DESCRIBE_TAG', 'default') }}"
+  version: "0.1.0"
 
 source: 
+  git_branch: 47-update-conda_build
   git_url: https://github.com/meteocat/pymica.git
-  git_branch: master
+  
 
 requirements:
   build:
     - python
     - cython
-    - numpy >=1.15.2
-    - scipy >=1.1.0
-    - scikit-learn >=0.20.0
+    - numpy
+    - scipy
+    - scikit-learn
+    - gdal
   run:
     - python
-    - numpy >=1.15.2
-    - scipy >=1.1.0
-    - scikit-learn >=0.20.0
+    - cython
+    - numpy
+    - scipy
+    - scikit-learn
+    - gdal
 
 about:
   home: https://github.com/meteocat/pymica
