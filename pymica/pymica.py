@@ -172,15 +172,6 @@ class PyMica:
             if not {'id','lat','lon','value'} < set(elements.keys()):
                 raise KeyError('id, lat, lon, value keys must be included in the imput data')
 
-            if 'id' not in elements.keys():
-                raise KeyError('id must be included in the data file')
-            if 'lat' not in elements.keys():
-                raise KeyError('lat must be included in the data file')
-            if 'lon' not in elements.keys():
-                raise KeyError('lon must be included in the data file')
-            if 'value' not in elements.keys():
-                raise KeyError('value must be included in the data file')
-
         if self.methodology in ['id3d', 'mlr+id3d']:
             for elements in data_dict:
                 if 'altitude' not in elements.keys():
