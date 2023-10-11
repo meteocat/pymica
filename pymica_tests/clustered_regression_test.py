@@ -12,6 +12,7 @@ class TestClusteredRegression(unittest.TestCase):
         data = json.load(f_p)
 
     def test_regression_ideal_data(self):
+        """Test clustered regression with ideal data"""
         inst = ClusteredRegression(
             self.data, ["pymica_tests/data/clusters.json"], ("altitude", "dist")
         )
@@ -29,6 +30,7 @@ class TestClusteredRegression(unittest.TestCase):
         self.assertEqual("cluster file must be a list", str(cm.exception))
 
     def test_get_residuals(self):
+        """Test get residuals from clustered regression"""
         inst = ClusteredRegression(
             self.data, ["pymica_tests/data/clusters.json"], ("altitude", "dist")
         )
@@ -38,6 +40,7 @@ class TestClusteredRegression(unittest.TestCase):
             self.assertTrue(point["id"] in result)
 
     def test_predict_points(self):
+        """Test predict points"""
         inst = ClusteredRegression(
             self.data, ["pymica_tests/data/clusters.json"], ("altitude", "dist")
         )

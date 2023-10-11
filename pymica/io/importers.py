@@ -9,12 +9,11 @@ from datetime import datetime
 def import_api_smc(
     variable: str, url_meta: str, date: datetime, url: str, station_list: list
 ) -> list:
-    """Import data from API REST Interna SMC.
+    """
 
     Args:
-        variables (str): Name of the variable among '2t', '2r', 'ws_2', 'wdir_2',
-            'ws_6', 'wdir_6', 'ws_10', 'wdir_10'.
-        url_meta (str): URL for download the metadata
+        variables (str): String containing the name of the variables.
+        url_meta (str): String which contains the url for download the metadata
         date (datetime): Is the time for which we obtained the data
         url (str): String which contains the url for download the metadata
         station_list (list): List with the codes of stations to be extracted.

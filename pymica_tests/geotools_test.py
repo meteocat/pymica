@@ -9,6 +9,7 @@ from pymica.utils.geotools import get_utm_epsg_from_lonlat
 
 class TestGeotools(unittest.TestCase):
     """Test geotools module"""
+
     def test_get_utm_epsg_from_lonlat(self):
         """Test get definition of UTM from a point"""
         utm_epsg = get_utm_epsg_from_lonlat(0, 0)
