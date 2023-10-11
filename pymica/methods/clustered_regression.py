@@ -1,23 +1,21 @@
-'''Runs multiple regressions clustering the data in all the ways is asked for
+"""Runs multiple regressions clustering the data in all the ways is asked for
 and takes the best option for each zone
-'''
-import numpy as np
+"""
 import sys
 from copy import deepcopy
 
-from osgeo import ogr
+import numpy as np
+from osgeo import ogr, osr
 
 from pymica.methods.multiregression import MultiRegressionSigma
 
 
 class ClusteredRegression:
-    '''Calculates multiple linear regressions looking which cluster is better
-    '''
-    def __init__(self, data, clusters_files, x_vars,
-                 regression_params=None):
+    """Calculates multiple linear regressions looking which cluster is better"""
+
+    def __init__(self, data, clusters_files, x_vars, regression_params=None):
         if regression_params is None:
-            self.regression_params = {'sigma_limit': 1.5,
-                                      'score_threshold': 0.05}
+            self.regression_params = {"sigma_limit": 1.5, "score_threshold": 0.05}
         else:
             self.regression_params = regression_params
 
@@ -41,24 +39,23 @@ class ClusteredRegression:
                 cluster_file_regressions = []
                 file_mse = 0
                 data_used = 0
-                clustered_data = __filter_data_by_cluster__(data,
-                                                            cluster_file)
+                clustered_data = __filter_data_by_cluster__(data, cluster_file)
                 for data_in_cluster in clustered_data:
-                    mse_all = __get_cluster_mse__(residuals_all,
-                                                  data_in_cluster)
+                    mse_all = __get_cluster_mse__(residuals_all, data_in_cluster)
 
                     try:
                         cluster_regression = MultiRegressionSigma(
-                            data_in_cluster,
-                            x_vars=x_vars)
-                        mse_cluster = __get_residuals_mse__(cluster_regression
-                                                            .get_residuals())
+                            data_in_cluster, x_vars=x_vars
+                        )
+                        mse_cluster = __get_residuals_mse__(
+                            cluster_regression.get_residuals()
+                        )
                     except ValueError:
                         mse_cluster = sys.float_info.max
 
                     if mse_all > mse_cluster:
                         cluster_file_regressions.append(cluster_regression)
-                        file_mse += (mse_cluster * len(data_in_cluster))
+                        file_mse += mse_cluster * len(data_in_cluster)
                     else:
                         new_regr_all = deepcopy(regr_all)
                         new_regr_all.original_data = data_in_cluster
@@ -79,11 +76,11 @@ class ClusteredRegression:
             raise ValueError("cluster file must be a list")
 
     def get_residuals(self):
-        '''Gets the residuals for each point, using the cluster regresion
+        """Gets the residuals for each point, using the cluster regresion
 
         Returns:
             dict: The residuals with the id of the point as a key
-        '''
+        """
 
         out = {}
         for regr in self.final_regr:
@@ -91,7 +88,7 @@ class ClusteredRegression:
         return out
 
     def predict_points(self, x_data):
-        '''Returns the predicted values for multiple points given the
+        """Returns the predicted values for multiple points given the
            x variables (predictors). The formula applied will depend on
            the cluster where the point is located, so the method classifies
            the points into the different clusters too.
@@ -102,24 +99,23 @@ class ClusteredRegression:
 
         Returns:
             list: The predicted values
-        '''
+        """
 
-        clustered_data = __filter_data_by_cluster__(x_data,
-                                                    self.final_cluster_file)
+        clustered_data = __filter_data_by_cluster__(x_data, self.final_cluster_file)
         out = [None] * len(x_data)
         x_data_idx = {}
         for i, data in enumerate(x_data):
-            x_data_idx[data['id']] = i  # TODO: id must be configurable
+            x_data_idx[data["id"]] = i  # TODO: id must be configurable
 
         for i, cluster_data in enumerate(clustered_data):
             if cluster_data:
                 result = self.final_regr[i].predict_points(cluster_data)
                 for data in zip(cluster_data, result):
-                    out[x_data_idx[data[0]['id']]] = data[1]
+                    out[x_data_idx[data[0]["id"]]] = data[1]
         return out
 
     def apply_clustered_regression(self, raster_data, raster_fields, mask):
-        '''The same as apply_regression, but using a "clustered regresion".
+        """The same as apply_regression, but using a "clustered regresion".
         The result is weighed by a mask array.
 
         Args:
@@ -136,7 +132,7 @@ class ClusteredRegression:
 
         Returns:
         nd.array: The final value array, after overlapping all the clusters.
-        '''
+        """
 
         result = np.zeros((mask.shape[1], mask.shape[2]), dtype=np.float64)
         for i, regr in enumerate(self.final_regr):
@@ -149,7 +145,8 @@ def __filter_data_by_cluster__(data, cluster):
     ds_in = ogr.Open(cluster)
     if not ds_in:
         raise FileNotFoundError(
-            "File not found, or not ogr compatible {}".format(cluster))
+            "File not found, or not ogr compatible {}".format(cluster)
+        )
     layer = ds_in.GetLayer()
     num_clusters = layer.GetFeatureCount()
     classified_data = []
@@ -157,10 +154,17 @@ def __filter_data_by_cluster__(data, cluster):
         cluster_points = []
         feat = layer.GetNextFeature()
         cluster_geom = feat.GetGeometryRef()
+
+        input_srs = osr.SpatialReference()
+        input_srs.ImportFromEPSG(4326)
+        cluster_srs = cluster_geom.GetSpatialReference()
+        transform = osr.CoordinateTransformation(input_srs, cluster_srs)
+
         for point in data:
             point_geom = ogr.Geometry(ogr.wkbPoint)
-            # TODO: lon and lat must be configurable keys
-            point_geom.AddPoint(point['lon'], point['lat'])
+            # Transform lon lat coordinates to cluster projection
+            point_geom.AddPoint(point["lat"], point["lon"])
+            point_geom.Transform(transform)
             if point_geom.Within(cluster_geom):
                 cluster_points.append(point)
         classified_data.append(cluster_points)
@@ -171,20 +175,20 @@ def __filter_data_by_cluster__(data, cluster):
 def __get_residuals_mse__(residuals):
     mse = 0
     for i in residuals:
-        mse += residuals[i]**2
+        mse += residuals[i] ** 2
 
-    return mse/len(residuals)
+    return mse / len(residuals)
 
 
 def __get_cluster_mse__(residuals_all, data_in_cluster):
     residuals_sum = 0
     for element in data_in_cluster:
-        residuals_sum += residuals_all[element["id"]]**2
-    return residuals_sum/len(data_in_cluster)
+        residuals_sum += residuals_all[element["id"]] ** 2
+    return residuals_sum / len(data_in_cluster)
 
 
 def __apply_regression__(regr, raster_data, raster_fields):
-    '''Applies the regression formula to an array, to
+    """Applies the regression formula to an array, to
     get all the values for each point
 
     Args:
@@ -201,12 +205,11 @@ def __apply_regression__(regr, raster_data, raster_fields):
 
     Returns:
         nd.array: A 2-D array with all the calculated values
-    '''
-    if not type(raster_data) == np.ndarray or len(raster_data.shape) != 3:
+    """
+    if not isinstance(raster_data, np.ndarray) or len(raster_data.shape) != 3:
         raise ValueError("raster_data must be a 3 dimensional array")
     coefs = regr.get_coefs()
-    out_data = coefs[1] * np.ones((raster_data[0].shape[0],
-                                   raster_data[0].shape[1]))
+    out_data = coefs[1] * np.ones((raster_data[0].shape[0], raster_data[0].shape[1]))
 
     for i, coef in enumerate(coefs[0]):
         field_pos = raster_fields.index(regr.used_vars[i])

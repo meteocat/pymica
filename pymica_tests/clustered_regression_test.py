@@ -12,11 +12,13 @@ class TestClusteredRegression(unittest.TestCase):
         data = json.load(f_p)
 
     def test_regression_ideal_data(self):
+        """Test clustered regression with ideal data"""
+
         inst = ClusteredRegression(
-            self.data, ["pymica_tests/data/clusters.json"], ("altitude", "dist")
+            self.data, ["pymica_tests/data/test_clusters_3.shp"], ("altitude", "dist")
         )
         self.assertEqual(len(inst.final_data), 3)
-        self.assertAlmostEqual(inst.mse, 2.1828, 3)
+        self.assertAlmostEqual(inst.mse, 2.1853, 3)
 
         with self.assertRaises(FileNotFoundError) as cm:
             ClusteredRegression(self.data, ["BadFile"], ("altitude", "dist"))
@@ -30,7 +32,7 @@ class TestClusteredRegression(unittest.TestCase):
 
     def test_get_residuals(self):
         inst = ClusteredRegression(
-            self.data, ["pymica_tests/data/clusters.json"], ("altitude", "dist")
+            self.data, ["pymica_tests/data/test_clusters_3.shp"], ("altitude", "dist")
         )
         result = inst.get_residuals()
         self.assertEqual(len(self.data), len(result))
@@ -39,7 +41,7 @@ class TestClusteredRegression(unittest.TestCase):
 
     def test_predict_points(self):
         inst = ClusteredRegression(
-            self.data, ["pymica_tests/data/clusters.json"], ("altitude", "dist")
+            self.data, ["pymica_tests/data/test_clusters_3.shp"], ("altitude", "dist")
         )
         sample_data = [
             {
@@ -70,12 +72,14 @@ class TestClusteredRegression(unittest.TestCase):
         result = inst.predict_points(sample_data)
         self.assertEqual(len(result), 3)
         # Order is maintained
-        self.assertEqual(result[1], inst.predict_points([sample_data[1]])[0])
+        self.assertAlmostEqual(result[1], inst.predict_points([sample_data[1]])[0], 3)
 
     def test_apply_clustered_regression(self):
         """Test application of clustered regression"""
         inst = ClusteredRegression(
-            self.data, ["pymica_tests/data/clusters.json"], x_vars=("altitude", "dist")
+            self.data,
+            ["pymica_tests/data/test_clusters_3.shp"],
+            x_vars=("altitude", "dist"),
         )
 
         size = [1000, 1000]

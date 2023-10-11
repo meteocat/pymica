@@ -48,6 +48,8 @@ class PyMica:
             self.__check_variables__()
             self.__read_variables_files__()
 
+        self.field = None
+
     def __read_config__(self, config_file: str) -> dict:
         """Read configuration file and return it as a dictionary.
 
@@ -62,11 +64,11 @@ class PyMica:
             dict: Configuration dictionary.
         """
         try:
-            with open(config_file, "r") as f:
+            with open(config_file, "r", encoding="utf-8") as f:
                 config = json.load(f)
                 f.close()
-        except FileNotFoundError:
-            raise FileNotFoundError(config_file + " not found.")
+        except FileNotFoundError as err:
+            raise FileNotFoundError(config_file + " not found.") from err
         except json.decoder.JSONDecodeError as err:
             raise json.decoder.JSONDecodeError(err.msg, err.doc, err.pos)
 
@@ -216,7 +218,7 @@ class PyMica:
         if self.methodology in ["id3d", "mlr+id3d"]:
             for elements in input_data:
                 if "altitude" not in elements.keys():
-                    raise KeyError("altitude must be included in the " "data file")
+                    raise KeyError("altitude must be included in the data file")
 
         if self.methodology in ["mlr", "mlr+id2d", "mlr+id3d"]:
             for elements in input_data:
@@ -292,7 +294,7 @@ class PyMica:
             d_s = None
 
             out_data = cl_reg.apply_clustered_regression(
-                self.variables, self.data_format["x_vars"], mask
+                self.variables, list(self.variables_files.keys()), mask
             )
         else:
             cl_reg = MultiRegressionSigma(
@@ -385,9 +387,11 @@ class PyMica:
             file_name (str): Output file path.
         """
         driver = gdal.GetDriverByName("GTiff")
-        d_s = driver.Create(file_name, self.size[1], self.size[0], 1, gdal.GDT_Float32)
-        d_s.SetGeoTransform(self.geotransform)
-        d_s.SetProjection(self.out_proj.ExportToWkt())
+        d_s = driver.Create(
+            file_name, self.field_size[1], self.field_size[0], 1, gdal.GDT_Float32
+        )
+        d_s.SetGeoTransform(self.field_geotransform)
+        d_s.SetProjection(self.field_proj.ExportToWkt())
 
         d_s.GetRasterBand(1).WriteArray(self.field)
 
