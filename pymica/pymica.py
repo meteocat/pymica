@@ -107,7 +107,7 @@ class PyMica:
             raise KeyError(
                 "interpolation_bounds must be defined in the configuration dictionary."
             )
-        if type(self.interpolation_bounds) is not list:
+        if not isinstance(self.interpolation_bounds, list):
             raise TypeError(
                 "interpolation_bounds must be a list as [x_min, y_min, x_max, y_max]"
             )
@@ -121,13 +121,13 @@ class PyMica:
             raise KeyError(
                 "resolution must be defined in the configuration dictionary."
             )
-        if type(self.resolution) is str:
+        if isinstance(self.resolution, str):
             raise TypeError("resolution must have a valid value in meters.")
 
         self.EPSG = self.config[methodology].get("EPSG", None)
         if self.EPSG is None:
             raise KeyError("EPSG must be defined in the configuration dictionary.")
-        if type(self.EPSG) is not int:
+        if not isinstance(self.EPSG, int):
             raise TypeError("EPSG must have a valid int value.")
 
         if methodology in ["mlr+id2d", "mlr+id3d", "mlr", "id3d"]:
@@ -156,8 +156,8 @@ class PyMica:
             [
                 self.field_geotransform,
                 self.field_proj.ExportToWkt(),
-                self.field_size[0],
                 self.field_size[1],
+                self.field_size[0],
             ],
             dtype="object",
         )
