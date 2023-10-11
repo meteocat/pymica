@@ -16,6 +16,8 @@ requirements:
     - scikit-learn
     - gdal
     - pyproj
+    - pyshp
+    - shapely
   run:
     - python
     - cython
@@ -24,6 +26,8 @@ requirements:
     - scikit-learn
     - gdal
     - pyproj
+    - pyshp
+    - shapely
 
 about:
   home: https://github.com/meteocat/pymica
