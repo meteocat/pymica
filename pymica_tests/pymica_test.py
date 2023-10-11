@@ -416,7 +416,8 @@ class TestPyMica(unittest.TestCase):
 
     def test_init_interpolate_mlr(self):
 
-        config = {'mlr': {'id_power': 2.5,
+        config = {'mlr': {'clusters': "None",
+                          'id_power': 2.5,
                           'id_smoothing': 0.0,
                           'interpolation_bounds': [260000, 4480000,
                                                    530000, 4750000],
@@ -440,7 +441,8 @@ class TestPyMica(unittest.TestCase):
 
     def test_init_interpolate_mlr_id2d(self):
 
-        config = {'mlr+id2d': {'id_power': 2.5,
+        config = {'mlr+id2d': {'clusters': "None",
+                               'id_power': 2.5,
                                'id_smoothing': 0.0,
                                'interpolation_bounds': [260000, 4480000,
                                                         530000, 4750000],
@@ -464,7 +466,8 @@ class TestPyMica(unittest.TestCase):
 
     def test_init_interpolate_mlr_id3d(self):
 
-        config = {'mlr+id3d': {'id_power': 2.5,
+        config = {'mlr+id3d': {'clusters': "None",
+                               'id_power': 2.5,
                                'id_smoothing': 0.0,
                                'interpolation_bounds': [260000, 4480000,
                                                         530000, 4750000],

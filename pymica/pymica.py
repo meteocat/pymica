@@ -279,7 +279,7 @@ class PyMica:
         ]
 
     def __get_regression_results__(self, clusters, data):
-        if clusters:
+        if isinstance(clusters, dict):
             cl_reg = ClusteredRegression(
                 data,
                 clusters["clusters_files"],
@@ -337,7 +337,9 @@ class PyMica:
                 self.penalization,
             )
         elif self.methodology in ["mlr", "mlr+id2d", "mlr+id3d"]:
-            regression, field = self.__get_regression_results__(False, data)
+            regression, field = self.__get_regression_results__(
+                self.config[self.methodology]["clusters"], data
+            )
 
         if self.methodology in ["mlr+id2d", "mlr+id3d"]:
             residues = regression.get_residuals()
