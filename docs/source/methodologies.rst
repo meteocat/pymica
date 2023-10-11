@@ -29,6 +29,13 @@ Where:
 This technique accounts for the spatial distribution of stations and their influence on
 the interpolated values, providing more accurate estimates for various geographic points.
 
+
+In the context of inverse distance interpolation, the degree of smoothing at a point location is influenced by the power parameter (\(p\)). When the power parameter is set to 0.0, a specific behavior occurs: the interpolated value at that point location becomes identical to the observation value recorded at that precise data point.
+
+In simpler terms, when \(p\) is set to 0.0, there is no smoothing applied during interpolation. The interpolated value at a given location matches the observed value at the closest data point exactly. This phenomenon is often referred to as 'zero-distance power' because the distance to the data point is raised to the power of 0, effectively negating the influence of other data points.
+
+Practically, setting \(p\) to 0.0 means that the interpolated surface will pass through each data point without any smoothing or averaging between neighboring data points. This can be beneficial when you require the interpolated surface to faithfully replicate the observed values exactly at the data points themselves. However, it's important to be cautious as this approach may result in a surface with 'spiky' behavior if the observed data points contain noise or outliers.
+
 Here an example result of the interpolation of residuals using this methodology.
 
 .. figure:: _static/iod2d_residues_map.png
