@@ -14,6 +14,8 @@ from pymica.pymica import PyMica
 
 
 class TestPyMica(unittest.TestCase):
+    """Test main PyMica class"""
+
     data = [
         {"id": "A", "lon": 0.3990722, "lat": 40.6215578, "altitude": 10, "value": 50.0},
         {
@@ -32,9 +34,12 @@ class TestPyMica(unittest.TestCase):
         },
     ]
 
+    with open("pymica_tests/data/sample_data_value.json", "rb") as f_p:
+        data_clusters = json.load(f_p)
+
     @classmethod
     def setUpClass(cls):
-        size = [1000, 1000]
+        size = [970, 1000]
         alt_data = np.ones(size)
         alt_data[2][2] = 12
         alt_data[185, 814] = 1000
@@ -83,14 +88,14 @@ class TestPyMica(unittest.TestCase):
                 "id_penalization": 30,
                 "resolution": 270,
                 "id_power": 2.5,
-                "interpolation_bounds": [260000, 4480000, 530000, 4750000],
+                "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "EPSG": 25831,
                 "variables_files": {"altitude": "pymica_tests/data/tifs/altitude.tif"},
             },
             "mlr": {
                 "clusters": None,
                 "resolution": 270,
-                "interpolation_bounds": [260000, 4480000, 530000, 4750000],
+                "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "EPSG": 25831,
                 "variables_files": {
                     "altitude": "pymica_tests/data/tifs/altitude.tif",
@@ -99,25 +104,27 @@ class TestPyMica(unittest.TestCase):
             },
         }
 
-        with open("pymica_tests/data/config_interpolate.json", "w") as f:
+        with open(
+            "pymica_tests/data/config_interpolate.json", "w", encoding="utf-8"
+        ) as f:
             json.dump(config, f)
-            f.close()
 
     def test_init_wrong_variables_files(self):
+        """Test init wrong variables files"""
         config = {
             "mlr": {
                 "resolution": 270,
-                "interpolation_bounds": [260000, 4480000, 530000, 4750000],
+                "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "clusters": "None",
                 "variables_files": {
-                    "altitude": "pymica_tests/data/tifs/" "altitude.tif",
-                    "d_coast": "pymica_tests/data/tifs/" "d_coast_2.tif",
+                    "altitude": "pymica_tests/data/tifs/altitude.tif",
+                    "d_coast": "pymica_tests/data/tifs/d_coast_2.tif",
                 },
                 "EPSG": 25831,
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
@@ -131,11 +138,13 @@ class TestPyMica(unittest.TestCase):
         )
 
     def test_init_config_not_found(self):
+        """Test init configuration file not found"""
         with self.assertRaises(FileNotFoundError) as cm:
             PyMica("id3d", "aaaa.json")
         self.assertEqual("aaaa.json not found.", str(cm.exception))
 
     def test_init_config_json_error(self):
+        """Test init configuration file JSONDecodeError"""
         with self.assertRaises(json.decoder.JSONDecodeError) as cm:
             PyMica("id3d", "pymica_tests/data/config_error.json")
         self.assertEqual(
@@ -145,24 +154,26 @@ class TestPyMica(unittest.TestCase):
         )
 
     def test_init_wrong_methodology(self):
+        """Test init methodology not supported"""
         with self.assertRaises(ValueError) as cm:
             PyMica("id3", "pymica_tests/data/config_interpolate.json")
         self.assertEqual(
-            'Methodology must be "id2d", "id3d", ' '"mlr+id2d", "mlr+id3d" or "mlr"',
+            'Methodology must be "id2d", "id3d", "mlr+id2d", "mlr+id3d" or "mlr"',
             str(cm.exception),
         )
 
     def test_init_methodology_not_in_config(self):
+        """Test init methodology not in configuration dict"""
         config = {
             "id3d": {
                 "resolution": 270,
-                "interpolation_bounds": [260000, 4480000, 530000, 4750000],
+                "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "EPSG": 25831,
                 "variables_files": {"altitude": "pymica_tests/data/tifs/altitude.tif"},
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
@@ -173,16 +184,17 @@ class TestPyMica(unittest.TestCase):
         )
 
     def test_init_default_values_config(self):
+        """Test init default values in configuration dict"""
         config = {
             "id3d": {
                 "resolution": 270,
-                "interpolation_bounds": [260000, 4480000, 530000, 4750000],
+                "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "EPSG": 25831,
                 "variables_files": {"altitude": "pymica_tests/data/tifs/altitude.tif"},
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
@@ -202,6 +214,7 @@ class TestPyMica(unittest.TestCase):
         self.assertEqual(inst.smoothing, 0)
 
     def test_init_missing_interpolation_bounds(self):
+        """Test init missing interpolation bounds"""
         config = {
             "id2d": {
                 "id_power": 2.5,
@@ -211,18 +224,19 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
         with self.assertRaises(KeyError) as cm:
             PyMica("id2d", "pymica_tests/data/config_test.json")
         self.assertEqual(
-            "interpolation_bounds must be defined in the " "configuration dictionary.",
+            "interpolation_bounds must be defined in the configuration dictionary.",
             cm.exception.args[0],
         )
 
     def test_init_wrong_type_interpolation_bounds(self):
+        """Test init wrong type interpolation bounds"""
         config = {
             "id2d": {
                 "id_power": 2.5,
@@ -233,18 +247,19 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
         with self.assertRaises(TypeError) as cm:
             PyMica("id2d", "pymica_tests/data/config_test.json")
         self.assertEqual(
-            "interpolation_bounds must be a list as " "[x_min, y_min, x_max, y_max]",
+            "interpolation_bounds must be a list as [x_min, y_min, x_max, y_max]",
             cm.exception.args[0],
         )
 
     def test_init_wrong_length_interpolation_bounds(self):
+        """Test init wrong lendth of interpolation bounds"""
         config = {
             "id2d": {
                 "id_power": 2.5,
@@ -255,18 +270,19 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
         with self.assertRaises(ValueError) as cm:
             PyMica("id2d", "pymica_tests/data/config_test.json")
         self.assertEqual(
-            "interpolation_bounds must be a list as " "[x_min, y_min, x_max, y_max]",
+            "interpolation_bounds must be a list as [x_min, y_min, x_max, y_max]",
             cm.exception.args[0],
         )
 
     def test_init_missing_resolution(self):
+        """Test init missing resolution in configuration dicitionary"""
         config = {
             "id2d": {
                 "id_power": 2.5,
@@ -276,18 +292,19 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
         with self.assertRaises(KeyError) as cm:
             PyMica("id2d", "pymica_tests/data/config_test.json")
         self.assertEqual(
-            "resolution must be defined in the configuration " "dictionary.",
+            "resolution must be defined in the configuration dictionary.",
             cm.exception.args[0],
         )
 
     def test_init_wrong_type_resolution(self):
+        """Test init wrong type resolution"""
         config = {
             "id2d": {
                 "id_power": 2.5,
@@ -298,7 +315,7 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
@@ -309,6 +326,7 @@ class TestPyMica(unittest.TestCase):
         )
 
     def test_init_missing_epsg(self):
+        """Test init missing epsg in configuration dict"""
         config = {
             "id2d": {
                 "id_power": 2.5,
@@ -318,18 +336,19 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
         with self.assertRaises(KeyError) as cm:
             PyMica("id2d", "pymica_tests/data/config_test.json")
         self.assertEqual(
-            "EPSG must be defined in the configuration " "dictionary.",
+            "EPSG must be defined in the configuration dictionary.",
             cm.exception.args[0],
         )
 
     def test_init_wrong_type_epsg(self):
+        """Test init wrong type EPSG code in configuration dictionary"""
         config = {
             "id2d": {
                 "id_power": 2.5,
@@ -340,7 +359,7 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
@@ -349,6 +368,7 @@ class TestPyMica(unittest.TestCase):
         self.assertEqual("EPSG must have a valid int value.", cm.exception.args[0])
 
     def test_init_missing_variables_files(self):
+        """Test init missing variables files in mlr"""
         config = {
             "mlr+id2d": {
                 "id_power": 2.5,
@@ -359,19 +379,20 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
         with self.assertRaises(KeyError) as cm:
             PyMica("mlr+id2d", "pymica_tests/data/config_test.json")
         self.assertEqual(
-            "variables_files must be included in the "
-            + "configuration file if mlr+id2d is selected.",
+            "variables_files must be included in the configuration file if mlr+id2d is"
+            " selected.",
             cm.exception.args[0],
         )
 
     def test_init_empty_variables_files(self):
+        """Test init empty variables files"""
         config = {
             "mlr+id2d": {
                 "id_power": 2.5,
@@ -383,7 +404,7 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
@@ -397,6 +418,7 @@ class TestPyMica(unittest.TestCase):
         )
 
     def test_init_not_found_variables_files(self):
+        """Test init variables files not found"""
         config = {
             "mlr+id2d": {
                 "id_power": 2.5,
@@ -408,7 +430,7 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
@@ -417,11 +439,12 @@ class TestPyMica(unittest.TestCase):
         self.assertEqual("No such file or directory: notfound.tif", str(cm.exception))
 
     def test_init_two_variables_files(self):
+        """Test init with two variables files"""
         config = {
             "mlr+id2d": {
                 "id_power": 2.5,
                 "id_smoothing": 0.0,
-                "interpolation_bounds": [260000, 4480000, 530000, 4750000],
+                "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "resolution": 270,
                 "EPSG": 25831,
                 "variables_files": {
@@ -431,20 +454,21 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
         mlr_id2d = PyMica("mlr+id2d", "pymica_tests/data/config_test.json")
 
-        self.assertEqual(mlr_id2d.variables.shape, (2, 1000, 1000))
+        self.assertEqual(mlr_id2d.variables.shape, (2, 970, 1000))
 
     def test_init_interpolate_id2d(self):
+        """Test init interpolate id2d"""
         config = {
             "id2d": {
                 "id_power": 2.5,
                 "id_smoothing": 0.0,
-                "interpolation_bounds": [260000, 4480000, 530000, 4750000],
+                "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "resolution": 270,
                 "EPSG": 25831,
                 "variables_files": {
@@ -454,24 +478,25 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
         id2d = PyMica("id2d", "pymica_tests/data/config_test.json")
         field = id2d.interpolate(self.data)
 
-        self.assertEqual(field.shape, (1000, 1000))
+        self.assertEqual(field.shape, (970, 1000))
         self.assertAlmostEqual(field[0, 0], 23.992, 2)
         self.assertAlmostEqual(field[500, 500], 20.052, 2)
         self.assertAlmostEqual(field[750, 750], 21.693, 2)
 
     def test_init_interpolate_id3d(self):
+        """Test interpolation id3d"""
         config = {
             "id3d": {
                 "id_power": 2.5,
                 "id_smoothing": 0.0,
-                "interpolation_bounds": [260000, 4480000, 530000, 4750000],
+                "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "resolution": 270,
                 "EPSG": 25831,
                 "variables_files": {
@@ -481,92 +506,127 @@ class TestPyMica(unittest.TestCase):
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
         id3d = PyMica("id3d", "pymica_tests/data/config_test.json")
         field = id3d.interpolate(self.data)
 
-        self.assertEqual(field.shape, (1000, 1000))
+        self.assertEqual(field.shape, (970, 1000))
         self.assertAlmostEqual(field[0, 0], 24.086, 2)
         self.assertAlmostEqual(field[500, 500], 20.063, 2)
         self.assertAlmostEqual(field[750, 750], 21.809, 2)
 
     def test_init_interpolate_mlr(self):
+        """Test mlr interpolation"""
         config = {
             "mlr": {
+                "clusters": "None",
                 "id_power": 2.5,
                 "id_smoothing": 0.0,
-                "interpolation_bounds": [260000, 4480000, 530000, 4750000],
+                "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "resolution": 270,
                 "EPSG": 25831,
                 "variables_files": {"altitude": "pymica_tests/data/tifs/altitude.tif"},
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
         mlr = PyMica("mlr", "pymica_tests/data/config_test.json")
         field = mlr.interpolate(self.data)
 
-        self.assertEqual(field.shape, (1000, 1000))
+        self.assertEqual(field.shape, (970, 1000))
         self.assertAlmostEqual(field[0, 0], 37.193, 2)
         self.assertAlmostEqual(field[2, 2], 36.879, 2)
         self.assertAlmostEqual(field[3, 3], 37.193, 2)
 
     def test_init_interpolate_mlr_id2d(self):
+        """Test interpolate mlr+id2d"""
         config = {
             "mlr+id2d": {
+                "clusters": "None",
                 "id_power": 2.5,
                 "id_smoothing": 0.0,
-                "interpolation_bounds": [260000, 4480000, 530000, 4750000],
+                "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "resolution": 270,
                 "EPSG": 25831,
                 "variables_files": {"altitude": "pymica_tests/data/tifs/altitude.tif"},
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
         mlr_id2d = PyMica("mlr+id2d", "pymica_tests/data/config_test.json")
         field = mlr_id2d.interpolate(self.data)
 
-        self.assertEqual(field.shape, (1000, 1000))
+        self.assertEqual(field.shape, (970, 1000))
         self.assertAlmostEqual(field[925, 74], 50.000, 2)
         self.assertAlmostEqual(field[555, 444], 20.000, 2)
         self.assertAlmostEqual(field[185, 814], 9.999, 2)
 
     def test_init_interpolate_mlr_id3d(self):
+        """Test interpolate mlr+i3d"""
         config = {
             "mlr+id3d": {
+                "clusters": "None",
                 "id_power": 2.5,
                 "id_smoothing": 0.0,
-                "interpolation_bounds": [260000, 4480000, 530000, 4750000],
+                "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "resolution": 270,
                 "EPSG": 25831,
                 "variables_files": {"altitude": "pymica_tests/data/tifs/altitude.tif"},
             }
         }
 
-        with open("pymica_tests/data/config_test.json", "w") as f:
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
             json.dump(config, f)
             f.close()
 
         mlr_id2d = PyMica("mlr+id3d", "pymica_tests/data/config_test.json")
         field = mlr_id2d.interpolate(self.data)
 
-        self.assertEqual(field.shape, (1000, 1000))
+        self.assertEqual(field.shape, (970, 1000))
         self.assertAlmostEqual(field[925, 74], 50.000, 2)
         self.assertAlmostEqual(field[555, 444], 20.000, 2)
         self.assertAlmostEqual(field[185, 814], 9.999, 2)
 
+    def test_init_interpolate_mlr_id3d_clusters(self):
+        """Test init interpolation mlr+id3d with clusters"""
+        config = {
+            "mlr+id3d": {
+                "clusters": {
+                    "clusters_files": ["pymica_tests/data/clusters_3.shp"],
+                    "mask_files": ["pymica_tests/data/rasterized_clusters_3"],
+                },
+                "id_power": 2.5,
+                "id_smoothing": 0.0,
+                "interpolation_bounds": [260000, 4488100, 530000, 4750000],
+                "resolution": 270,
+                "EPSG": 25831,
+                "variables_files": {"altitude": "pymica_tests/data/tifs/altitude.tif"},
+            }
+        }
+
+        with open("pymica_tests/data/config_test.json", "w", encoding="utf-8") as f:
+            json.dump(config, f)
+            f.close()
+
+        mlr_id2d = PyMica("mlr+id3d", "pymica_tests/data/config_test.json")
+        field = mlr_id2d.interpolate(self.data_clusters)
+
+        self.assertEqual(field.shape, (970, 1000))
+        self.assertAlmostEqual(field[925, 74], 13.225, 2)
+        self.assertAlmostEqual(field[555, 444], 10.859, 2)
+        self.assertAlmostEqual(field[185, 814], 4.075, 2)
+
     def test_interpolate_input_bad_keys(self):
-        # Fem test per les lat
+        """Test interpolation bad keys input"""
         data_dict = [
             {
                 "id": "C6",
@@ -595,6 +655,7 @@ class TestPyMica(unittest.TestCase):
         )
 
     def test_interpolate_input_altitude_missing(self):
+        """Test interpolation with altitude missing"""
         data_dict = [
             {
                 "id": "C6",
@@ -622,6 +683,7 @@ class TestPyMica(unittest.TestCase):
         )
 
     def test_interpolate_input_data_variable_missing(self):
+        """Test interpolate with variable missing"""
         data_dict = [
             {"id": "C6", "value": 6.4, "altitude": 264, "lon": 0.95172, "lat": 41.6566},
             {
@@ -645,6 +707,7 @@ class TestPyMica(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
+        """Tear down class"""
         if exists("pymica_tests/data/config_test.json"):
             remove("pymica_tests/data/config_test.json")
         if exists("pymica_tests/data/config_interpolate.json"):

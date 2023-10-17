@@ -3,7 +3,9 @@
 import math
 
 import numpy as np
+import numpy as np
 import pyproj
+from osgeo import gdal, osr
 from osgeo import gdal, osr
 
 
@@ -46,24 +48,26 @@ def reproject_point(point: tuple, in_proj: int | str, out_proj: int | str) -> tu
     return (point_x, point_y)
 
 
-def get_tif_from_array(
-    file_path: str, data: np.array, geotransform: np.array, projection: int
+def save_array_as_geotiff(
+    output_path: str, data: np.array, geotransform: list, epsg_code: int
 ) -> None:
-    """Save an array into a raster TIF file.
+    """Save a numpy array into a GeoTIFF file.
 
     Args:
-        file_path (str): Output file path.
-        data (np.array): Array to be saved as a raster file.
-        geotransform (np.array): GDAL Geotransform.
-        projection (int): EPSG projection.
-    """
+        output_path (str): Path of the GeoTIFF file to be saved.
+        data (np.array): Data to be saved as GeoTIFF.
+        geotransform (list): Geotransform as [x_min, x_res, x_rot, y_max, y_rot, y_res]
+        EPSG_code (int): ESPG coordinate system code.
+    """    
     driver = gdal.GetDriverByName("GTiff")
-    ds_out = driver.Create(file_path, data.shape[1], data.shape[0], 1, gdal.GDT_Float32)
+    ds_out = driver.Create(
+        output_path, data.shape[1], data.shape[0], 1, gdal.GDT_Float32
+    )
     ds_out.GetRasterBand(1).WriteArray(data)
     ds_out.GetRasterBand(1).SetNoDataValue(0)
     ds_out.SetGeoTransform(geotransform)
     spatialRef = osr.SpatialReference()
-    spatialRef.ImportFromEPSG(projection)
+    spatialRef.ImportFromEPSG(epsg_code)
     ds_out.SetProjection(str(spatialRef))
 
     ds_out = None

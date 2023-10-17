@@ -8,16 +8,18 @@ from pymica.methods.clustered_regression import ClusteredRegression
 
 
 class TestClusteredRegression(unittest.TestCase):
+    """Test clustered regression"""
     with open("pymica_tests/data/sample_data_value.json", "rb") as f_p:
         data = json.load(f_p)
 
     def test_regression_ideal_data(self):
         """Test clustered regression with ideal data"""
+
         inst = ClusteredRegression(
-            self.data, ["pymica_tests/data/clusters.json"], ("altitude", "dist")
+            self.data, ["pymica_tests/data/test_clusters_3.shp"], ("altitude", "dist")
         )
         self.assertEqual(len(inst.final_data), 3)
-        self.assertAlmostEqual(inst.mse, 2.1828, 3)
+        self.assertAlmostEqual(inst.mse, 2.1853, 3)
 
         with self.assertRaises(FileNotFoundError) as cm:
             ClusteredRegression(self.data, ["BadFile"], ("altitude", "dist"))
@@ -25,14 +27,15 @@ class TestClusteredRegression(unittest.TestCase):
             "File not found, or not ogr compatible BadFile", str(cm.exception)
         )
 
-        with self.assertRaises(ValueError) as cm:
+        with self.assertRaises(TypeError) as cm:
             ClusteredRegression(self.data, 23, ("altitude", "dist"))
         self.assertEqual("cluster file must be a list", str(cm.exception))
 
     def test_get_residuals(self):
         """Test get residuals from clustered regression"""
+        """Test get residuals from clustered regression"""
         inst = ClusteredRegression(
-            self.data, ["pymica_tests/data/clusters.json"], ("altitude", "dist")
+            self.data, ["pymica_tests/data/test_clusters_3.shp"], ("altitude", "dist")
         )
         result = inst.get_residuals()
         self.assertEqual(len(self.data), len(result))
@@ -40,9 +43,9 @@ class TestClusteredRegression(unittest.TestCase):
             self.assertTrue(point["id"] in result)
 
     def test_predict_points(self):
-        """Test predict points"""
+        """Test predict points from clustered regression"""
         inst = ClusteredRegression(
-            self.data, ["pymica_tests/data/clusters.json"], ("altitude", "dist")
+            self.data, ["pymica_tests/data/test_clusters_3.shp"], ("altitude", "dist")
         )
         sample_data = [
             {
@@ -73,12 +76,14 @@ class TestClusteredRegression(unittest.TestCase):
         result = inst.predict_points(sample_data)
         self.assertEqual(len(result), 3)
         # Order is maintained
-        self.assertEqual(result[1], inst.predict_points([sample_data[1]])[0])
+        self.assertAlmostEqual(result[1], inst.predict_points([sample_data[1]])[0], 3)
 
     def test_apply_clustered_regression(self):
         """Test application of clustered regression"""
         inst = ClusteredRegression(
-            self.data, ["pymica_tests/data/clusters.json"], x_vars=("altitude", "dist")
+            self.data,
+            ["pymica_tests/data/test_clusters_3.shp"],
+            x_vars=("altitude", "dist"),
         )
 
         size = [1000, 1000]

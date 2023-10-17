@@ -79,13 +79,7 @@
         "xema"
     ],
     "python.pythonPath": "~/anaconda3/envs/pymica/bin/python",
-    
-    "python.linting.flake8Enabled": true,
-    "python.linting.pycodestyleEnabled": false,
-    "python.linting.pylintPath": "~/anaconda3/envs/pymica_test/bin/python",
-    "python.linting.pylintArgs": [
-        "--extension-pkg-whitelist=numpy,scipy"
-    ],
+
     "restructuredtext.confPath": "${workspaceFolder}/docs/source",
     "python.testing.pytestEnabled": false,
     "python.testing.nosetestsEnabled": false,
@@ -97,5 +91,9 @@
         "./pymica_tests",
         "-p",
         "*_test.py"
-    ]
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "none"
 }
