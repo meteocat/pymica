@@ -72,8 +72,8 @@ class ClusteredRegression:
                     self.final_data = clustered_data
                     self.final_cluster_file = cluster_file
                     self.mse = file_mse
-        except TypeError:
-            raise ValueError("cluster file must be a list")
+        except TypeError as err:
+            raise TypeError("cluster file must be a list") from err
 
     def get_residuals(self):
         """Gets the residuals for each point, using the cluster regresion
@@ -105,7 +105,7 @@ class ClusteredRegression:
         out = [None] * len(x_data)
         x_data_idx = {}
         for i, data in enumerate(x_data):
-            x_data_idx[data["id"]] = i  # TODO: id must be configurable
+            x_data_idx[data["id"]] = i
 
         for i, cluster_data in enumerate(clustered_data):
             if cluster_data:

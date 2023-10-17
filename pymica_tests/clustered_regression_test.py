@@ -8,6 +8,7 @@ from pymica.methods.clustered_regression import ClusteredRegression
 
 
 class TestClusteredRegression(unittest.TestCase):
+    """Test clustered regression"""
     with open("pymica_tests/data/sample_data_value.json", "rb") as f_p:
         data = json.load(f_p)
 
@@ -26,11 +27,12 @@ class TestClusteredRegression(unittest.TestCase):
             "File not found, or not ogr compatible BadFile", str(cm.exception)
         )
 
-        with self.assertRaises(ValueError) as cm:
+        with self.assertRaises(TypeError) as cm:
             ClusteredRegression(self.data, 23, ("altitude", "dist"))
         self.assertEqual("cluster file must be a list", str(cm.exception))
 
     def test_get_residuals(self):
+        """Test get residuals from clustered regression"""
         inst = ClusteredRegression(
             self.data, ["pymica_tests/data/test_clusters_3.shp"], ("altitude", "dist")
         )
@@ -40,6 +42,7 @@ class TestClusteredRegression(unittest.TestCase):
             self.assertTrue(point["id"] in result)
 
     def test_predict_points(self):
+        """Test predict points from clustered regression"""
         inst = ClusteredRegression(
             self.data, ["pymica_tests/data/test_clusters_3.shp"], ("altitude", "dist")
         )
