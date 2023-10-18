@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 
 project = 'pymica'
 copyright = 'Servei Meteorològic de Catalunya'
-author = 'SMC'
+author = 'Servei Meteorològic de Catalunya'
 
 # The short X.Y version
 version = '0.1.0'
@@ -68,7 +68,7 @@ html_theme_options = {
     'logo_only': True,
 }
 
-html_logo = "_static/img/logoM.svg"
+html_logo = "_static/logo_lbug.png"
 
 html_title = "pymica - interpolation"
 
