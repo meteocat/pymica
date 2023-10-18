@@ -1,6 +1,7 @@
-How to...
+Tutorials
 =========
 
+This page contains various tutorials on how to prepare everything necessary to run PyMica and obtain interpolated fields from meteorological observations. It also covers the usage of different interpolation methodologies.
 
 .. toctree::
    :maxdepth: 1
