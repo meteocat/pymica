@@ -261,8 +261,7 @@ def clip_clusters_extent(
 def rasterize_clusters(
     shapefile_path: str, raster_config: dict, sigma: float = 15
 ) -> None:
-    """
-    Rasterize clusters from a GeoJSON file and save the result as a raster image.
+    """Rasterize clusters from a GeoJSON file and save the result as a raster image.
 
     Args:
         shapefile_path (str): The path to the GeoJSON file containing cluster
@@ -270,8 +269,7 @@ def rasterize_clusters(
         raster_config (dict): A dictionary with the following required keys:
             - 'out_file' (str): Path to save the rasterized clusters.
             - 'size' (tuple): Raster size (x, y) in pixels.
-            - 'geotransform' (list): GeoTransform information [ul_x, x_res, x_rot,
-                                                               ul_y, y_rot, y_res].
+            - 'geotransform' (list): GeoTransform information [ul_x, x_res, x_rot, ul_y, y_rot, y_res].
         sigma (float, optional): Sigma parameter for a Gaussian filter. Defaults to 15.
 
     Returns:

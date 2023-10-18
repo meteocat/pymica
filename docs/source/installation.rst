@@ -44,3 +44,12 @@ To install pymica from source it is recommended to use `pip` instead of `setup.p
 .. code-block:: bash
 
    $ pip install ./pymica
+
+`conda` environment
+-------------------
+
+A `conda` environment can be created using `environment.yml` file.
+
+.. code-block:: bash
+
+   $ conda env create -f environment.yml
