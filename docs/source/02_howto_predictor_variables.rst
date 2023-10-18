@@ -64,7 +64,7 @@ defined parameters.
 
 .. parsed-literal::
 
-    Progress: 0.1%Progress: 100%  
+    Progress: 100%  
 
 
 Now, we can get a quick look of the ``dcoast_field`` array using

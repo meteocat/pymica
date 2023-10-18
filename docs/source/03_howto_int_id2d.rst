@@ -62,12 +62,6 @@ With all these parameters and configurations set, let’s initialize the
     id2d_method = PyMica(methodology='id2d', config=config_file)
 
 
-.. parsed-literal::
-
-    /home/ecm/anaconda3/envs/pymica-test/lib/python3.10/site-packages/osgeo/osr.py:385: FutureWarning: Neither osr.UseExceptions() nor osr.DontUseExceptions() has been explicitly called. In GDAL 4.0, exceptions will be enabled by default.
-      warnings.warn(
-
-
 Now that we have the interpolator set, we can input some data for
 interpolation. We will use data from the Meteorological Service of
 Catalonia AWS network.
@@ -110,15 +104,6 @@ Now, we can get a quick look of the ``data_field`` array using
     
     plt.imshow(data_field)
     plt.colorbar(label='Air temperature (\u00b0C)')
-
-
-
-
-.. parsed-literal::
-
-    <matplotlib.colorbar.Colorbar at 0x7fb1187de860>
-
-
 
 
 .. image:: _static/03_howto_int_id2d_12_1.png

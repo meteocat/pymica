@@ -134,15 +134,6 @@ Now, we can get a quick look of the ``data_field`` array using
     plt.imshow(clusters_fields[0] * 1 + clusters_fields[1] * 2 + clusters_fields[2] * 3)
 
 
-
-
-.. parsed-literal::
-
-    <matplotlib.image.AxesImage at 0x7f8e1abb37c0>
-
-
-
-
 .. image:: _static/07_howto_int_creation_clusters_13_1.png
 
 

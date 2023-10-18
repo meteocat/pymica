@@ -109,15 +109,6 @@ Now, we can get a quick look of the ``data_field`` array using
     plt.colorbar(label='Air temperature (\u00b0C)')
 
 
-
-
-.. parsed-literal::
-
-    <matplotlib.colorbar.Colorbar at 0x7f617d0cb520>
-
-
-
-
 .. image:: _static/05_howto_int_mlr_12_1.png
 
 
