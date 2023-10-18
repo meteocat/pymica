@@ -63,7 +63,7 @@ pygments_style = None
 # 'searchbox.html']``.
 #
 html_theme_options = {
-    "repository_url": "https://bitbucket.org/smc-postproc/unimodel/src/main/",
+    "repository_url": "https://github.com/meteocat/pymica",
     "use_repository_button": True,
     'logo_only': True,
 }

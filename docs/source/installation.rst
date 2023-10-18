@@ -1,23 +1,46 @@
 Installation
 ============
 
+pymica needs the following dependencies:
+
+- python 3.9/3.10
+- cython
+- numpy
+- scipy
+- scikit-learn
+- gdal
+- pyproj
+- pyshp
+- shapely
+
+
 There are several ways to install this package.
 
-Anaconda
---------
+Anaconda install
+----------------
 
-:code:`conda install -c meteocat pymica`
+pymica is available in **meteocat** Anaconda channel and it can be installed in your `conda` environment by running in a terminal the following command:
 
-pip
----
+.. code-block:: bash
+   
+   $ conda install -c meteocat -c conda-forge pymica
 
-:code:`pip install -r requirements.txt`
 
-:code:`pip install pymica`
+pip install
+-----------
 
-setup.py
---------
+pymica is also avaialbe in Python package installer `pip` and it can be installed in your environemnt by running in a terminal the following command:
 
-:code:`python setup.py build`
+.. code-block:: bash
 
-:code:`python setup.py install`
+   $ pip install -r requirements.txt
+   $ pip install pymica
+
+Install from source
+-------------------
+
+To install pymica from source it is recommended to use `pip` instead of `setup.py`.
+
+.. code-block:: bash
+
+   $ pip install ./pymica

@@ -17,18 +17,19 @@ approach is also useful in regions affected by or prone to thermal inversions.
 
 More information can be found in `A meteorological analysis interpolation scheme for high spatial-temporal resolution in complex terrain <https://doi.org/10.1016/j.atmosres.2020.105103>`_.
 
+Contents
+--------
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
    
    installation
    methodologies
    tutorials
-   ht_explanatory
    api
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

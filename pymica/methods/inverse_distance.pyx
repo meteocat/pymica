@@ -1,8 +1,7 @@
 #cython: boundscheck=False, wraparound=False, nonecheck=False, cdivision=True
 """
 A residue value is calculated for a point considering the quadratic inverse
-of the distance between the point and all the stations. For more information,
-see :ref:`Inverse of the distance - 2D`.
+of the distance between the point and all the stations.
 """
 
 import numpy as np

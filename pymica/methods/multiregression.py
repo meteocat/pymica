@@ -1,7 +1,5 @@
 """Calculates a multiple linear regression recursively adding variables,
 until the score is under a threshold
-
-For more information, see :ref:`Multiple Linear Regression`.
 """
 import numpy as np
 from numpy import array, std, ones
