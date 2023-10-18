@@ -2,8 +2,6 @@
 """
 A residue value is calculated for a point considering not only the distance 
 between the point and all the stations, but also their altitude difference. 
-
-For more information, see :ref:`Inverse of the distance - 3D`.
 """
 
 import numpy as np

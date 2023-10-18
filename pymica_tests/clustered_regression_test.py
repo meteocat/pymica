@@ -33,6 +33,7 @@ class TestClusteredRegression(unittest.TestCase):
 
     def test_get_residuals(self):
         """Test get residuals from clustered regression"""
+        """Test get residuals from clustered regression"""
         inst = ClusteredRegression(
             self.data, ["pymica_tests/data/test_clusters_3.shp"], ("altitude", "dist")
         )

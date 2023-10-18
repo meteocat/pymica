@@ -1,46 +1,16 @@
-Examples and tutorials
-======================
+Tutorials
+=========
 
-MICA step by step
-~~~~~~~~~~~~~~~~~
-In these tutorials we’ll show step by step how to obtain an air
-temperature interpolated field using a Multiple Linear Regression with
-altitude and distance to coast as explanatory variables.
-
-There are three step by step tutorials that will guide you through PyMica 
-functions to obtain an air temperature interpolated field.
+This page contains various tutorials on how to prepare everything necessary to run PyMica and obtain interpolated fields from meteorological observations. It also covers the usage of different interpolation methodologies.
 
 .. toctree::
    :maxdepth: 1
 
-   tutorial_01
-   tutorial_02
-   tutorial_03
-
-
-MICA how to
-~~~~~~~~~~~
-
-.. toctree::
-   :maxdepth: 1
-   
-   ht_dcoast
-   ht_explanatory
-   ht_clusters
-   ht_rasterize
-   ht_without
-   ht_one
-   ht_multiple
-
-
-
-Specific tutorials
-~~~~~~~~~~~~~~~~~~
-
-.. toctree::
-   :maxdepth: 1
-   
-   ems_tutorial_1
-   ems_tutorial_2
-   ems_tutorial_3
-   ems_tutorial_4
+   01_howto_prepare_data
+   02_howto_predictor_variables
+   03_howto_int_id2d
+   04_howto_int_id3d
+   05_howto_int_mlr
+   06_howto_int_mlr_residuals
+   07_howto_int_creation_clusters
+   08_howto_int_mlr_residuals_clusters

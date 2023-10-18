@@ -1,8 +1,10 @@
-"""Tests for pymica.multiregression.py
+"""Tests for MLR sigma
 """
 import unittest
-import numpy as np
 from datetime import datetime
+
+import numpy as np
+
 from pymica.methods.multiregression import MultiRegression, MultiRegressionSigma
 
 
@@ -45,7 +47,7 @@ class TestMultiRegressionSigma(unittest.TestCase):
                     )
 
         inst_regression = MultiRegression(data, x_vars=["altitude", "dist", "hr"])
-        # print(vars(inst_regression))
+
         coefs1 = inst_regression.get_coefs()
 
         data.append({"id": "BAD", "hr": 0, "value": 0, "dist": 0, "altitude": 0})
@@ -53,7 +55,7 @@ class TestMultiRegressionSigma(unittest.TestCase):
         inst_regression = MultiRegressionSigma(
             data, ["altitude", "dist", "hr"], sigma_limit=1.5
         )
-        # print(vars(inst_regression))
+
         coefs2 = inst_regression.get_coefs()
         # The MultiRegressionSigma class must have filtered the bad data
         self.assertEqual(len(coefs2[0]), len(coefs1[0]))
@@ -129,6 +131,7 @@ class TestMultiRegressionSigma(unittest.TestCase):
         print("Time for 1000x1000:", spent_time.total_seconds(), "s")
 
     def test_apply_regression_errors(self):
+        """Test error raises from apply regression"""
         data = [
             {"id": "AA", "hr": 0, "value": 0, "dist": 0, "altitude": 0},
             {"id": "BB", "hr": 0.5, "value": 0.5, "dist": 0, "altitude": 0.5},
