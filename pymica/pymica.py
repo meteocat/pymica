@@ -1,171 +1,400 @@
-'''Main class. Calculates data fields from points, using
-clusters multi-linear regressions corrected with residuals.
-'''
+"""Main class. Calculates data fields from points, using clusters multi-linear
+regressions corrected with residuals.
+"""
 import json
 
-from interpolation.idw import idw
-from interpolation.inverse_distance import inverse_distance
-from interpolation.inverse_distance_3d import inverse_distance_3d
-from numpy import concatenate, newaxis
-from osgeo import gdal, ogr, osr
+import numpy as np
+from genericpath import exists
+from osgeo import gdal, osr, ogr
+from pymica.methods.inverse_distance import inverse_distance
+from pymica.methods.inverse_distance_3d import inverse_distance_3d
 
-from pymica.apply_regression import (apply_clustered_regression,
-                                     apply_regression)
-from pymica.clustered_regression import (ClusteredRegression,
-                                         MultiRegressionSigma)
+from pymica.methods.clustered_regression import (
+    ClusteredRegression,
+    MultiRegressionSigma,
+)
 
 
 class PyMica:
-    '''Main project class. Calculates the regressions, corrects
-    them with the interpolated residuals and saves files and gives
-    errors.
-    '''
+    """Main project class. Calculates regressions, corrects them with interpolated
+    residuals, saves the results into raster files and calculates errors.
+    """
 
-    def __init__(self, data_file, variables_file,
-                 clusters=None, data_format=None, residuals_int='id2d',
-                 z_field='altitude'):
-        '''
+    def __init__(self, methodology: str, config: dict) -> None:
+        """Implements different checks to config depending on the chosen methodology.
+
         Args:
-            data_file (str): The path with the point data
-            variables_file (str, list): The file(s) path(s) containing the
-                                        fields used in the regression
-            clusters (dict, optional): Defaults to None. Two keys,
-                                        clusters_files and mask_files,
-                                        with the paths for the
-                                        cluster definitions and merging data
-            data_format (dict, optional): Defaults to None. The name of the
-                                          variables in the data files.
-                                          Defaults to:
-                                          {'loc_vars': ('lon', 'lat'),
-                                          'id_key': 'id',
-                                          'y_var': 'temp',
-                                          'x_vars': ('altitude', 'dist')}
-            residuals_int (str): The indicator of the residuals interpolation
-                                  methodology. Defaults to 'id2d'.
-                                  Methodologies available: id2d, id3d and idw.
-            z_field (str): The field used as the z variable when using the id3d
-                           value as the residuals_int method.
-                           Defaults to 'altitude'
-        '''
-        if data_format is None:
-            self.data_format = {'loc_vars': ('lon', 'lat'),
-                                'id_key': 'id',
-                                'y_var': 'temp',
-                                'x_vars': ('altitude', 'dist')}
-        else:
-            self.data_format = data_format
+            methodology (str): Interpolation method among 'id2d', 'id3d', 'mlr',
+                'mlr+id2d' and 'mlr+id3d'.
+            config (dict): Configuration dictionary.
 
-        with open(data_file, "r") as f_p:
-            data = json.load(f_p)
+        Raises:
+            ValueError: If `methodology` not in 'id2d', 'id3d', 'mlr', 'mlr+id2d'
+                and 'mlr+id3d'.
+        """
+        if methodology not in ["id2d", "mlr+id2d", "id3d", "mlr+id3d", "mlr"]:
+            raise ValueError(
+                'Methodology must be "id2d", "id3d", "mlr+id2d", "mlr+id3d" or "mlr"'
+            )
 
-        self.__read_variables_files__(variables_file)
+        self.methodology = methodology
+        self.config = self.__read_config__(config)
+
+        self.__check_config__(methodology)
+
+        self.__get_geographical_parameters__()
+
+        if methodology in ["mlr", "id3d", "mlr+id2d", "mlr+id3d"]:
+            self.__check_variables__()
+            self.__read_variables_files__()
+
+        self.field = None
+
+    def __read_config__(self, config_file: str) -> dict:
+        """Read configuration file and return it as a dictionary.
+
+        Args:
+            config_file (str): Path to a configuration file.
+
+        Raises:
+            FileNotFoundError: If `config_file` not found.
+            json.decoder.JSONDecodeError: If `config_file` is bad formatted.
+
+        Returns:
+            dict: Configuration dictionary.
+        """
+        try:
+            with open(config_file, "r", encoding="utf-8") as f:
+                config = json.load(f)
+                f.close()
+        except FileNotFoundError as err:
+            raise FileNotFoundError(config_file + " not found.") from err
+        except json.decoder.JSONDecodeError as err:
+            raise json.decoder.JSONDecodeError(err.msg, err.doc, err.pos)
+
+        return config
+
+    def __check_config__(self, methodology: str) -> None:
+        """Check configuration keys and parameters based on the methodology selected"""
+        if methodology not in self.config.keys():
+            raise KeyError(methodology + " not defined in the configuration file.")
+
+        if methodology in ["id2d", "id3d", "mlr+id2d", "mlr+id3d"]:
+            if "id_power" not in self.config[methodology].keys():
+                print(
+                    "id_power not in the configuration dictionary. "
+                    + "id_power set to default value of 2.5."
+                )
+            self.power = self.config[methodology].get("id_power", 2.5)
+
+            if "id_smoothing" not in self.config[methodology].keys():
+                print(
+                    "id_smoothing not in the configuration dictionary. "
+                    + "id_smoothing set to default value of 0.0."
+                )
+            self.smoothing = self.config[methodology].get("id_smoothing", 0.0)
+
+        if methodology in ["id3d", "mlr+id3d"]:
+            if "id_penalization" not in self.config[methodology].keys():
+                print(
+                    "id_penalization not in the configuration dictionary. "
+                    + "id_penalization set to default value of 30."
+                )
+            self.penalization = self.config[methodology].get("id_penalization", 30.0)
+
+        self.interpolation_bounds = self.config[methodology].get(
+            "interpolation_bounds", None
+        )
+        if self.interpolation_bounds is None:
+            raise KeyError(
+                "interpolation_bounds must be defined in the configuration dictionary."
+            )
+        if not isinstance(self.interpolation_bounds, list):
+            raise TypeError(
+                "interpolation_bounds must be a list as [x_min, y_min, x_max, y_max]"
+            )
+        if len(self.interpolation_bounds) != 4:
+            raise ValueError(
+                "interpolation_bounds must be a list as [x_min, y_min, x_max, y_max]"
+            )
+
+        self.resolution = self.config[methodology].get("resolution", None)
+        if self.resolution is None:
+            raise KeyError(
+                "resolution must be defined in the configuration dictionary."
+            )
+        if isinstance(self.resolution, str):
+            raise TypeError("resolution must have a valid value in meters.")
+
+        self.EPSG = self.config[methodology].get("EPSG", None)
+        if self.EPSG is None:
+            raise KeyError("EPSG must be defined in the configuration dictionary.")
+        if not isinstance(self.EPSG, int):
+            raise TypeError("EPSG must have a valid int value.")
+
+        if methodology in ["mlr+id2d", "mlr+id3d", "mlr", "id3d"]:
+            if "variables_files" not in self.config[methodology].keys():
+                raise KeyError(
+                    "variables_files must be included in the configuration file if "
+                    + methodology
+                    + " is selected."
+                )
+            self.variables_files = self.config[methodology].get("variables_files", None)
+
+            if len(self.variables_files.keys()) < 1:
+                raise ValueError(
+                    "variables_files dictionary must have at least one key including "
+                    "a variable file path containing a 2D predictor field."
+                )
+
+    def __check_variables__(self) -> None:
+        """Check if the properties of variable fields are the same to each other.
+
+        Raises:
+            ValueError: If properties of variable fields are not the same with
+                        each other.
+        """
+        geo_param = np.array(
+            [
+                self.field_geotransform,
+                self.field_proj.ExportToWkt(),
+                self.field_size[1],
+                self.field_size[0],
+            ],
+            dtype="object",
+        )
+
+        for var in list(self.config[self.methodology]["variables_files"].keys()):
+            if not exists(self.config[self.methodology]["variables_files"][var]):
+                raise FileNotFoundError(
+                    "No such file or directory: "
+                    + self.config[self.methodology]["variables_files"][var]
+                )
+            var_ds = gdal.Open(self.config[self.methodology]["variables_files"][var])
+
+            check_equal = np.array_equal(
+                np.array(
+                    [
+                        var_ds.GetGeoTransform(),
+                        var_ds.GetProjectionRef(),
+                        var_ds.RasterXSize,
+                        var_ds.RasterYSize,
+                    ],
+                    dtype="object",
+                ),
+                geo_param,
+            )
+
+            if check_equal is False:
+                raise ValueError(
+                    "Variables properties are not the same. Variables fields must have"
+                    " the same GeoTransform, Projection, XSize and YSize."
+                )
+
+    def __input_data__(self, input_data: list) -> None:
+        """Check and transform input data depending on the selected interpolation
+        methodology.
+
+        Args:
+            input_data (list): Input data as list of dictionaries with keys including
+                at least {'id', 'lat', 'lon', 'value'}.
+
+        Raises:
+            KeyError: If id, lat, lon, value keys not included in the input data.
+            KeyError: If methodology is 'id3d' or 'mlr+id3d' and 'altitude' variable is
+                not included in the data dictionary.
+            KeyError: If any variable provided in `variables_files` dictionary missing
+                in any of the data dictionaries.
+
+        Returns:
+            dict: Formatted input data.
+        """
+        for elements in input_data:
+            if not {"id", "lat", "lon", "value"} < set(elements.keys()):
+                raise KeyError(
+                    "id, lat, lon, value keys must be included in the imput data"
+                )
+
+        if self.methodology in ["id3d", "mlr+id3d"]:
+            for elements in input_data:
+                if "altitude" not in elements.keys():
+                    raise KeyError("altitude must be included in the data file")
+
+        if self.methodology in ["mlr", "mlr+id2d", "mlr+id3d"]:
+            for elements in input_data:
+                if not set(
+                    list(self.config[self.methodology]["variables_files"].keys())
+                ).issubset(set(list(elements.keys()))):
+                    raise KeyError(
+                        "Some of the variables provided in the "
+                        "variables_files dictionary missing in " + elements["id"] + "."
+                    )
 
         in_proj = osr.SpatialReference()
         in_proj.ImportFromEPSG(4326)
+        transf = osr.CoordinateTransformation(in_proj, self.field_proj)
 
-        transf = osr.CoordinateTransformation(in_proj, self.out_proj)
-
-        cl_reg, out_data = self.__get_regression_results(clusters, data)
-
-        residuals = cl_reg.get_residuals()
-        residuals_data = {}
-
-        for point in data:
+        for point in input_data:
             geom = ogr.Geometry(ogr.wkbPoint)
-            geom.AddPoint(point[self.data_format['loc_vars'][1]],
-                          point[self.data_format['loc_vars'][0]])
+            geom.AddPoint(point["lat"], point["lon"])
             geom.Transform(transf)
 
-            if point[self.data_format['id_key']] in residuals:
-                residuals_data[point[
-                    self.data_format['id_key']]] = {
-                    'value': residuals[point[
-                        self.data_format['id_key']]],
-                    'x': geom.GetX(), 'y': geom.GetY()}
+            point["x"] = geom.GetX()
+            point["y"] = geom.GetY()
 
-            if residuals_int == 'id3d':
-                residuals_data[point[self.data_format['id_key']]
-                               ]['z'] = point[z_field]
+        return input_data
 
-        if residuals_int == 'id2d':
-            residuals_field = inverse_distance(residuals_data, self.size,
-                                               self.geotransform)
-        elif residuals_int == 'id3d':
-            dem = gdal.Open(
-                variables_file[self.data_format['x_vars'].index(z_field)])
-            dem = dem.ReadAsArray()
-            residuals_field = inverse_distance_3d(residuals_data, self.size,
-                                                  self.geotransform, dem)
-        elif residuals_int == 'idw':
-            residuals_field = idw(residuals_data, self.size, self.geotransform)
-        else:
-            raise ValueError("[Errno 2]residuals_int must be \"id2d\"," +
-                             " \"id3d\" or \"idw\"")
+    def __read_variables_files__(self):
+        for i, var in enumerate(
+            list(self.config[self.methodology]["variables_files"].keys())
+        ):
+            var_ds = gdal.Open(self.config[self.methodology]["variables_files"][var])
+            if i == 0:
+                self.variables = np.array([var_ds.ReadAsArray()])
+            else:
+                self.variables = np.concatenate(
+                    (self.variables, np.array([var_ds.ReadAsArray()])), axis=0
+                )
 
-        self.result = out_data - residuals_field
+        var_ds = None
 
-    def save_file(self, file_name):
-        '''Saves the calculate field data into a file
+    def __get_geographical_parameters__(self):
+        int_bounds = self.config[self.methodology]["interpolation_bounds"]
+        res = self.config[self.methodology]["resolution"]
 
-        Args:
-            file_name (str): The output file path
-        '''
+        self.field_geotransform = (
+            float(int_bounds[0]),
+            float(res),
+            float(0),
+            float(int_bounds[3]),
+            float(0),
+            float(-res),
+        )
 
-        driver = gdal.GetDriverByName('GTiff')
-        d_s = driver.Create(file_name, self.size[1], self.size[0], 1,
-                            gdal.GDT_Float32)
-        d_s.SetGeoTransform(self.geotransform)
-        d_s.SetProjection(self.out_proj.ExportToWkt())
+        self.field_proj = osr.SpatialReference()
+        self.field_proj.ImportFromEPSG(self.config[self.methodology]["EPSG"])
+        self.field_size = [
+            int((int_bounds[3] - int_bounds[1]) / res),
+            int((int_bounds[2] - int_bounds[0]) / res),
+        ]
 
-        d_s.GetRasterBand(1).WriteArray(self.result)
+    def __get_regression_results__(self, clusters, data):
+        if isinstance(clusters, dict):
+            cl_reg = ClusteredRegression(
+                data,
+                clusters["clusters_files"],
+                x_vars=list(self.variables_files.keys()),
+            )
+            cluster_file_index = clusters["clusters_files"].index(
+                cl_reg.final_cluster_file
+            )
 
-    def __get_regression_results(self, clusters, data):
-        if clusters:
-            cl_reg = ClusteredRegression(data, clusters['clusters_files'],
-                                         data_format=self.data_format)
-            cluster_file_index = clusters['clusters_files'].index(
-                    cl_reg.final_cluster_file)
-
-            d_s = gdal.Open(clusters['mask_files'][cluster_file_index])
+            d_s = gdal.Open(clusters["mask_files"][cluster_file_index])
             mask = d_s.ReadAsArray()
             d_s = None
 
-            out_data = apply_clustered_regression(
-                                cl_reg, self.variables,
-                                self.data_format['x_vars'],
-                                mask)
+            out_data = cl_reg.apply_clustered_regression(
+                self.variables, list(self.variables_files.keys()), mask
+            )
         else:
-            cl_reg = MultiRegressionSigma(data,
-                                          id_key=self.data_format['id_key'],
-                                          y_var=self.data_format['y_var'],
-                                          x_vars=self.data_format['x_vars'])
-            out_data = apply_regression(cl_reg, self.variables,
-                                        self.data_format['x_vars'])
+            cl_reg = MultiRegressionSigma(
+                data, x_vars=list(self.variables_files.keys())
+            )
+            out_data = cl_reg.apply_regression(
+                self.variables, list(self.variables_files.keys())
+            )
 
         return cl_reg, out_data
 
-    def __read_variables_files__(self, variables_file):
-        if isinstance(variables_file, (list,)):
-            self.variables = None
-            for layer_file in variables_file:
-                d_s = gdal.Open(layer_file)
-                if d_s is None:
-                    raise FileNotFoundError("[Errno 2] No such file or " +
-                                            "directory: 'BadFile'")
-                for i in range(d_s.RasterCount):
-                    layer_data = d_s.GetRasterBand(i + 1)\
-                        .ReadAsArray()[newaxis, :, :]
-                    if self.variables is None:
-                        self.variables = layer_data
-                    else:
-                        self.variables = concatenate((self.variables,
-                                                      layer_data), axis=0)
-        else:
-            d_s = gdal.Open(variables_file)
-            self.variables = d_s.ReadAsArray()
+    def interpolate(self, input_data: list) -> np.array:
+        """Apply the interpolation methodology to input data.
 
-        self.out_proj = osr.SpatialReference()
-        self.out_proj.ImportFromWkt(d_s.GetProjection())
-        self.size = (d_s.RasterYSize, d_s.RasterXSize)
-        self.geotransform = d_s.GetGeoTransform()
+        Args:
+            input_dict (list): Input data as list of dictionaries with keys including
+                at least {'id', 'lat', 'lon', 'value'}.
+
+        Returns:
+            np.array: Interpolated field.
+        """
+        data = self.__input_data__(input_data)
+
+        if self.methodology == "id2d":
+            field = inverse_distance(
+                data,
+                self.field_size,
+                list(self.field_geotransform),
+                self.power,
+                self.smoothing,
+            )
+        elif self.methodology == "id3d":
+            field = inverse_distance_3d(
+                data,
+                list(self.field_size),
+                list(self.field_geotransform),
+                self.variables[list(self.variables_files.keys()).index("altitude")],
+                self.power,
+                self.smoothing,
+                self.penalization,
+            )
+        elif self.methodology in ["mlr", "mlr+id2d", "mlr+id3d"]:
+            regression, field = self.__get_regression_results__(
+                self.config[self.methodology]["clusters"], data
+            )
+
+        if self.methodology in ["mlr+id2d", "mlr+id3d"]:
+            residues = regression.get_residuals()
+
+            res_interp = []
+            for stat in data:
+                if stat["id"] in residues.keys():
+                    res = {
+                        "id": stat["id"],
+                        "x": stat["x"],
+                        "y": stat["y"],
+                        "value": residues[stat["id"]],
+                    }
+                    if self.methodology == "mlr+id3d":
+                        res["altitude"] = stat["altitude"]
+                    res_interp.append(res)
+
+            if self.methodology == "mlr+id2d":
+                res_field = inverse_distance(
+                    res_interp,
+                    list(self.field_size),
+                    list(self.field_geotransform),
+                    self.power,
+                    self.smoothing,
+                )
+            elif self.methodology == "mlr+id3d":
+                res_field = inverse_distance_3d(
+                    res_interp,
+                    list(self.field_size),
+                    list(self.field_geotransform),
+                    self.variables[list(self.variables_files.keys()).index("altitude")],
+                    self.power,
+                    self.smoothing,
+                    self.penalization,
+                )
+
+            field = field - res_field
+
+        self.field = field
+
+        return field
+
+    def save_file(self, file_name: str) -> None:
+        """Save the interpolated field into a raster file.
+
+        Args:
+            file_name (str): Output file path.
+        """
+        driver = gdal.GetDriverByName("GTiff")
+        d_s = driver.Create(
+            file_name, self.field_size[1], self.field_size[0], 1, gdal.GDT_Float32
+        )
+        d_s.SetGeoTransform(self.field_geotransform)
+        d_s.SetProjection(self.field_proj.ExportToWkt())
+
+        d_s.GetRasterBand(1).WriteArray(self.field)
+
         d_s = None

@@ -2,14 +2,12 @@
 Run python setup.py --help for options
 '''
 import datetime
-import subprocess
 
 import numpy
 import setuptools
 
-release = subprocess.check_output(
-    ['git', 'describe', '--abbrev=0', '--tags']).decode('utf-8').strip()
-version = ".".join(release.split('.')[0:2])
+release = "0.1.0"
+version = "0.1.0"
 name = "pymica"
 
 now = datetime.datetime.now()
@@ -27,11 +25,11 @@ else:
     has_cython = True
     ext_extention = 'pyx'
 
-ext_modules = [Extension("interpolation.inverse_distance",
-                         ['interpolation/inverse_distance.' + ext_extention],
+ext_modules = [Extension("pymica.methods.inverse_distance",
+                         ['pymica/methods/inverse_distance.' + ext_extention],
                          include_dirs=[numpy.get_include()]),
-               Extension("interpolation.inverse_distance_3d",
-                         ['interpolation/inverse_distance_3d.'
+               Extension("pymica.methods.inverse_distance_3d",
+                         ['pymica/methods/inverse_distance_3d.'
                           + ext_extention],
                          include_dirs=[numpy.get_include()])]
 
@@ -60,8 +58,7 @@ setuptools.setup(
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Atmospheric Science',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.9'],
+        'Programming Language :: Python :: 3'],
     command_options={
         'build_sphinx': {
             'project': ('setup.py', name),

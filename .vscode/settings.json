@@ -79,31 +79,21 @@
         "xema"
     ],
     "python.pythonPath": "~/anaconda3/envs/pymica/bin/python",
-    "python.unitTest.unittestArgs": [
-        "-v",
-        "-s",
-        "./test",
-        "-p",
-        "*_test.py"
-    ],
-    "python.unitTest.pyTestEnabled": false,
-    "python.unitTest.nosetestsEnabled": false,
-    "python.unitTest.unittestEnabled": true,
-    "python.linting.flake8Enabled": true,
-    "python.linting.pep8Enabled": false,
-    "python.linting.pylintPath": "~/anaconda3/envs/pymica/bin/python",
-    "python.linting.pylintArgs": [
-        "--extension-pkg-whitelist=numpy,scipy"
-    ],
+
     "restructuredtext.confPath": "${workspaceFolder}/docs/source",
+    "python.testing.pytestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "esbonio.sphinx.confDir": "${workspaceFolder}/docs/source",
     "python.testing.unittestArgs": [
         "-v",
         "-s",
-        "./test",
+        "./pymica_tests",
         "-p",
         "*_test.py"
     ],
-    "python.testing.pyTestEnabled": false,
-    "python.testing.nosetestsEnabled": false,
-    "python.testing.unittestEnabled": true
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "none"
 }

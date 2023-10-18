@@ -18,11 +18,20 @@ jobs:
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
-    - name: Install dependencies
-      run: |
-        conda env update --file environment_dev.yml --name base
+    #- name: Install dependencies
+    #  run: |
+    #    # conda env update --file environment_dev.yml --name base
+    #    conda env create --file environment_dev.yml --name pymica-dev 
+    #    # $CONDA/bin/activate pymica-dev
+    - name: Setup conda environment
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-activate-base: true
+        activate-environment: pymica-dev
+        environment-file: environment_dev.yml
     - name: Lint with flake8
       run: |
+        source /usr/share/miniconda/bin/activate pymica-dev
         conda install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -30,7 +39,8 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        python /home/runner/work/pymica/setup.py build_ext --inplace
+        source /usr/share/miniconda/bin/activate pymica-dev
+        python /home/runner/work/pymica/pymica/setup.py build_ext --inplace
         conda install pytest
         export PYTHONPATH=$PYTHONPATH:/home/runner/work/pymica/pymica/
         pytest

@@ -1,8 +1,0 @@
-* pymica.py fer que es puguin configurar paràmetres de dades
-* Travis
-* Fer camps privats a les classes?
-* Treure getters de multiregression.py
-* Mirar TODO de clustered_regression.py
-* inverse_distance canviar estructura de dades per no tenir un dict sinó un list
-* Canviar paraula residues per residuals a tot arreu
-* Canviar enumerate per zip quan es pugui (apply_regression, per exemple)

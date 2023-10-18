@@ -1,7 +1,11 @@
 name: pymica-git
 dependencies:
+  - python
+  - cython
   - numpy
   - scipy
   - scikit-learn
   - gdal
   - pyproj
+  - pyshp
+  - shapely
