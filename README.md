@@ -4,7 +4,8 @@
 [![Build Status](https://travis-ci.org/meteocat/pymica.svg?branch=master)](https://travis-ci.org/meteocat/pymica)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/meteocat/pymica-examples/master?urlpath=/lab/tree/00_index.ipynb)
 
-[![Logo](https://github.com/meteocat/pymica/blob/master/docs/source/_static/logo_lbug.png)](#)
+<img src="https://github.com/meteocat/pymica/blob/master/docs/source/_static/logo_lbug.png" alt="drawing" width="300"/>
+
 
 (py)Meteorological variable Interpolation based on Clustered data Analysis
 ==========================================================================
