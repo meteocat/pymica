@@ -13,7 +13,7 @@ Pymica is a Python library that performs meteorological observation interpolatio
 
 A complete explanation of how it works and the idea behind MICA can be found in [pyMICA documentation](https://pymica.readthedocs.io/en/latest/howitworks.html).
 
-More information can be found in [A meteorological analysis interpolation scheme for high spatial-temporal resolution in complex terrain.](https://doi.org/10.1016/j.atmosres.2020.105103)
+More information can be found in [A meteorological analysis interpolation scheme for high spatial-temporal resolution in complex terrain.](https://doi.org/10.1016/j.atmosres.2020.105103).
 
 If you use pyMICA, please cite us as:
 
