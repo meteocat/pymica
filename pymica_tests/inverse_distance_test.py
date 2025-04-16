@@ -52,13 +52,13 @@ class TestInverseDistance(unittest.TestCase):
 
     def test_inverse_distance_100(self):
         """Test inverse of the distance 2D array size"""
-        now = datetime.utcnow()
+        now = datetime.now()
         geotransform = [0, 0.002002, 0, 2, 0, -0.002002]
         size = [1000, 1000]
 
         result = inverse_distance(self.residues, size, geotransform)
 
-        spent_time = datetime.utcnow() - now
+        spent_time = datetime.now() - now
         print("test_inverse_distance:")
         print("Time for 1000x1000:", spent_time.total_seconds(), "s")
         self.assertLess(spent_time.total_seconds(), 2.0)
