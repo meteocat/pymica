@@ -1,6 +1,7 @@
 """Main class. Calculates data fields from points, using clusters multi-linear
 regressions corrected with residuals.
 """
+
 import json
 
 import numpy as np

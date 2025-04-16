@@ -1,5 +1,5 @@
-"""Testing pymica.clustered_regression.py
-"""
+"""Testing pymica.clustered_regression.py"""
+
 import json
 import unittest
 import numpy as np
@@ -9,6 +9,7 @@ from pymica.methods.clustered_regression import ClusteredRegression
 
 class TestClusteredRegression(unittest.TestCase):
     """Test clustered regression"""
+
     with open("pymica_tests/data/sample_data_value.json", "rb") as f_p:
         data = json.load(f_p)
 

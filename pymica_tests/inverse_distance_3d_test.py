@@ -1,5 +1,5 @@
-"""Tests inverse of the distance 3D methodology
-"""
+"""Tests inverse of the distance 3D methodology"""
+
 import unittest
 from datetime import datetime
 
@@ -11,6 +11,7 @@ from pymica.methods.inverse_distance_3d import inverse_distance_3d
 
 class TestInverseDistance3D(unittest.TestCase):
     """Test inverse of the distance 3D"""
+
     residues = [
         {"id": "AA", "value": 0, "altitude": 1, "y": 0, "x": 0},
         {"id": "BB", "value": 1, "altitude": 0, "y": 1, "x": 1},

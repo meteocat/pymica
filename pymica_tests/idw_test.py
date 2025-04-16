@@ -1,5 +1,5 @@
-"""Tests for inverse distance weighting method.
-"""
+"""Tests for inverse distance weighting method."""
+
 import unittest
 from datetime import datetime
 
@@ -10,6 +10,7 @@ from pymica.methods.idw import idw
 
 class TestInverseDistanceWeighting(unittest.TestCase):
     """Test for inverse distance weighting"""
+
     def test_inverse_distance_weighting(self):
         """Test inverse distance weighting"""
         residues = {

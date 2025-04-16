@@ -1,5 +1,5 @@
-"""Tests for MLR sigma
-"""
+"""Tests for MLR sigma"""
+
 import unittest
 from datetime import datetime
 

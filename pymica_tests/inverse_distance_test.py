@@ -1,5 +1,5 @@
-"""Tests for inverse of the distance 2D.
-"""
+"""Tests for inverse of the distance 2D."""
+
 import unittest
 from datetime import datetime
 
@@ -10,6 +10,7 @@ from pymica.methods.inverse_distance import inverse_distance  # pylint: disable=
 
 class TestInverseDistance(unittest.TestCase):
     """Test inverse of the distance 2D"""
+
     residues = [
         {"id": "AA", "value": 0, "y": 0, "x": 0},
         {"id": "BB", "value": 1, "y": 1, "x": 1},

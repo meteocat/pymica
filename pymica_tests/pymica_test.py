@@ -1,5 +1,5 @@
-"""Tests for pymica.pymica.py
-"""
+"""Tests for pymica.pymica.py"""
+
 import io
 import json
 import unittest
