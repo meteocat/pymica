@@ -466,7 +466,7 @@ class TestPyMica(unittest.TestCase):
         """Test init interpolate id2d"""
         config = {
             "id2d": {
-                "id_power": 2.5,
+                "id_power": 2,
                 "id_smoothing": 0.0,
                 "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "resolution": 270,
@@ -486,15 +486,15 @@ class TestPyMica(unittest.TestCase):
         field = id2d.interpolate(self.data)
 
         self.assertEqual(field.shape, (970, 1000))
-        self.assertAlmostEqual(field[0, 0], 23.992, 2)
-        self.assertAlmostEqual(field[500, 500], 20.052, 2)
-        self.assertAlmostEqual(field[750, 750], 21.693, 2)
+        self.assertAlmostEqual(field[0, 0], 24.477, 2)
+        self.assertAlmostEqual(field[500, 500], 20.189, 2)
+        self.assertAlmostEqual(field[750, 750], 22.393, 2)
 
     def test_init_interpolate_id3d(self):
         """Test interpolation id3d"""
         config = {
             "id3d": {
-                "id_power": 2.5,
+                "id_power": 2.0,
                 "id_smoothing": 0.0,
                 "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "resolution": 270,
@@ -514,9 +514,12 @@ class TestPyMica(unittest.TestCase):
         field = id3d.interpolate(self.data)
 
         self.assertEqual(field.shape, (970, 1000))
-        self.assertAlmostEqual(field[0, 0], 24.086, 2)
-        self.assertAlmostEqual(field[500, 500], 20.063, 2)
-        self.assertAlmostEqual(field[750, 750], 21.809, 2)
+        self.assertAlmostEqual(field[0, 0], 24.556, 2)
+        self.assertAlmostEqual(field[500, 500], 20.211, 2)
+        self.assertAlmostEqual(field[750, 750], 22.506, 2)
+        self.assertAlmostEqual(field[925, 74], 50.000, 2)
+        self.assertAlmostEqual(field[555, 444], 20.000, 2)
+        self.assertAlmostEqual(field[185, 814], 9.999, 2)
 
     def test_init_interpolate_mlr(self):
         """Test mlr interpolation"""
@@ -549,7 +552,7 @@ class TestPyMica(unittest.TestCase):
         config = {
             "mlr+id2d": {
                 "clusters": "None",
-                "id_power": 2.5,
+                "id_power": 2,
                 "id_smoothing": 0.0,
                 "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "resolution": 270,
@@ -575,7 +578,7 @@ class TestPyMica(unittest.TestCase):
         config = {
             "mlr+id3d": {
                 "clusters": "None",
-                "id_power": 2.5,
+                "id_power": 2.0,
                 "id_smoothing": 0.0,
                 "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "resolution": 270,
@@ -604,7 +607,7 @@ class TestPyMica(unittest.TestCase):
                     "clusters_files": ["pymica_tests/data/clusters_3.shp"],
                     "mask_files": ["pymica_tests/data/rasterized_clusters_3"],
                 },
-                "id_power": 2.5,
+                "id_power": 2.0,
                 "id_smoothing": 0.0,
                 "interpolation_bounds": [260000, 4488100, 530000, 4750000],
                 "resolution": 270,
@@ -617,13 +620,14 @@ class TestPyMica(unittest.TestCase):
             json.dump(config, f)
             f.close()
 
-        mlr_id2d = PyMica("mlr+id3d", "pymica_tests/data/config_test.json")
-        field = mlr_id2d.interpolate(self.data_clusters)
+        mlr_id3d = PyMica("mlr+id3d", "pymica_tests/data/config_test.json")
+        field = mlr_id3d.interpolate(self.data_clusters)
 
         self.assertEqual(field.shape, (970, 1000))
-        self.assertAlmostEqual(field[925, 74], 13.225, 2)
-        self.assertAlmostEqual(field[555, 444], 10.859, 2)
-        self.assertAlmostEqual(field[185, 814], 4.075, 2)
+
+        self.assertAlmostEqual(field[925, 74], 12.954, 2)
+        self.assertAlmostEqual(field[555, 444], 10.890, 2)
+        self.assertAlmostEqual(field[185, 814], 4.028, 2)
 
     def test_interpolate_input_bad_keys(self):
         """Test interpolation bad keys input"""

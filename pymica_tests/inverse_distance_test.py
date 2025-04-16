@@ -45,8 +45,8 @@ class TestInverseDistance(unittest.TestCase):
         )
         self.assertIsInstance(result, type(array((0, 0))))
 
-        self.assertAlmostEqual(result[0][4], 1.9169, 3)
-        self.assertAlmostEqual(result[4][0], 0.0830, 3)
+        self.assertAlmostEqual(result[0][4], 1.8495, 3)
+        self.assertAlmostEqual(result[4][0], 0.1504, 3)
         self.assertAlmostEqual(result[2][2], 1)
 
     def test_inverse_distance_100(self):

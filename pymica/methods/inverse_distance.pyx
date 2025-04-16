@@ -17,7 +17,7 @@ ctypedef np.float64_t DTYPE_t
 
 def inverse_distance(data: List[Dict[str, float]],
                      size: List[int], geotransform: List[int],
-                     power: float=2.5, smoothing: float=0.0):
+                     power: int=2, smoothing: float=0.0):
     """
     inverse_distance(data, size, geotransform)
 
@@ -75,20 +75,44 @@ def inverse_distance(data: List[Dict[str, float]],
     data_array = np.array(cda)
     return data_array.reshape(size)
 
-cdef float point_residue(double x, double y, double[:] xpos, double[:] ypos,
-                         double[:] values, int N, float power, float smoothing):
-    cdef double numerator = 0
+
+cdef inline float point_residue(double x, double y,
+                                double[:] xpos, double[:] ypos,
+                                double[:] values, int N,
+                                int power, float smoothing) nogil:
+    cdef double numerator = 0.0
+    cdef double denominator = 0.0
+    cdef double dx, dy, dist_sq, weight
     cdef int i
-    cdef double denominator = 0
+
+    smoothing = smoothing * smoothing  # square once
 
     for i in range(N):
-        dist = sqrt((x - xpos[i]) ** 2 + (
-            y - ypos[i]) ** 2 + smoothing * smoothing)
+        dx = x - xpos[i]
+        dy = y - ypos[i]
+        dist_sq = dx * dx + dy * dy + smoothing
 
-        if dist < 0.00000000001:
+        if dist_sq < 1e-11:
             return values[i]
-        numerator = numerator + (values[i] / pow(dist, power))
-        denominator = denominator + (1 / pow(dist, power))
 
-    if denominator != 0:
+        if power == 2:
+            weight = 1.0 / dist_sq
+        else:
+            weight = 1.0 / fast_pow(dist_sq, power // 2)
+
+        numerator += values[i] * weight
+        denominator += weight
+
+    if denominator != 0.0:
         return numerator / denominator
+    return 0.0
+
+
+cdef inline double fast_pow(double base, int exp) nogil:
+    cdef double result = 1.0
+    while exp > 0:
+        if exp & 1:
+            result *= base
+        base *= base
+        exp >>= 1
+    return result
