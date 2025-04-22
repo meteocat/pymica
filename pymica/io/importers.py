@@ -1,5 +1,4 @@
-"""Module to import data from different sources and transform it to pymica format.
-"""
+"""Module to import data from different sources and transform it to pymica format."""
 
 import json
 import urllib.request

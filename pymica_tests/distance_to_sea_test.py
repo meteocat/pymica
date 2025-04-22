@@ -1,5 +1,5 @@
-"""Tests for distance to coastline calculations.
-"""
+"""Tests for distance to coastline calculations."""
+
 import unittest
 
 from pymica.utils.distance_to_coastline import dist2func, get_dist_array, get_distances
@@ -7,6 +7,7 @@ from pymica.utils.distance_to_coastline import dist2func, get_dist_array, get_di
 
 class TestDistSea(unittest.TestCase):
     """Test distance to coastline calculations"""
+
     def test_dist2func(self):
         """Test distance function"""
         self.assertEqual(dist2func(0), 0)

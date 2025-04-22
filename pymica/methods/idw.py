@@ -54,11 +54,12 @@ class Tree(object):
         Returns:
             object: idw_tree instance
 
-            """
+        """
         return self.__init__(coordinates, scores, leafsize)
 
-    def __call__(self, coordinates, num_nearest=6, eps=1e-6, p_norm=2,
-                 regularize_by=1e-9):
+    def __call__(
+        self, coordinates, num_nearest=6, eps=1e-6, p_norm=2, regularize_by=1e-9
+    ):
         """
         Compute the score of query points based on the scores of their
         k-nearest neighbours, weighted by the inverse of their distances.
@@ -84,16 +85,15 @@ class Tree(object):
         Returns:
             (N,) ndarray: Corresponding scores.
         """
-        distances, idx = self.tree.query(coordinates, num_nearest,
-                                         eps=eps, p=p_norm)
+        distances, idx = self.tree.query(coordinates, num_nearest, eps=eps, p=p_norm)
         distances += regularize_by
         weights = self.scores[idx.ravel()].reshape(idx.shape)
-        m_w = np.sum(weights/distances, axis=1) / np.sum(1./distances,
-                                                         axis=1)
+        m_w = np.sum(weights / distances, axis=1) / np.sum(1.0 / distances, axis=1)
         return m_w
 
-    def transform(self, coordinates, num_nearest=6,
-                  p_norm=2, eps=1e-6, regularize_by=1e-9):
+    def transform(
+        self, coordinates, num_nearest=6, p_norm=2, eps=1e-6, regularize_by=1e-9
+    ):
         """Compute the score of query points based on the scores of their
         k-nearest neighbours, weighted by the inverse of their distances.
 
@@ -118,12 +118,11 @@ class Tree(object):
             (N,) ndarray: Corresponding scores.
 
         """
-        return self.__call__(coordinates, num_nearest, eps,
-                             p_norm, regularize_by)
+        return self.__call__(coordinates, num_nearest, eps, p_norm, regularize_by)
 
 
 def idw(residues, size, geotransform, num_nearest=6):
-    '''Interpolates the residues field using the inverse of the distance
+    """Interpolates the residues field using the inverse of the distance
         weighting method
 
     Args:
@@ -137,24 +136,24 @@ def idw(residues, size, geotransform, num_nearest=6):
     Returns:
         list: The interpolated residues
 
-    '''
+    """
     coords = []
     values = []
     for key in residues.keys():
-        coords.append([residues[key]['x'], residues[key]['y']])
-        values.append(residues[key]['value'])
+        coords.append([residues[key]["x"], residues[key]["y"]])
+        values.append(residues[key]["value"])
     coords = np.array(coords)
     values = np.array(values)
 
     idw_tree = Tree(coords, values)
 
-    x_coords = np.arange(geotransform[0],
-                         geotransform[0]+size[1]*geotransform[1],
-                         geotransform[1])
+    x_coords = np.arange(
+        geotransform[0], geotransform[0] + size[1] * geotransform[1], geotransform[1]
+    )
 
-    y_coords = np.arange(geotransform[3],
-                         geotransform[3]+size[0]*geotransform[5],
-                         geotransform[5])
+    y_coords = np.arange(
+        geotransform[3], geotransform[3] + size[0] * geotransform[5], geotransform[5]
+    )
 
     xy_coords = np.meshgrid(x_coords, y_coords)
     xy_coords = np.reshape(xy_coords, (2, -1)).T

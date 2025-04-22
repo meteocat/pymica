@@ -6,8 +6,8 @@ import datetime
 import numpy
 import setuptools
 
-release = "0.1.0"
-version = "0.1.0"
+release = "0.1.1"
+version = "0.1.1"
 name = "pymica"
 
 now = datetime.datetime.now()

@@ -1,5 +1,5 @@
-'''Calculations to get the distance to the coast values
-'''
+"""Calculations to get the distance to the coast values"""
+
 from math import exp, floor
 
 from osgeo import ogr
@@ -8,7 +8,7 @@ from numpy import ones
 
 
 def dist2func(dist):
-    '''A basic distance function that makes it not linear and
+    """A basic distance function that makes it not linear and
     with a maximum value of 1
 
     Args:
@@ -16,13 +16,13 @@ def dist2func(dist):
 
     Returns:
         float: A value from 0 to 1 to be used in the regression
-    '''
+    """
 
-    return 1 - exp(-3*dist/100000)
+    return 1 - exp(-3 * dist / 100000)
 
 
 def get_distances(points, dist_file):
-    '''Get the distances from a shore line (or any line) to a set
+    """Get the distances from a shore line (or any line) to a set
     of points. The function reprojects the points and file to the
     best fitting UTM projection so the distances are in meters
 
@@ -36,7 +36,7 @@ def get_distances(points, dist_file):
 
     Returns:
         list: The list of distances, one for each point, in meters
-    '''
+    """
 
     d_s = ogr.Open(dist_file)
 
@@ -60,8 +60,7 @@ def get_distances(points, dist_file):
 
     out = []
     for point in points:
-        point = ogr.CreateGeometryFromWkt("POINT ({} {})".format(point[1],
-                                                                 point[0]))
+        point = ogr.CreateGeometryFromWkt("POINT ({} {})".format(point[1], point[0]))
         point.Transform(transform_point)
 
         out.append(point.Distance(geom))
@@ -69,26 +68,27 @@ def get_distances(points, dist_file):
 
 
 def calculate_utm_def(point):
-    '''Calculates the utm zone from a point in lon - lat
+    """Calculates the utm zone from a point in lon - lat
 
     Args:
         point (list): A two element list with the longitude and latitude values
 
     Returns:
        osr.SpatialReference : The osr projection object
-    '''
+    """
 
     proj = osr.SpatialReference()
-    zone = (floor((point[0] + 180)/6) % 60) + 1
+    zone = (floor((point[0] + 180) / 6) % 60) + 1
     south = " +south " if point[1] < 0 else " "
-    desc = ("+proj=utm +zone={}{}+ellps=WGS84 +datum=WGS84 " +
-            "+units=m +no_defs").format(zone, south)
+    desc = (
+        "+proj=utm +zone={}{}+ellps=WGS84 +datum=WGS84 " + "+units=m +no_defs"
+    ).format(zone, south)
     proj.ImportFromProj4(desc)
     return proj
 
 
 def get_dist_array(proj, geotransform, size, dist_file, verbose=True):
-    '''Creates a numpy array with the distance to the coast values applying
+    """Creates a numpy array with the distance to the coast values applying
     the dist2func to all the actual distances so the values go from 0 to 1
 
     Args:
@@ -103,7 +103,7 @@ def get_dist_array(proj, geotransform, size, dist_file, verbose=True):
 
     Returns:
         numpy.ndarray: The matrix with the function values
-    '''
+    """
 
     d_s = ogr.Open(dist_file)
 
@@ -126,8 +126,7 @@ def get_dist_array(proj, geotransform, size, dist_file, verbose=True):
 
     for i in range(size[0]):
         if verbose:
-            print("\rProgress: {:.1f}%".format(100*(i/size[0])), end='',
-                  flush=True)
+            print("\rProgress: {:.1f}%".format(100 * (i / size[0])), end="", flush=True)
         for j in range(size[1]):
             x_coord = i * geotransform[1] + geotransform[0]
             y_coord = j * geotransform[5] + geotransform[3]

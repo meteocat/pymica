@@ -1,5 +1,5 @@
-"""Tests for creation of clusters.
-"""
+"""Tests for creation of clusters."""
+
 import unittest
 
 import pyproj

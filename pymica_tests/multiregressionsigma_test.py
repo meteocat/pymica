@@ -1,5 +1,5 @@
-"""Tests for MLR sigma
-"""
+"""Tests for MLR sigma"""
+
 import unittest
 from datetime import datetime
 
@@ -124,10 +124,10 @@ class TestMultiRegressionSigma(unittest.TestCase):
 
         dist_data = np.ones(size)
         in_data = np.array([alt_data, dist_data])
-        now = datetime.utcnow()
+        now = datetime.now()
         result = inst.apply_regression(in_data, ["altitude", "dist"])
 
-        spent_time = datetime.utcnow() - now
+        spent_time = datetime.now() - now
         print("Time for 1000x1000:", spent_time.total_seconds(), "s")
 
     def test_apply_regression_errors(self):
