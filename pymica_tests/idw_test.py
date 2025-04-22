@@ -1,5 +1,5 @@
-"""Tests for inverse distance weighting method.
-"""
+"""Tests for inverse distance weighting method."""
+
 import unittest
 from datetime import datetime
 
@@ -10,6 +10,7 @@ from pymica.methods.idw import idw
 
 class TestInverseDistanceWeighting(unittest.TestCase):
     """Test for inverse distance weighting"""
+
     def test_inverse_distance_weighting(self):
         """Test inverse distance weighting"""
         residues = {
@@ -27,13 +28,13 @@ class TestInverseDistanceWeighting(unittest.TestCase):
         self.assertAlmostEqual(result[4][0], 0, places=2)
         self.assertAlmostEqual(result[2][2], 1, places=2)
 
-        now = datetime.utcnow()
+        now = datetime.now()
         geotransform = [0, 0.002002, 0, 2, 0, -0.002002]
         size = [1000, 1000]
 
         result = idw(residues, size, geotransform, 2)
 
-        spent_time = datetime.utcnow() - now
+        spent_time = datetime.now() - now
 
         print("test_inverse_distance:")
         print("Time for 1000x1000:", spent_time.total_seconds(), "s")

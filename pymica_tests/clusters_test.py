@@ -1,5 +1,5 @@
-"""Tests creation of clusters files (shapefiles and rasters)
-"""
+"""Tests creation of clusters files (shapefiles and rasters)"""
+
 import json
 import unittest
 from glob import glob

@@ -17,8 +17,8 @@ ctypedef np.float64_t DTYPE_t
 
 def inverse_distance_3d(data: List[Dict[str, float]],
                         size: List[int], geotransform: List[int], dem,
-                        power: float=2, smoothing: float=0,
-                        penalization: float=30):
+                        int power=2, int smoothing=0,
+                        int penalization=30):
     """
     inverse_distance_3d(residues, size, geotransform, dem)
 
@@ -85,31 +85,44 @@ def inverse_distance_3d(data: List[Dict[str, float]],
     data_array = np.array(cda)
     return data_array.reshape(size)
 
-cdef float point_residue(double x, double y, double z, double[:] xpos,
-                         double[:] ypos, double[:] zpos, double[:] values,
-                         int N, float power, float smoothing,
-                         float penalization):
-    # cdef int power = 2
-    # cdef int smoothing = 0
-    # cdef int penalization = 30
+cdef float point_residue(double x, double y, double z,
+                               double[:] xpos, double[:] ypos,
+                               double[:] zpos, double[:] values, int N,
+                               int power, int smoothing, int penalization):
     cdef double numerator = 0
+    cdef double denominator = 0
+    cdef double dist, dist_3d, dist3d_sq, weight
     cdef int i
-    cdef double dist_3d
-    cdef double denominator
-    denominator = 0
 
     for i in range(N):
-        dist = sqrt((x - xpos[i]) ** 2 + (
-            y - ypos[i]) ** 2)
+        dist = sqrt((x - xpos[i]) * (x - xpos[i]) +
+                    (y - ypos[i]) * (y - ypos[i]))
 
-        if dist < 0.00000000001:
+        if dist < 1e-11:
             return values[i]
 
-        dist_3d = sqrt(dist ** 2 + (penalization * (z - zpos[i])) ** 2 + 
-                       smoothing * smoothing)
+        dist3d_sq = dist * dist + (penalization * (z - zpos[i])) ** 2 + smoothing * smoothing
 
-        numerator = numerator + (values[i] / pow(dist_3d, power))
-        denominator = denominator + (1 / pow(dist_3d, power))
-        
+        if power == 2:
+            weight = 1.0 / dist3d_sq
+        elif power == 3:
+            weight = 1.0 / (dist3d_sq * sqrt(dist3d_sq))  # faster than full pow
+        else:
+            weight = 1.0 / fast_pow(dist3d_sq, power // 2)
+
+        numerator += values[i] * weight
+        denominator += weight
+
     if denominator != 0:
         return numerator / denominator
+    return 0
+
+
+cdef inline double fast_pow(double base, int exp) nogil:
+    cdef double result = 1.0
+    while exp > 0:
+        if exp % 2 == 1:
+            result *= base
+        base *= base
+        exp //= 2
+    return result

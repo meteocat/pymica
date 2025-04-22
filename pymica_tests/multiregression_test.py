@@ -1,5 +1,5 @@
-"""Tests for MLR
-"""
+"""Tests for MLR"""
+
 import unittest
 
 from pymica.methods.multiregression import MultiRegression
@@ -7,6 +7,7 @@ from pymica.methods.multiregression import MultiRegression
 
 class TestMultiRegression(unittest.TestCase):
     """Test MLR"""
+
     general_data = [
         {"id": "AA", "value": 0, "dist": 0, "altitude": 0},
         {"id": "BB", "value": 0.5, "dist": 0, "altitude": 0.5},

@@ -1,5 +1,5 @@
-"""Tool for creating clusters with the K-Means method.
-"""
+"""Tool for creating clusters with the K-Means method."""
+
 import json
 from glob import glob
 from os import remove

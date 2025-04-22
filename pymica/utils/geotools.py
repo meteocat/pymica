@@ -1,5 +1,5 @@
-"""Module with geographic tools.
-"""
+"""Module with geographic tools."""
+
 import math
 
 import numpy as np
@@ -58,7 +58,7 @@ def save_array_as_geotiff(
         data (np.array): Data to be saved as GeoTIFF.
         geotransform (list): Geotransform as [x_min, x_res, x_rot, y_max, y_rot, y_res]
         EPSG_code (int): ESPG coordinate system code.
-    """    
+    """
     driver = gdal.GetDriverByName("GTiff")
     ds_out = driver.Create(
         output_path, data.shape[1], data.shape[0], 1, gdal.GDT_Float32

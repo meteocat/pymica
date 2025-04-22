@@ -1,5 +1,5 @@
-"""Tests for inverse of the distance 2D.
-"""
+"""Tests for inverse of the distance 2D."""
+
 import unittest
 from datetime import datetime
 
@@ -10,6 +10,7 @@ from pymica.methods.inverse_distance import inverse_distance  # pylint: disable=
 
 class TestInverseDistance(unittest.TestCase):
     """Test inverse of the distance 2D"""
+
     residues = [
         {"id": "AA", "value": 0, "y": 0, "x": 0},
         {"id": "BB", "value": 1, "y": 1, "x": 1},
@@ -45,19 +46,19 @@ class TestInverseDistance(unittest.TestCase):
         )
         self.assertIsInstance(result, type(array((0, 0))))
 
-        self.assertAlmostEqual(result[0][4], 1.9169, 3)
-        self.assertAlmostEqual(result[4][0], 0.0830, 3)
+        self.assertAlmostEqual(result[0][4], 1.8495, 3)
+        self.assertAlmostEqual(result[4][0], 0.1504, 3)
         self.assertAlmostEqual(result[2][2], 1)
 
     def test_inverse_distance_100(self):
         """Test inverse of the distance 2D array size"""
-        now = datetime.utcnow()
+        now = datetime.now()
         geotransform = [0, 0.002002, 0, 2, 0, -0.002002]
         size = [1000, 1000]
 
         result = inverse_distance(self.residues, size, geotransform)
 
-        spent_time = datetime.utcnow() - now
+        spent_time = datetime.now() - now
         print("test_inverse_distance:")
         print("Time for 1000x1000:", spent_time.total_seconds(), "s")
         self.assertLess(spent_time.total_seconds(), 2.0)

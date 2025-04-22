@@ -1,5 +1,5 @@
-"""Tests inverse of the distance 3D methodology
-"""
+"""Tests inverse of the distance 3D methodology"""
+
 import unittest
 from datetime import datetime
 
@@ -11,6 +11,7 @@ from pymica.methods.inverse_distance_3d import inverse_distance_3d
 
 class TestInverseDistance3D(unittest.TestCase):
     """Test inverse of the distance 3D"""
+
     residues = [
         {"id": "AA", "value": 0, "altitude": 1, "y": 0, "x": 0},
         {"id": "BB", "value": 1, "altitude": 0, "y": 1, "x": 1},
@@ -101,7 +102,7 @@ class TestInverseDistance3D(unittest.TestCase):
 
     def test_inverse_distance_3d_1000(self):
         """Test inverse of the distance size array"""
-        now = datetime.utcnow()
+        now = datetime.now()
         geotransform = [0, 0.002002, 0, 2, 0, -0.002002]
         size = [1000, 1000]
 
@@ -110,7 +111,7 @@ class TestInverseDistance3D(unittest.TestCase):
         dem[:, 0:250] = 1
 
         result = inverse_distance_3d(self.residues, size, geotransform, dem)
-        spent_time = datetime.utcnow() - now
+        spent_time = datetime.now() - now
         print("test_inverse_distance:")
         print("Time for 1000x1000:", spent_time.total_seconds(), "s")
         self.assertLess(spent_time.total_seconds(), 50.5)
