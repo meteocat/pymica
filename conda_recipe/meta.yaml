@@ -1,9 +1,9 @@
 package:
   name: 'pymica'
-  version: "0.1.0"
+  version: "0.1.1"
 
 source: 
-  git_branch: release/v0.1.0
+  git_branch: release/v0.1.1
   git_url: https://github.com/meteocat/pymica.git
   
 
