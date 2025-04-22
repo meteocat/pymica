@@ -11,7 +11,7 @@ requirements:
   build:
     - python
     - cython
-    - numpy
+    - numpy >=2.0.0
     - scipy
     - scikit-learn
     - gdal
@@ -21,7 +21,7 @@ requirements:
   run:
     - python
     - cython
-    - numpy
+    - numpy >=2.0.0
     - scipy
     - scikit-learn
     - gdal
