@@ -27,7 +27,7 @@ jobs:
       - name: Build all Python versions from conda_build_config.yaml
         run: |
           source "$HOME/miniconda/etc/profile.d/conda.sh"
-          conda build conda-recipe/
+          conda build conda_recipe/
 
       - name: Upload all built packages to Anaconda
         env:
@@ -35,6 +35,6 @@ jobs:
         run: |
           source "$HOME/miniconda/etc/profile.d/conda.sh"
           anaconda login --token $ANACONDA_TOKEN
-          for pkg in $(conda build conda-recipe/ --output); do
+          for pkg in $(conda build conda_recipe/ --output); do
             anaconda upload "$pkg"
           done
