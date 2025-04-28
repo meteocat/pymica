@@ -1,6 +1,6 @@
 sphinx==5.3.0
 sphinx_rtd_theme==1.1.1
 sphinx_book_theme==1.0.0
-readthedocs-sphinx-search==0.1.1
+readthedocs-sphinx-search==0.3.2
 sphinxcontrib-autoprogram==0.1.5
 pydata-sphinx-theme==0.13.1
